@@ -31,16 +31,10 @@
     <button type='submit' class='btn btn-primary'>可視化</button>
   </form>
 
-  {% if request_data %}
-  <p>
-    {{request_data.name}}
-  </p>
-  <p>
-    {{request_data.hinshi}}
-  </p>
-  <p>
-    {{request_data.number}}
-  </p>
+  {% if request_path %}
+  <div class='border embed-responsive embed-responsive-4by3'>
+    <iframe src='{{request_path}}' width='100%' height='750px'></iframe>
+  </div>
   {% endif %}
 </div>
 {% endblock %}

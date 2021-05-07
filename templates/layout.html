@@ -19,11 +19,25 @@
   {% if title %}
   <title>{{ title }}</title>
   {% else %}
-  <title>江戸川作品の共起ネットワーク</title>
+  <title>江戸川乱歩作品 | {{ title }}</title>
   {% endif %}
 </head>
 
 <body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">共起ネットワーク可視化システム</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+          <a class="nav-link active" aria-current="page" href="#">ホーム</a>
+        </div>
+      </div>
+    </div>
+  </nav>
   {% block content %}{% endblock %}
 </body>
 
