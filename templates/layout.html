@@ -17,23 +17,23 @@
     integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
     crossorigin="anonymous"></script>
   {% if title %}
-  <title>{{ title }}</title>
+  <title>江戸川乱歩作品可視化システム | {{ title }}</title>
   {% else %}
-  <title>江戸川乱歩作品 | {{ title }}</title>
+  <title>江戸川乱歩作品可視化システム</title>
   {% endif %}
 </head>
 
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">共起ネットワーク可視化システム</a>
+      <a class="navbar-brand" href={{ url_for('index') }}>江戸川乱歩作品可視化システム</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
         aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
-          <a class="nav-link active" aria-current="page" href="#">ホーム</a>
+          <a class="nav-link active" aria-current="page" href={{ url_for('co_occurrence_network') }}>共起ネットワーク</a>
         </div>
       </div>
     </div>

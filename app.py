@@ -17,14 +17,20 @@ def get_edogawa_df():
 
 @app.route('/')
 def index():
-    title = '江戸川乱歩作品の共起ネットワーク可視化システム'
-    return render_template('index.html', title=title, hinshi_dict=get_hinshi_dict(), edogawa_df=get_edogawa_df())
+    title = 'ホーム'
+    return render_template('index.html', title=title)
 
 
-@app.route('/network_visualization', methods=['GET', 'POST'])
+@app.route('/co-occurrence_network')
+def co_occurrence_network():
+    title = '共起ネットワーク'
+    return render_template('co-occurrence_network.html', title=title, hinshi_dict=get_hinshi_dict(), edogawa_df=get_edogawa_df())
+
+
+@app.route('/co-occurrence_network/visualization', methods=['GET', 'POST'])
 def network_visualization():
     if request.method == 'POST':
-        title = '江戸川乱歩作品の共起ネットワーク可視化システム'
+        title = '共起ネットワーク'
         name, file_name = request.form['name'].split('-')
         hinshi_eng, hinshi_jpn = request.form['hinshi'].split('-')
         number = 250 if hinshi_jpn in ['名詞', '動詞', '形容詞', '副詞'] else 1000
@@ -32,12 +38,12 @@ def network_visualization():
         request_path = f'{EXTERNAL_STATIC_FILE_PATH}/{file_name}_{hinshi_eng}_{number}.html'
         request_data = {'name': name, 'hinshi': hinshi_jpn, 'number': number}
         try:
-            return render_template('index.html', title=title, hinshi_dict=get_hinshi_dict(), edogawa_df=get_edogawa_df(), request_path=request_path, request_data=request_data)
+            return render_template('co-occurrence_network.html', title=title, hinshi_dict=get_hinshi_dict(), edogawa_df=get_edogawa_df(), request_path=request_path, request_data=request_data)
         except:
-            return redirect(url_for('index'))
+            return redirect(url_for('co_occurrence_network'))
     else:
         # エラーなどでリダイレクトしたい場合
-        return redirect(url_for('index'))
+        return redirect(url_for('co_occurrence_network'))
 
 
 # おまじない
