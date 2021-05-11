@@ -8,5 +8,12 @@ services:
     volumes:
       - .:/code
     tty: true
-    command: waitress-serve --port=8000 app:app
+    command: >
+      waitress-serve --listen '*:8000'
+      --trusted-proxy '*'
+      --trusted-proxy-headers 'x-forwarded-for x-forwarded-proto x-forwarded-port'
+      --log-untrusted-proxy-headers
+      --clear-untrusted-proxy-headers
+      --threads 10
+      app:app
     env_file: ./app.env
