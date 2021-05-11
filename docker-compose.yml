@@ -4,9 +4,9 @@ services:
   app:
     build: .
     ports:
-      - 5000:5000
+      - 8000:8000
     volumes:
       - .:/code
     tty: true
-    command: python app.py
+    command: waitress-serve --port=8000 app:app
     env_file: ./app.env
