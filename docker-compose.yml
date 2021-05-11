@@ -1,12 +1,12 @@
 version: "3"
 
 services:
-  flask:
+  app:
     build: .
     ports:
       - 5000:5000
     volumes:
       - .:/code
     tty: true
-    command: flask run --host 0.0.0.0 --port 5000
+    command: python app.py
     env_file: ./app.env

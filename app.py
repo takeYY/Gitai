@@ -1,8 +1,7 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for
-import numpy as np
+from waitress import serve
 import pandas as pd
-import itertools
 
 app = Flask(__name__)
 
@@ -51,4 +50,4 @@ def network_visualization():
 
 # おまじない
 if __name__ == "__main__":
-    app.run()
+    serve(app, host='0.0.0.0', port=5000, threads=10)
