@@ -4,16 +4,17 @@ services:
   app:
     build: .
     ports:
-      - 8000:8000
+      - 8080:8080
     volumes:
       - .:/code
     tty: true
     command: >
-      waitress-serve --listen '*:8000'
+      waitress-serve --listen "*:${PORT:-8080}"
+      --url-scheme=https
       --trusted-proxy '*'
       --trusted-proxy-headers 'x-forwarded-for x-forwarded-proto x-forwarded-port'
       --log-untrusted-proxy-headers
       --clear-untrusted-proxy-headers
-      --threads 10
+      --threads ${WEB_CONCURRENCY:-4}
       app:app
     env_file: ./app.env
