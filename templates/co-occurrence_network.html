@@ -1,24 +1,24 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class='container'>
-  <h3 class='text-center'>{{title}}</h3>
+  <h3 class='text-center'>{{ basic_data.get('title') }}</h3>
 
   <form action='/co-occurrence_network/visualization' method='post'>
     <div class='form-group'>
       <label for='name' class='form-check-label'>作品名</label>
       <select name='name' class='form-control'>
-        {% for name, file in edogawa_df.values %}
-        <option value={{name}}-{{file}} {{'selected' if request_data and request_data.name==name else '' }}>{{name}}
+        {% for name, file in edogawa_data.get('name_file') %}
+        <option value={{name}}-{{file}} {{'selected' if sent_data and sent_data.get('name')==name else '' }}>{{name}}
         </option>
         {% endfor %}
       </select>
     </div>
     <div class='form-group'>
       <label>可視化対象の品詞</label>
-      {% for key, value in hinshi_dict.items() %}
+      {% for key, value in edogawa_data.get('hinshi_dict').items() %}
       <div class='form-check'>
         <input type='radio' name='hinshi' value={{key}}-{{value}} id={{key}} class='form-check-input' {{'checked' if
-          request_data and request_data.hinshi==value else '' }}>
+          sent_data and sent_data.get('hinshi')==value else '' }}>
         <label for={{key}} class='form-check-label'>{{value}}</label>
       </div>
       {% endfor %}
@@ -26,15 +26,15 @@
     <button type='submit' class='btn btn-primary'>可視化</button>
   </form>
 
-  {% if request_path %}
+  {% if sent_data %}
   <hr>
   <div class='my-2'>
-    <p>作品名：{{request_data.name}}</p>
-    <p>可視化対象の品詞：{{request_data.hinshi}}</p>
-    <p>共起上位：{{request_data.number}}</p>
+    <p>作品名：{{ sent_data.get('name') }}</p>
+    <p>可視化対象の品詞：{{ sent_data.get('hinshi') }}</p>
+    <p>共起上位：{{ sent_data.get('number') }}</p>
   </div>
   <div class='border embed-responsive embed-responsive-4by3'>
-    <iframe src='{{request_path}}' width='100%' height='750px'></iframe>
+    <iframe src='{{ sent_data.get("path") }}' width='100%' height='750px'></iframe>
   </div>
   {% endif %}
 </div>

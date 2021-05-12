@@ -16,8 +16,8 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
     integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
     crossorigin="anonymous"></script>
-  {% if title %}
-  <title>江戸川乱歩作品可視化システム | {{ title }}</title>
+  {% if basic_data.get('title') %}
+  <title>江戸川乱歩作品可視化システム | {{ basic_data.get('title') }}</title>
   {% else %}
   <title>江戸川乱歩作品可視化システム</title>
   {% endif %}
@@ -34,10 +34,11 @@
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
-            <a class="nav-link {{ 'active' if active_url == 'home' else '' }}" href={{ url_for('index') }}>ホーム</a>
+            <a class="nav-link {{ 'active' if basic_data.get('active_url') == 'home' else '' }}" href={{
+              url_for('index') }}>ホーム</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link {{ 'active' if active_url == 'co-oc_network' else '' }}" href={{
+            <a class="nav-link {{ 'active' if basic_data.get('active_url') == 'co-oc_network' else '' }}" href={{
               url_for('co_occurrence_network') }}>共起ネットワーク</a>
           </li>
         </ul>
