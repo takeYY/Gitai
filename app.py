@@ -24,6 +24,21 @@ def index():
     return render_template('index.html', basic_data=basic_data)
 
 
+@app.route('/information')
+def information():
+    # 基本情報
+    title = '作品情報'
+    active_url = 'information'
+    basic_data = dict(title=title, active_url=active_url)
+    # 江戸川乱歩作品関連の情報
+    novels = get_edogawa_df()
+    novels_name = list(novels['name'])
+    novels_reader_id = list(novels['reader_id'])
+    novels_data = list(zip(novels_name, novels_reader_id))
+
+    return render_template('information.html', basic_data=basic_data, novels_data=novels_data)
+
+
 @app.route('/co-occurrence_network')
 def co_occurrence_network():
     # 基本情報
