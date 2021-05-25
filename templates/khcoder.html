@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class='container mb-4'>
+  <h3 class='text-center'>{{ basic_data.get('title') }}</h3>
+
+  <form action='/khcoder' method='post'>
+    <div class='form-group'>
+      <label for='name' class='form-check-label'>作品名</label>
+      <select name='name' class='form-control'>
+        {% for name, file in novels_data %}
+        <option value={{name}}-{{file}} {{'selected' if sent_data and sent_data.get('name')==name else '' }}>{{name}}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type='submit' class='btn btn-primary'>表示</button>
+  </form>
+
+  {% if sent_data %}
+  <hr>
+  <div class='my-2'>
+    <p>作品名：{{ sent_data.get('name') }}</p>
+  </div>
+  <table class='table table-sm table-striped table-hover'>
+    <thead class='thead-dark'>
+      <tr>
+        <th>テキスト</th>
+        <th>章</th>
+      </tr>
+    </thead>
+    {% for text, chapter in sent_data.get('text_chapter') %}
+    <tr>
+      <td title={{text}}>{{text | truncate(50)}}</td>
+      <td>{{chapter}}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  <hr>
+  <form action='/khcoder/download' method='post'>
+    <input type='hidden' name='file_name' value={{sent_data.get('file_name')}}>
+    <button type='submit' class='btn btn-primary'>CSVダウンロード</button>
+  </form>
+  {% endif %}
+</div>
+{% endblock %}

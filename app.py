@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory
 from waitress import serve
 import pandas as pd
 
@@ -12,6 +12,10 @@ def get_hinshi_dict():
 
 def get_edogawa_df():
     return pd.read_csv('csv/edogawa_list.csv')
+
+
+def get_khcoder_df(file_name):
+    return pd.read_csv(f'csv/khcoder/{file_name}.csv')
 
 
 @app.route('/')
@@ -88,6 +92,45 @@ def network_visualization():
         return render_template('co-occurrence_network.html', basic_data=basic_data, edogawa_data=edogawa_data, sent_data=sent_data)
     except:
         return redirect(url_for('co_occurrence_network'))
+
+
+@app.route('/khcoder', methods=['GET', 'POST'])
+def khcoder():
+    # 基本情報
+    title = 'KH Coder'
+    active_url = 'KH-coder'
+    basic_data = dict(title=title, active_url=active_url)
+    # 江戸川乱歩作品関連の情報
+    novels = get_edogawa_df()
+    novels_name = list(novels['name'])
+    novels_file_name = list(novels['file_name'])
+    novels_data = list(zip(novels_name, novels_file_name))
+
+    if request.method == 'GET':
+        return render_template('khcoder.html', basic_data=basic_data, novels_data=novels_data)
+    else:
+        # 利用者から送られてきた情報を基にデータ整理
+        name, file_name = request.form['name'].split('-')
+        khcoder = get_khcoder_df(file_name)
+        text_list = list(khcoder['テキスト'])
+        chapter_list = list(khcoder['章'])
+        text_chapter = list(zip(text_list, chapter_list))
+        sent_data = dict(name=name, file_name=file_name,
+                         text_chapter=text_chapter)
+
+        return render_template('khcoder.html', basic_data=basic_data, novels_data=novels_data, sent_data=sent_data)
+
+
+@app.route('/khcoder/download', methods=['POST'])
+def khcoder_download():
+    file_name = request.form['file_name']
+
+    return send_from_directory(
+        directory='csv/khcoder',
+        filename=f'{file_name}.csv',
+        as_attachment=True,
+        attachment_filename=f'{file_name}.csv',
+    )
 
 
 # おまじない
