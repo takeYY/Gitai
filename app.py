@@ -86,8 +86,8 @@ def khcoder_download():
     file_name = request.form['file_name']
 
     return send_from_directory(
-        directory='csv/khcoder',
-        filename=f'{file_name}.csv',
+        'csv/khcoder',
+        f'{file_name}.csv',
         as_attachment=True,
         attachment_filename=f'{file_name}.csv',
     )
