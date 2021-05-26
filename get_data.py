@@ -13,6 +13,10 @@ def get_khcoder_df(file_name):
     return pd.read_csv(f'csv/khcoder/{file_name}.csv')
 
 
+def get_jumanpp_df(file_name):
+    return pd.read_csv(f'csv/jumanpp/{file_name}.csv')
+
+
 def get_basic_data(title='ホーム', active_url='home'):
     return dict(title=title, active_url=active_url)
 

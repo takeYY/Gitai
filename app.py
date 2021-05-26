@@ -1,7 +1,8 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, send_file, send_from_directory
 from waitress import serve
 from get_data import get_hinshi_dict, get_khcoder_df, get_basic_data, get_novels_tuple
+from co_oc_network import create_network
 
 app = Flask(__name__)
 
@@ -48,19 +49,25 @@ def network_visualization():
                         name_file=get_novels_tuple(col1='name', col2='file_name'))
     # 利用者から送られてきた情報を基にデータ整理
     name, file_name = request.form['name'].split('-')
+    number = int(request.form['number'])
     hinshi_eng, hinshi_jpn = request.form['hinshi'].split('-')
-    number = 250 if hinshi_jpn in ['名詞', '動詞', '形容詞', '副詞'] else 1000
-    # 可視化HTMLファイルのパスを設定
-    EXTERNAL_STATIC_FILE_PATH = os.environ.get('EXTERNAL_STATIC_FILE_PATH')
-    visualizer_path = f'{EXTERNAL_STATIC_FILE_PATH}/{file_name}_{hinshi_eng}_{number}.html'
+    remove_words = request.form['remove-words']
+    # 共起ネットワーク作成
+    now = create_network(file_name=file_name, target_hinshi=hinshi_jpn,
+                         target_num=number, remove_words=remove_words)
     # 利用者から送られてきた情報を基に送る情報
-    sent_data = dict(name=name, hinshi=hinshi_jpn,
-                     number=number, path=visualizer_path)
+    sent_data = dict(name=name, file_name=now, number=number, hinshi=hinshi_jpn,
+                     remove_words=remove_words)
 
     try:
         return render_template('co-occurrence_network.html', basic_data=basic_data, edogawa_data=edogawa_data, sent_data=sent_data)
     except:
         return redirect(url_for('co_occurrence_network'))
+
+
+@app.route('/co-occurrence_network/visualization/<file_name>')
+def show_co_oc_network(file_name):
+    return send_file(f'tmp/{file_name}.html')
 
 
 @app.route('/khcoder', methods=['GET', 'POST'])

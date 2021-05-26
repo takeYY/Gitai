@@ -4,7 +4,7 @@
   <h3 class='text-center'>{{ basic_data.get('title') }}</h3>
 
   <form action='/co-occurrence_network/visualization' method='post'>
-    <div class='form-group'>
+    <div class='form-group w-50'>
       <label for='name' class='form-check-label'>作品名</label>
       <select name='name' class='form-control'>
         {% for name, file in edogawa_data.get('name_file') %}
@@ -13,28 +13,48 @@
         {% endfor %}
       </select>
     </div>
+    <div class='form-group w-25'>
+      <label for='number' class='form-check-label'>共起数上位</label>
+      <input type='number' class='form-control' name='number' value={{ sent_data.get('number') if sent_data else 250 }}>
+    </div>
     <div class='form-group'>
-      <label>可視化対象の品詞</label>
+      <label for='hinshi' class='form-check-label'>可視化対象の品詞</label>
       {% for key, value in edogawa_data.get('hinshi_dict').items() %}
       <div class='form-check'>
-        <input type='radio' name='hinshi' value={{key}}-{{value}} id={{key}} class='form-check-input' {{'checked' if
-          sent_data and sent_data.get('hinshi')==value else '' }}>
+        <input type='radio' name='hinshi' value={{key}}-{{value}} id={{key}} class='form-check-input' {{'checked' if (
+          sent_data and sent_data.get('hinshi')==value ) or ( not sent_data and key=='all' ) else '' }}>
         <label for={{key}} class='form-check-label'>{{value}}</label>
       </div>
       {% endfor %}
     </div>
-    <button type='submit' class='btn btn-primary'>可視化</button>
+    <div class='form-group'>
+      <label for='remove-word' class='form-check-label'>除去ワード</label>
+      <div class='p-2'>
+        <p>共起ネットワークに含めない単語を指定可能です。</p>
+        <button class='btn btn-info dropdown-toggle' aria-controls='remove-word-sample' aria-expanded='false'
+          data-target='#remove-word-sample' data-toggle='collapse' type='button'>入力例</button>
+        <div id='remove-word-sample' class='collapse'>
+          <textarea class='form-control' disabled placeholder=二十面相&#13;&#10;明智 rows=2></textarea>
+        </div>
+      </div>
+      <textarea class='form-control' rows=3
+        name='remove-words'>{{ sent_data.get('remove_words') if sent_data else ''}}</textarea>
+    </div>
+    <div class='text-center'>
+      <button type='submit' class='btn btn-primary'>可視化</button>
+    </div>
   </form>
 
   {% if sent_data %}
   <hr>
   <div class='my-2'>
     <p>作品名：{{ sent_data.get('name') }}</p>
-    <p>可視化対象の品詞：{{ sent_data.get('hinshi') }}</p>
     <p>共起上位：{{ sent_data.get('number') }}</p>
+    <p>可視化対象の品詞：{{ sent_data.get('hinshi') }}</p>
+    <p>除去ワード：{{ sent_data.get('remove_words') }}</p>
   </div>
   <div class='border embed-responsive embed-responsive-16by9'>
-    <iframe src='{{ sent_data.get("path") }}'></iframe>
+    <iframe src={{ url_for('show_co_oc_network', file_name=sent_data.get('file_name')) }}></iframe>
   </div>
   {% endif %}
 </div>
