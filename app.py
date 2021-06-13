@@ -1,7 +1,7 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for, send_file, send_from_directory
 from waitress import serve
-from get_data import get_hinshi_dict, get_khcoder_df, get_basic_data, get_novels_tuple, get_edogawa_merge_with_rows_df
+from get_data import get_hinshi_dict, get_khcoder_df, get_basic_data, get_novels_tuple, get_edogawa_merge_df
 from co_oc_network import create_network
 
 app = Flask(__name__)
@@ -20,7 +20,7 @@ def information():
     # 基本情報
     basic_data = get_basic_data(title='作品情報', active_url='information')
     # 江戸川乱歩作品関連の情報
-    edogawa_merge_df = get_edogawa_merge_with_rows_df()
+    edogawa_merge_df = get_edogawa_merge_df()
 
     return render_template('information.html', basic_data=basic_data, edogawa_merge_df=edogawa_merge_df)
 

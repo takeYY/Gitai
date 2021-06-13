@@ -15,7 +15,7 @@
       </tr>
     </thead>
     {% for index, rows in edogawa_merge_df.iterrows() %}
-    {% if 1 == rows.rows_num or rows.is_parent %}
+    {% if index != 0 and rows['name'] != edogawa_merge_df.at[index-1, 'name'] %}
     <tr>
       <td>
         {% if rows.name == '随筆銭形平次' %}
@@ -23,7 +23,7 @@
         {% else %}
         {% set aozora_uri = 'https://www.aozora.gr.jp/cards/001779/card' %}
         {% endif %}
-        <a href="{{aozora_uri}}{{rows.reader_id}}.html" target="_blank">{{rows['name']}}</a>
+        <a href="{{aozora_uri}}{{rows.reader_id}}.html" target="_blank">{{ rows['name'] }}</a>
       </td>
       <td>{{ rows.first_appearance }}</td>
       <td>{{ rows.original_text }}</td>
