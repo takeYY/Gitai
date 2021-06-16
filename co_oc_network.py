@@ -46,9 +46,30 @@ def kyoki_word_network(target_num=250, file_name='3742_9_3_11_02'):
 
 
 def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], target_num=250, remove_words=''):
+    """
+    共起ネットワークの作成
+
+    params
+    ------
+    file_name: str, default='kaijin_nijumenso'
+        作品のファイル名
+
+    target_hinshi: list, default=['名詞']
+        共起に含めたい品詞
+
+    target_num: int, default=250
+        表示したい上位共起数
+
+    remove_words: str, default=''
+        共起に含めたくない除去ワード集
+
+    """
+    # jumanppにより形態素解析したDF取得
     df = get_jumanpp_df(file_name)
+    # 除去ワードリスト
     remove_words_list = remove_words.split('\r\n')
 
+    # 形態素解析DFから各列の要素をリストで取得
     midashi = list(df['見出し'])
     genkei = list(df['原型'])
     hinshi = list(df['品詞'])
@@ -56,16 +77,21 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
     for i in range(len(midashi)):
         sentences.append([midashi[i], genkei[i], hinshi[i]])
 
+    # 同一文の中で設定に合致したwordsをkeywordsに含める
     keywords = []
     words = []
     for sentence in sentences:
-        if sentence[0] != '。':
-            if sentence[2] in target_hinshi and not (sentence[0] in remove_words_list or sentence[1] in remove_words_list):
-                words.append(sentence[1])
-        else:
+        # 句点があれば
+        if sentence[0] == '。':
             keywords.append(words)
             words = []
+            continue
 
+        # 品詞がtarget_hinshiに含まれている and not (見出しが除去ワードリストに入っている or 原型が除去ワードリストに入っている)
+        if sentence[2] in target_hinshi and not (sentence[0] in remove_words_list or sentence[1] in remove_words_list):
+            words.append(sentence[1])
+
+    # keywordsを基にカウントベースで共起をカウント
     sentence_combinations = [list(itertools.combinations(
         set(sentence), 2)) for sentence in keywords]
     sentence_combinations = [[tuple(sorted(words)) for words in sentence]
@@ -73,7 +99,6 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
     target_combinations = []
     for sentence in sentence_combinations:
         target_combinations.extend(sentence)
-
     ct = collections.Counter(target_combinations)
 
     # 所定の構造でCSVファイルに出力

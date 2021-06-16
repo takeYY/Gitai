@@ -21,8 +21,8 @@
       <label for='hinshi' class='form-check-label'>可視化対象の品詞</label>
       {% for key, value in edogawa_data.get('hinshi_dict').items() %}
       <div class='form-check'>
-        <input type='radio' name='hinshi' value={{key}}-{{value}} id={{key}} class='form-check-input' {{'checked' if (
-          sent_data and sent_data.get('hinshi')==value ) or ( not sent_data and key=='all' ) else '' }}>
+        <input type='checkbox' name='hinshi' value={{value}} id={{key}} class='form-check-input' {{'checked' if 
+        (sent_data and value in sent_data.get('hinshi') or not sent_data) else '' }}>
         <label for={{key}} class='form-check-label'>{{value}}</label>
       </div>
       {% endfor %}
@@ -50,8 +50,8 @@
   <div class='my-2'>
     <p>作品名：{{ sent_data.get('name') }}</p>
     <p>共起上位：{{ sent_data.get('number') }}</p>
-    <p>可視化対象の品詞：{{ sent_data.get('hinshi') }}</p>
-    <p>除去ワード：{{ sent_data.get('remove_words') }}</p>
+    <p>可視化対象の品詞：{{ ', '.join(sent_data.get('hinshi')) }}</p>
+    <p>除去ワード：{{ ', '.join(sent_data.get('remove_words').split('\r\n')) }}</p>
   </div>
   <div class='border embed-responsive embed-responsive-16by9'>
     <iframe src={{ url_for('show_co_oc_network', file_name=sent_data.get('file_name')) }}></iframe>

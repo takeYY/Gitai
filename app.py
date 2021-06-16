@@ -9,6 +9,10 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
+    """
+    ホーム
+
+    """
     # 基本情報
     basic_data = get_basic_data()
 
@@ -17,6 +21,10 @@ def index():
 
 @app.route('/information')
 def information():
+    """
+    作品情報
+
+    """
     # 基本情報
     basic_data = get_basic_data(title='作品情報', active_url='information')
     # 江戸川乱歩作品関連の情報
@@ -27,6 +35,10 @@ def information():
 
 @app.route('/co-occurrence_network')
 def co_occurrence_network():
+    """
+    共起ネットワーク
+
+    """
     # 基本情報
     basic_data = get_basic_data(title='共起ネットワーク', active_url='co-oc_network')
     # 江戸川乱歩作品関連の情報
@@ -38,8 +50,12 @@ def co_occurrence_network():
 
 @app.route('/co-occurrence_network/visualization', methods=['GET', 'POST'])
 def network_visualization():
+    """
+    共起ネットワーク（「可視化」ボタン押下後）
+
+    """
+    # エラーなどでリダイレクトしたい場合
     if not request.method == 'POST':
-        # エラーなどでリダイレクトしたい場合
         return redirect(url_for('co_occurrence_network'))
 
     # 基本情報
@@ -50,7 +66,7 @@ def network_visualization():
     # 利用者から送られてきた情報を基にデータ整理
     name, file_name = request.form['name'].split('-')
     number = int(request.form['number'])
-    hinshi_eng, hinshi_jpn = request.form['hinshi'].split('-')
+    hinshi_jpn = request.form.getlist('hinshi')
     remove_words = request.form['remove-words']
     # 共起ネットワーク作成
     now = create_network(file_name=file_name, target_hinshi=hinshi_jpn,
@@ -67,11 +83,19 @@ def network_visualization():
 
 @app.route('/co-occurrence_network/visualization/<file_name>')
 def show_co_oc_network(file_name):
+    """
+    共起ネットワーク用htmlファイル
+
+    """
     return send_file(f'tmp/{file_name}.html')
 
 
 @app.route('/khcoder', methods=['GET', 'POST'])
 def khcoder():
+    """
+    KH Coder
+
+    """
     # 基本情報
     basic_data = get_basic_data(title='KH Coder', active_url='KH-coder')
     # 江戸川乱歩作品関連の情報
@@ -90,6 +114,10 @@ def khcoder():
 
 @app.route('/khcoder/download', methods=['POST'])
 def khcoder_download():
+    """
+    KH Coder用前処理データ
+
+    """
     file_name = request.form['file_name']
 
     return send_from_directory(
