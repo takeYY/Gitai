@@ -3,7 +3,13 @@
 <div class='container'>
   <h3 class='text-center'>{{ basic_data.get('title') }}</h3>
 
+  <!--
+  ----- 作品検索フォーム -----
+  -->
   <form action='/co-occurrence_network/visualization' method='post'>
+    <!--
+    ----- 作品名 ------
+    -->
     <div class='form-group w-50'>
       <label for='name' class='form-check-label'>作品名</label>
       <select name='name' class='form-control'>
@@ -13,20 +19,29 @@
         {% endfor %}
       </select>
     </div>
+    <!--
+    ----- 表示する共起数上位 -----
+    -->
     <div class='form-group w-25'>
       <label for='number' class='form-check-label'>共起数上位</label>
       <input type='number' class='form-control' name='number' value={{ sent_data.get('number') if sent_data else 250 }}>
     </div>
+    <!--
+    ----- 可視化対象の品詞 -----
+    -->
     <div class='form-group'>
       <label for='hinshi' class='form-check-label'>可視化対象の品詞</label>
       {% for key, value in edogawa_data.get('hinshi_dict').items() %}
       <div class='form-check'>
-        <input type='checkbox' name='hinshi' value={{value}} id={{key}} class='form-check-input' {{'checked' if 
+        <input type='checkbox' name='hinshi' value={{key}} id={{key}} class='form-check-input' {{'checked' if 
         (sent_data and value in sent_data.get('hinshi') or not sent_data) else '' }}>
         <label for={{key}} class='form-check-label'>{{value}}</label>
       </div>
       {% endfor %}
     </div>
+    <!--
+    ----- 除去ワード -----
+    -->
     <div class='form-group'>
       <label for='remove-word' class='form-check-label'>除去ワード</label>
       <div class='p-2'>
@@ -40,12 +55,21 @@
       <textarea class='form-control' rows=3
         name='remove-words'>{{ sent_data.get('remove_words') if sent_data else ''}}</textarea>
     </div>
+    <!--
+    ----- 可視化ボタン -----
+    -->
     <div class='text-center'>
       <button type='submit' class='btn btn-primary'>可視化</button>
     </div>
   </form>
 
+  <!--
+  ----- 可視化ボタンが押された後に表示される結果 -----
+  -->
   {% if sent_data %}
+  <!--
+  ----- 検索条件の表示 -----
+  -->
   <hr>
   <div class='my-2'>
     <p>作品名：{{ sent_data.get('name') }}</p>
@@ -53,8 +77,53 @@
     <p>可視化対象の品詞：{{ ', '.join(sent_data.get('hinshi')) }}</p>
     <p>除去ワード：{{ ', '.join(sent_data.get('remove_words').split('\r\n')) }}</p>
   </div>
+  <!--
+  ----- 共起ネットワーク -----
+  -->
   <div class='border embed-responsive embed-responsive-16by9'>
     <iframe src={{ url_for('show_co_oc_network', file_name=sent_data.get('file_name')) }}></iframe>
+  </div>
+  <hr>
+  <!--
+  ----- 下記データのダウンロードボタン -----
+  -->
+  <div class='float-right'>
+    <form action='/download/csv' method='post'>
+      <input type='hidden' name='dir_path' value=tmp>
+      <input type='hidden' name='file_name' value={{ sent_data.get('file_name') }}>
+      <input type='hidden' name='new_name'
+        value={{ sent_data.get('name') }}_{{ '-'.join(sent_data.get('hinshi')) }}_{{ sent_data.get('number') }}>
+      <button type='submit' class='btn btn-primary'>CSVダウンロード</button>
+    </form>
+  </div>
+  <!--
+  ----- 共起ネットワーク表示に使用したデータ表示 -----
+  -->
+  <div class='my-2'>
+    <table class='table table-sm table-striped table-hover'>
+      <thead class='thead-dark'>
+        <tr>
+          <th>NO.</th>
+          <th>first</th>
+          <th>second</th>
+          <th>count</th>
+        </tr>
+      </thead>
+      {% for index, rows in sent_data.get('co_oc_df')[:sent_data.get('number')].iterrows() %}
+      <tr>
+        <td>{{ index+1 }}</td>
+        <td>{{ rows['first'] }}</td>
+        <td>{{ rows['second'] }}</td>
+        <td>{{ rows['count'] }}</td>
+      </tr>
+      {% endfor %}
+      <tr>
+        <td>...</td>
+        <td>...</td>
+        <td>...</td>
+        <td>...</td>
+      </tr>
+    </table>
   </div>
   {% endif %}
 </div>

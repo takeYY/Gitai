@@ -2,8 +2,7 @@ import pandas as pd
 
 
 def get_hinshi_dict():
-    return dict(meishi='名詞', doushi='動詞', keiyoushi='形容詞', keiyoudoushi='形容動詞',
-                fukushi='副詞', kandoushi='感動詞')
+    return dict(meishi='名詞', doushi='動詞', keiyoushi='形容詞', fukushi='副詞', kandoushi='感動詞')
 
 
 def get_edogawa_df():

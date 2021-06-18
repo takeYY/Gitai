@@ -39,8 +39,10 @@
     {% endfor %}
   </table>
   <hr>
-  <form action='/khcoder/download' method='post'>
-    <input type='hidden' name='file_name' value={{sent_data.get('file_name')}}>
+  <form action='/download/csv' method='post'>
+    <input type='hidden' name='dir_path' value='csv/khcoder'>
+    <input type='hidden' name='file_name' value={{ sent_data.get('file_name') }}>
+    <input type='hidden' name='new_name' value={{ sent_data.get('file_name') }}>
     <button type='submit' class='btn btn-primary'>CSVダウンロード</button>
   </form>
   {% endif %}

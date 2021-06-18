@@ -103,13 +103,14 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
 
     # 所定の構造でCSVファイルに出力
     now = datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
-    pd.DataFrame([{'first': i[0][0], 'second': i[0][1], 'count': i[1]}
-                  for i in ct.most_common()]).to_csv(f'tmp/{now}.csv', index=False)
+    co_oc_df = pd.DataFrame(
+        [{'first': i[0][0], 'second': i[0][1], 'count': i[1]} for i in ct.most_common()])
+    co_oc_df.to_csv(f'tmp/{now}.csv', index=False, encoding='utf_8_sig')
 
     try:
         # 処理の実行
         got_net = kyoki_word_network(target_num=target_num, file_name=now)
         got_net.write_html(f'tmp/{now}.html')
-        return now
+        return now, co_oc_df
     except:
         return ''

@@ -61,19 +61,21 @@ def network_visualization():
     # 基本情報
     basic_data = get_basic_data(title='共起ネットワーク', active_url='co-oc_network')
     # 江戸川乱歩作品関連の情報
-    edogawa_data = dict(hinshi_dict=get_hinshi_dict(),
+    hinshi_dict = get_hinshi_dict()
+    edogawa_data = dict(hinshi_dict=hinshi_dict,
                         name_file=get_novels_tuple(col1='name', col2='file_name'))
     # 利用者から送られてきた情報を基にデータ整理
     name, file_name = request.form['name'].split('-')
     number = int(request.form['number'])
-    hinshi_jpn = request.form.getlist('hinshi')
+    hinshi_eng = request.form.getlist('hinshi')
+    hinshi_jpn = [hinshi_dict.get(k) for k in hinshi_eng]
     remove_words = request.form['remove-words']
     # 共起ネットワーク作成
-    now = create_network(file_name=file_name, target_hinshi=hinshi_jpn,
-                         target_num=number, remove_words=remove_words)
+    now, co_oc_df = create_network(file_name=file_name, target_hinshi=hinshi_jpn,
+                                   target_num=number, remove_words=remove_words)
     # 利用者から送られてきた情報を基に送る情報
-    sent_data = dict(name=name, file_name=now, number=number, hinshi=hinshi_jpn,
-                     remove_words=remove_words)
+    sent_data = dict(name=name, file_name=now, number=number, hinshi=hinshi_jpn, hinshi_eng=hinshi_eng,
+                     remove_words=remove_words, co_oc_df=co_oc_df)
 
     try:
         return render_template('co-occurrence_network.html', basic_data=basic_data, edogawa_data=edogawa_data, sent_data=sent_data)
@@ -112,19 +114,21 @@ def khcoder():
         return render_template('khcoder.html', basic_data=basic_data, novels_data=novels_data, sent_data=sent_data)
 
 
-@app.route('/khcoder/download', methods=['POST'])
-def khcoder_download():
+@app.route('/download/csv', methods=['POST'])
+def download_csv():
     """
-    KH Coder用前処理データ
+    csvデータのダウンロード
 
     """
-    file_name = request.form['file_name']
+    dir_path = request.form.get('dir_path')
+    file_name = request.form.get('file_name')
+    new_name = request.form.get('new_name')
 
     return send_from_directory(
-        'csv/khcoder',
+        dir_path,
         f'{file_name}.csv',
         as_attachment=True,
-        attachment_filename=f'{file_name}.csv',
+        attachment_filename=f'{new_name}.csv',
     )
 
 
