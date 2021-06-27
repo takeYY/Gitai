@@ -58,3 +58,7 @@ def get_novels_tuple(novels=get_edogawa_df(), col1='name', col2='file_name'):
     novels_col1 = list(novels[col1])
     novels_col2 = list(novels[col2])
     return list(zip(novels_col1, novels_col2))
+
+
+def get_mecab_type():
+    return ['surface', 'hinshi', 'hinshi_detail_1', 'hinshi_detail_2', 'hinshi_detail_3', 'katsuyou_type', 'katsuyou_form', 'genkei', 'yomi', 'hatsuon']

@@ -1,8 +1,9 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for, send_file, send_from_directory
 from waitress import serve
-from get_data import get_hinshi_dict, get_khcoder_df, get_basic_data, get_novels_tuple, get_edogawa_merge_df
+from get_data import get_hinshi_dict, get_khcoder_df, get_basic_data, get_novels_tuple, get_edogawa_merge_df, get_mecab_type
 from co_oc_network import create_network
+import MeCab
 
 app = Flask(__name__)
 
@@ -130,6 +131,58 @@ def download_csv():
         as_attachment=True,
         attachment_filename=f'{new_name}.csv',
     )
+
+
+@app.route('/morphological')
+def morphological():
+    """
+    形態素解析
+
+    """
+    # 基本情報
+    basic_data = get_basic_data(title='形態素解析', active_url='morph_analysis')
+
+    return render_template('morphological.html', basic_data=basic_data)
+
+
+@app.route('/morphological/analysis', methods=['GET', 'POST'])
+def morphological_analysis():
+    """
+    形態素解析の結果
+
+    """
+    # エラーなどでリダイレクトしたい場合
+    if not request.method == 'POST':
+        return redirect(url_for('morphological'))
+
+    # 基本情報
+    basic_data = get_basic_data(title='形態素解析', active_url='morph_analysis')
+    # 送信されたデータの取得と形態素解析
+    text = request.form.get('mecab-words')
+    tagger = MeCab.Tagger(
+        '-d /usr/lib/x86_64-linux-gnu/mecab/dic/mecab-ipadic-neologd'
+    )
+    # MeCabの分類リスト取得
+    mecab_type = get_mecab_type()
+    # MeCabによる形態素解析
+    mecab_parse = tagger.parse(text)
+    mecab_line = [line for line in mecab_parse.split('\n')]
+    mecab_result = []
+    for line in mecab_line:
+        mecab_dict = {}
+        line_split = line.split('\t')
+        if line_split[0] == 'EOS':
+            break
+
+        mecab_dict['surface'] = line_split[0]
+        values = line_split[1].split(',')
+        for idx, value in enumerate(values):
+            mecab_dict[mecab_type[idx+1]] = value
+        mecab_result.append(mecab_dict)
+    # MeCabによる形態素解析結果をまとめたデータ群
+    mecab_data = dict(words=text, result=mecab_result, type=mecab_type)
+
+    return render_template('morphological.html', basic_data=basic_data, mecab_data=mecab_data)
 
 
 # おまじない

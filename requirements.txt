@@ -4,3 +4,4 @@ pandas
 pyvis
 numexpr
 waitress
+gensim

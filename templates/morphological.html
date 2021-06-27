@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class='container'>
+  <h3 class='text-center'>{{basic_data.get('title')}}</h3>
+
+  <form action='/morphological/analysis' method='post'>
+    <!--
+    ----- 形態素解析用テキスト -----
+    -->
+    <div class='form-group'>
+      <label for='mecab-word' class='form-check-label'>形態素解析</label>
+      <div class='p-2'>
+        <p>Mecabで形態素解析したいテキストを入力してください。</p>
+      </div>
+      <textarea class='form-control' rows=3
+        name='mecab-words'>{{ mecab_data.get('words') if mecab_data else ''}}</textarea>
+    </div>
+    <!--
+    ----- 解析ボタン -----
+    -->
+    <div class='text-center'>
+      <button type='submit' class='btn btn-primary'>解析</button>
+    </div>
+  </form>
+
+  <!--
+  ----- 解析ボタンが押された後に表示される結果 -----
+  -->
+  {% if mecab_data %}
+  <div class='my-2'>
+    <table class='table table-sm table-striped table-hover'>
+      <thead class='thead-dark'>
+        <tr>
+          <th>表層形</th>
+          <th>品詞</th>
+          <th>品詞細分類(1)</th>
+          <th>品詞細分類(2)</th>
+          <th>品詞細分類(3)</th>
+          <th>活用型</th>
+          <th>活用形</th>
+          <th>原形</th>
+          <th>読み</th>
+          <th>発音</th>
+        </tr>
+      </thead>
+      {% for result in mecab_data.get('result') %}
+      <tr>
+        {% for type in mecab_data.get('type') %}
+        <td>{{ result.get(type, '*') }}</td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

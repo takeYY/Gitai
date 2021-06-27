@@ -49,6 +49,10 @@
             <a class="nav-link {{ 'active' if basic_data.get('active_url') == 'co-oc_network' else '' }}" href={{
               url_for('co_occurrence_network') }}>共起ネットワーク</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link {{ 'active' if basic_data.get('active_url') == 'morph_analysis' else '' }}" href={{
+              url_for('morphological') }}>形態素解析</a>
+          </li>
         </ul>
       </div>
     </div>
