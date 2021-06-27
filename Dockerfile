@@ -12,12 +12,20 @@ RUN apt-get update \
   && apt-get install -y file \
   && apt-get install -y sudo
 
-
 RUN git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git \
   && cd mecab-ipadic-neologd \
   && bin/install-mecab-ipadic-neologd -n -y
 
-RUN pip install mecab-python3==0.7
+# Jumanppの導入
+RUN wget https://github.com/ku-nlp/jumanpp/releases/download/v2.0.0-rc3/jumanpp-2.0.0-rc3.tar.xz \
+  && apt-get install -y cmake \
+  && apt-get install -y tar \
+  && tar xJvf jumanpp-2.0.0-rc3.tar.xz \
+  && cd jumanpp-2.0.0-rc3/ \
+  && mkdir bld \
+  && cd bld \
+  && cmake .. \
+  && sudo make install
 
 RUN mkdir /code
 WORKDIR /code

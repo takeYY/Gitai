@@ -1,7 +1,7 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for, send_file, send_from_directory
 from waitress import serve
-from get_data import get_hinshi_dict, get_khcoder_df, get_basic_data, get_novels_tuple, get_edogawa_merge_df, get_mecab_type
+from get_data import get_hinshi_dict, get_khcoder_df, get_basic_data, get_novels_tuple, get_edogawa_merge_df, get_juman_mrph, mecab_divide_dict, juman_divide_dict
 from co_oc_network import create_network
 import MeCab
 
@@ -142,7 +142,7 @@ def morphological():
     # 基本情報
     basic_data = get_basic_data(title='形態素解析', active_url='morph_analysis')
 
-    return render_template('morphological.html', basic_data=basic_data)
+    return render_template('morphological.html', basic_data=basic_data, mrph_type='None')
 
 
 @app.route('/morphological/analysis', methods=['GET', 'POST'])
@@ -159,30 +159,44 @@ def morphological_analysis():
     basic_data = get_basic_data(title='形態素解析', active_url='morph_analysis')
     # 送信されたデータの取得と形態素解析
     text = request.form.get('mecab-words')
-    tagger = MeCab.Tagger(
-        '-d /usr/lib/x86_64-linux-gnu/mecab/dic/mecab-ipadic-neologd'
-    )
-    # MeCabの分類リスト取得
-    mecab_type = get_mecab_type()
-    # MeCabによる形態素解析
-    mecab_parse = tagger.parse(text)
-    mecab_line = [line for line in mecab_parse.split('\n')]
-    mecab_result = []
-    for line in mecab_line:
-        mecab_dict = {}
-        line_split = line.split('\t')
-        if line_split[0] == 'EOS':
-            break
+    mrph_type = request.form.get('mrph')
 
-        mecab_dict['surface'] = line_split[0]
-        values = line_split[1].split(',')
-        for idx, value in enumerate(values):
-            mecab_dict[mecab_type[idx+1]] = value
-        mecab_result.append(mecab_dict)
-    # MeCabによる形態素解析結果をまとめたデータ群
-    mecab_data = dict(words=text, result=mecab_result, type=mecab_type)
+    # MeCabによる解析
+    if mrph_type == 'mecab':
+        tagger = MeCab.Tagger(
+            '-d /usr/lib/x86_64-linux-gnu/mecab/dic/mecab-ipadic-neologd'
+        )
+        # MeCabの分類リスト取得
+        divide_keys = list(mecab_divide_dict().keys())
+        # MeCabの分類辞書
+        divide_dict = mecab_divide_dict()
+        # MeCabによる形態素解析
+        mecab_parse = tagger.parse(text)
+        mecab_line = [line for line in mecab_parse.split('\n')]
+        mrph_result = []
+        for line in mecab_line:
+            mecab_dict = {}
+            line_split = line.split('\t')
+            if line_split[0] == 'EOS':
+                break
 
-    return render_template('morphological.html', basic_data=basic_data, mecab_data=mecab_data)
+            mecab_dict['surface'] = line_split[0]
+            values = line_split[1].split(',')
+            for idx, value in enumerate(values):
+                mecab_dict[divide_keys[idx+1]] = value
+            mrph_result.append(mecab_dict)
+
+    # Jumanによる解析
+    elif mrph_type == 'juman':
+        # Jumanppによる形態素解析
+        mrph_result = get_juman_mrph(text)
+        # Jumanppの分類辞書
+        divide_dict = juman_divide_dict()
+
+    # 形態素解析結果をまとめるデータ群
+    mrph_data = dict(words=text, mrph=mrph_result, divide_dict=divide_dict)
+
+    return render_template('morphological.html', basic_data=basic_data, mrph_type=mrph_type, mrph_data=mrph_data)
 
 
 # おまじない

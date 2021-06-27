@@ -5,15 +5,35 @@
 
   <form action='/morphological/analysis' method='post'>
     <!--
+    ----- 形態素解析器 -----
+    -->
+    <div class='form-group'>
+      <label for='mrph' class='form-check-label'>形態素解析器</label>
+      <div class='form-check'>
+        <input type='radio' name='mrph' value='mecab' id='mecab' class='form-check-input' {{'checked' if
+        mrph_type == 'mecab' or mrph_type == 'None' else '' }}>
+        <label for='mecab' class='form-check-label'>MeCab</label>
+      </div>
+      <div class='form-check'>
+        <input type='radio' name='mrph' value='juman' id='juman' class='form-check-input' {{'checked' if mrph_type == 'juman' else '' }}>
+        <label for='juman' class='form-check-label'>Jumanpp</label>
+      </div>
+    </div>
+    <!--
     ----- 形態素解析用テキスト -----
     -->
     <div class='form-group'>
-      <label for='mecab-word' class='form-check-label'>形態素解析</label>
+      <label for='mecab-word' class='form-check-label'>解析テキスト</label>
       <div class='p-2'>
-        <p>Mecabで形態素解析したいテキストを入力してください。</p>
+        <p>形態素解析したいテキストを入力してください。</p>
+        <button class='btn btn-info dropdown-toggle' aria-controls='mrph-word-sample' aria-expanded='false'
+          data-target='#mrph-word-sample' data-toggle='collapse' type='button'>入力例</button>
+        <div id='mrph-word-sample' class='collapse'>
+          <textarea class='form-control' disabled placeholder='すもももももももものうち' rows=1></textarea>
+        </div>
       </div>
       <textarea class='form-control' rows=3
-        name='mecab-words'>{{ mecab_data.get('words') if mecab_data else ''}}</textarea>
+        name='mecab-words'>{{ mrph_data.get('words') if mrph_data else ''}}</textarea>
     </div>
     <!--
     ----- 解析ボタン -----
@@ -24,29 +44,22 @@
   </form>
 
   <!--
-  ----- 解析ボタンが押された後に表示される結果 -----
+  ----- 形態素解析結果 -----
   -->
-  {% if mecab_data %}
+  {% if mrph_data %}
   <div class='my-2'>
     <table class='table table-sm table-striped table-hover'>
       <thead class='thead-dark'>
         <tr>
-          <th>表層形</th>
-          <th>品詞</th>
-          <th>品詞細分類(1)</th>
-          <th>品詞細分類(2)</th>
-          <th>品詞細分類(3)</th>
-          <th>活用型</th>
-          <th>活用形</th>
-          <th>原形</th>
-          <th>読み</th>
-          <th>発音</th>
+          {% for value in mrph_data.get('divide_dict').values() %}
+          <th>{{ value }}</th>
+          {% endfor %}
         </tr>
       </thead>
-      {% for result in mecab_data.get('result') %}
+      {% for mrph in mrph_data.get('mrph') %}
       <tr>
-        {% for type in mecab_data.get('type') %}
-        <td>{{ result.get(type, '*') }}</td>
+        {% for key in mrph_data.get('divide_dict').keys() %}
+        <td>{{ mrph.get(key, '*') }}</td>
         {% endfor %}
       </tr>
       {% endfor %}

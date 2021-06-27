@@ -1,4 +1,6 @@
 import pandas as pd
+import timeout_decorator
+from pyknp import Juman
 
 
 def get_hinshi_dict():
@@ -60,5 +62,32 @@ def get_novels_tuple(novels=get_edogawa_df(), col1='name', col2='file_name'):
     return list(zip(novels_col1, novels_col2))
 
 
-def get_mecab_type():
-    return ['surface', 'hinshi', 'hinshi_detail_1', 'hinshi_detail_2', 'hinshi_detail_3', 'katsuyou_type', 'katsuyou_form', 'genkei', 'yomi', 'hatsuon']
+def mecab_divide_dict():
+    return {'surface': '表層形', 'hinshi': '品詞', 'hinshi_detail_1': '品詞細分類(1)', 'hinshi_detail_2': '品詞細分類(2)',
+            'hinshi_detail_3': '品詞細分類(3)', 'katsuyou_type': '活用型', 'katsuyou_form': '活用形', 'genkei': '原形',
+            'yomi': '読み', 'hatsuon': '発音'}
+
+
+def juman_divide_dict():
+    return {'midashi': '見出し', 'yomi': '読み', 'genkei': '原形', 'hinshi': '品詞', 'bunrui': '品詞細分類',
+            'katsuyou1': '活用型', 'katsuyou2': '活用形', 'imis': '意味情報', 'repname': '代表表記'}
+
+
+@timeout_decorator.timeout(5, use_signals=False)
+def get_juman_mrph(text):
+    juman = Juman()
+    result = juman.analysis(text)
+    mrph_list = []
+    for mrph in result.mrph_list():
+        juman_dict = {}
+        juman_dict['midashi'] = mrph.midasi
+        juman_dict['yomi'] = mrph.yomi
+        juman_dict['genkei'] = mrph.genkei
+        juman_dict['hinshi'] = mrph.hinsi
+        juman_dict['bunrui'] = mrph.bunrui
+        juman_dict['katsuyou1'] = mrph.katuyou1
+        juman_dict['katsuyou2'] = mrph.katuyou2
+        juman_dict['imis'] = mrph.imis
+        juman_dict['repname'] = mrph.repname
+        mrph_list.append(juman_dict)
+    return mrph_list

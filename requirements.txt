@@ -4,4 +4,7 @@ pandas
 pyvis
 numexpr
 waitress
+mecab-python3==0.7
 gensim
+pyknp
+timeout-decorator
