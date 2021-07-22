@@ -19,6 +19,7 @@
         <label for='juman' class='form-check-label'>Jumanpp</label>
       </div>
     </div>
+
     <!--
     ----- 形態素解析用テキスト -----
     -->
@@ -35,6 +36,7 @@
       <textarea class='form-control' rows=3
         name='mecab-words'>{{ mrph_data.get('words') if mrph_data else ''}}</textarea>
     </div>
+
     <!--
     ----- 解析ボタン -----
     -->
@@ -42,6 +44,7 @@
       <button type='submit' class='btn btn-primary'>解析</button>
     </div>
   </form>
+
 
   <!--
   ----- 形態素解析結果 -----

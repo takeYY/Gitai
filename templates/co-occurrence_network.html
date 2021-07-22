@@ -19,6 +19,7 @@
         {% endfor %}
       </select>
     </div>
+
     <!--
     ----- 表示する共起数上位 -----
     -->
@@ -26,6 +27,7 @@
       <label for='number' class='form-check-label'>共起数上位</label>
       <input type='number' class='form-control' name='number' value={{ sent_data.get('number') if sent_data else 250 }}>
     </div>
+
     <!--
     ----- 可視化対象の品詞 -----
     -->
@@ -39,6 +41,7 @@
       </div>
       {% endfor %}
     </div>
+
     <!--
     ----- 除去ワード -----
     -->
@@ -55,6 +58,7 @@
       <textarea class='form-control' rows=3
         name='remove-words'>{{ sent_data.get('remove_words') if sent_data else ''}}</textarea>
     </div>
+
     <!--
     ----- 可視化ボタン -----
     -->
@@ -63,8 +67,9 @@
     </div>
   </form>
 
+
   <!--
-  ----- 可視化ボタンが押された後に表示される結果 -----
+  ----- 共起ネットワーク結果 -----
   -->
   {% if sent_data %}
   <!--
@@ -77,15 +82,17 @@
     <p>可視化対象の品詞：{{ ', '.join(sent_data.get('hinshi')) }}</p>
     <p>除去ワード：{{ ', '.join(sent_data.get('remove_words').split('\r\n')) }}</p>
   </div>
+
   <!--
-  ----- 共起ネットワーク -----
+  ----- 共起ネットワークのグラフ -----
   -->
   <div class='border embed-responsive embed-responsive-16by9'>
     <iframe src={{ url_for('show_co_oc_network', file_name=sent_data.get('file_name')) }}></iframe>
   </div>
   <hr>
+
   <!--
-  ----- 下記データのダウンロードボタン -----
+  ----- csvダウンロードボタン -----
   -->
   <div class='float-right'>
     <form action='/download/csv' method='post'>
@@ -96,8 +103,9 @@
       <button type='submit' class='btn btn-primary'>CSVダウンロード</button>
     </form>
   </div>
+
   <!--
-  ----- 共起ネットワーク表示に使用したデータ表示 -----
+  ----- テーブルデータ表示 -----
   -->
   <div class='my-2'>
     <table class='table table-sm table-striped table-hover'>
