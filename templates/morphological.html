@@ -8,11 +8,11 @@
     ----- 形態素解析器 -----
     -->
     <div class='form-group'>
-      <label for='mrph' class='form-check-label'>形態素解析器</label>
+      <label for='mrph' class='form-check-label'>形態素解析器 ※()内は使用する辞書</label>
       <div class='form-check'>
         <input type='radio' name='mrph' value='mecab' id='mecab' class='form-check-input' {{'checked' if
         mrph_type == 'mecab' or mrph_type == 'None' else '' }}>
-        <label for='mecab' class='form-check-label'>MeCab</label>
+        <label for='mecab' class='form-check-label'>MeCab（NEologd）</label>
       </div>
       <div class='form-check'>
         <input type='radio' name='mrph' value='juman' id='juman' class='form-check-input' {{'checked' if mrph_type == 'juman' else '' }}>
@@ -51,14 +51,14 @@
     <table class='table table-sm table-striped table-hover'>
       <thead class='thead-dark'>
         <tr>
-          {% for value in mrph_data.get('divide_dict').values() %}
-          <th>{{ value }}</th>
+          {% for column in mrph_data.get('result_df').columns %}
+          <th>{{ column }}</th>
           {% endfor %}
         </tr>
       </thead>
-      {% for mrph in mrph_data.get('mrph') %}
+      {% for index, mrph in mrph_data.get('result_df').iterrows() %}
       <tr>
-        {% for key in mrph_data.get('divide_dict').keys() %}
+        {% for key in mrph_data.get('result_df').columns %}
         <td>{{ mrph.get(key, '*') }}</td>
         {% endfor %}
       </tr>

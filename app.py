@@ -1,7 +1,7 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for, send_file, send_from_directory
 from waitress import serve
-from get_data import get_hinshi_dict, get_khcoder_df, get_basic_data, get_novels_tuple, get_edogawa_merge_df, get_juman_mrph, mecab_divide_dict, juman_divide_dict
+from get_data import get_hinshi_dict, get_khcoder_df, get_basic_data, get_novels_tuple, get_edogawa_merge_df, get_juman_mrph, mecab_divide_dict, juman_divide_dict, dict_in_list2csv
 from co_oc_network import create_network
 import MeCab
 
@@ -193,8 +193,11 @@ def morphological_analysis():
         # Jumanppの分類辞書
         divide_dict = juman_divide_dict()
 
+    # mrph_resultをcsvとして保存し、df, csv_nameを取得
+    result_df, csv_name = dict_in_list2csv(mrph_result, divide_dict)
     # 形態素解析結果をまとめるデータ群
-    mrph_data = dict(words=text, mrph=mrph_result, divide_dict=divide_dict)
+    # mrph=mrph_result, divide_dict=divide_dict)
+    mrph_data = dict(words=text, result_df=result_df, csv_name=csv_name)
 
     return render_template('morphological.html', basic_data=basic_data, mrph_type=mrph_type, mrph_data=mrph_data)
 
