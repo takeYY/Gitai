@@ -196,7 +196,6 @@ def morphological_analysis():
     # mrph_resultをcsvとして保存し、df, csv_nameを取得
     result_df, csv_name = dict_in_list2csv(mrph_result, divide_dict)
     # 形態素解析結果をまとめるデータ群
-    # mrph=mrph_result, divide_dict=divide_dict)
     mrph_data = dict(words=text, result_df=result_df, csv_name=csv_name)
 
     return render_template('morphological.html', basic_data=basic_data, mrph_type=mrph_type, mrph_data=mrph_data)
