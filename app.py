@@ -1,9 +1,9 @@
-import os
 from flask import Flask, render_template, request, redirect, url_for, send_file, send_from_directory
 from waitress import serve
+import re
+import string
 from get_data import get_hinshi_dict, get_khcoder_df, get_basic_data, get_novels_tuple, get_edogawa_merge_df, get_juman_mrph, mecab_divide_dict, juman_divide_dict, dict_in_list2csv
 from co_oc_network import create_network
-import MeCab
 
 app = Flask(__name__)
 
@@ -199,6 +199,72 @@ def morphological_analysis():
     mrph_data = dict(words=text, result_df=result_df, csv_name=csv_name)
 
     return render_template('morphological.html', basic_data=basic_data, mrph_type=mrph_type, mrph_data=mrph_data)
+
+
+@app.route('/preprocessing', methods=['GET', 'POST'])
+def preprocessing():
+    """
+    テキストの前処理
+
+    """
+    # 基本情報
+    basic_data = get_basic_data(
+        title='テキストの前処理', active_url='preprocessing')
+    # その他設定の項目
+    other_option = dict(all2half='全角を半角へ変換', big2small='英語大文字を小文字へ変換',
+                        remove_symbols='記号を削除', replace_numbers='数字を全て0に変換')
+    # その他設定の説明
+    other_option_description = ["""変換対象：！＂＃＄％＆＇（）＊＋，－．／０１２３４５６７８９：；＜＝＞？＠ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ［＼］＾＿｀ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ｛｜｝～
+    変換後：!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~""",
+                                """Hi, can you hear me? ==> hi, can you hear me?
+    Ｈｅｌｌｏ ==> ｈｅｌｌｏ""",
+                                """削除対象：!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~""",
+                                """明治27年10月21日 ==> 明治0年0月0日"""]
+    # 設定項目のキーにチェックボックスの文、バリューに説明文設定
+    other_option_description = {
+        value: other_option_description[idx] for idx, value in enumerate(other_option.values())}
+
+    if request.method == 'GET':
+        return render_template('preprocessing.html', basic_data=basic_data, other_option=other_option, description=other_option_description)
+    else:
+        # 利用者から送られてきた情報を取得
+        texts = request.form.get('texts')
+        remove_words = request.form['remove-texts']
+        replace_words = request.form['replace-texts']
+        other_options = request.form.getlist('other-option')
+        # テキストを前処理
+        preprocessed_text = []
+        for text in texts.split('\r\n'):
+            if remove_words:
+                for rw in remove_words.split('\r\n'):
+                    text = text.replace(rw, '')
+            if replace_words:
+                for rw in replace_words.split('\r\n'):
+                    try:
+                        target, replace = rw.split(' ')
+                        text = text.replace(target, replace)
+                    except:
+                        continue
+            # 全角 => 半角
+            if 'all2half' in other_options:
+                text = text.translate(str.maketrans(
+                    {chr(0xFF01 + i): chr(0x21 + i) for i in range(94)}))
+            # 英語大文字を小文字化
+            if 'big2small' in other_options:
+                text = text.lower()
+            # 記号を削除（半角スペースに置換後、半角スペースで結合）
+            if 'remove_symbols' in other_options:
+                table = str.maketrans(string.punctuation,
+                                      ' '*len(string.punctuation))
+                text = ' '.join(text.translate(table).split())
+            # 数字列を0に置換
+            if 'replace_numbers' in other_options:
+                text = re.sub('[0-9]+', '0', text)
+            preprocessed_text.append(text)
+        selected_option = [other_option.get(k) for k in other_options]
+        sent_data = dict(texts=texts, remove_texts=remove_words, other_option=selected_option,
+                         replace_texts=replace_words, preprocessed_texts=preprocessed_text)
+        return render_template('preprocessing.html', basic_data=basic_data, sent_data=sent_data, other_option=other_option, description=other_option_description)
 
 
 # おまじない
