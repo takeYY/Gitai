@@ -30,10 +30,15 @@
         <button class='btn btn-info dropdown-toggle' aria-controls='mrph-word-sample' aria-expanded='false'
           data-target='#mrph-word-sample' data-toggle='collapse' type='button'>入力例</button>
         <div id='mrph-word-sample' class='collapse'>
-          <textarea class='form-control' disabled placeholder='すもももももももものうち' rows=1></textarea>
+          <div class='bs-callout bs-callout-info mt-0 py-1'>
+            <p>
+            すもももももももものうち<br>
+            くるまでまつ
+            </p>
+          </div>
         </div>
       </div>
-      <textarea class='form-control' rows=3
+      <textarea class='form-control' rows=2
         name='mecab-words'>{{ mrph_data.get('words') if mrph_data else ''}}</textarea>
     </div>
 

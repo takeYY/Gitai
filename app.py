@@ -3,6 +3,7 @@ from waitress import serve
 from get_data import get_hinshi_dict, get_khcoder_df, get_basic_data, get_novels_tuple, get_edogawa_merge_df, get_juman_mrph, mecab_divide_dict, juman_divide_dict, dict_in_list2csv
 from co_oc_network import create_network
 from preprocessing import texts_preprocessing, get_other_option_dict, get_other_option_description_dict
+import MeCab
 
 app = Flask(__name__)
 

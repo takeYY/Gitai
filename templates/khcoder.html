@@ -6,7 +6,13 @@
   <p><a href='https://khcoder.net/' target='_blank'>KH Coder</a>とは、テキスト型（文章型）データを統計的に分析するためのフリーソフトウェアです。</p>
   <p>ここでは、KH Coderで分析するためのCSVデータをダウンロードできます。</p>
 
+  <!--
+  ----- 作品検索フォーム -----
+  -->
   <form action='/khcoder' method='post'>
+    <!--
+    ----- 作品名 ------
+    -->
     <div class='form-group'>
       <label for='name' class='form-check-label'>作品名</label>
       <select name='name' class='form-control'>
@@ -16,14 +22,41 @@
         {% endfor %}
       </select>
     </div>
-    <button type='submit' class='btn btn-primary'>表示</button>
+
+    <!--
+    ----- 内容確認ボタン -----
+    -->
+    <div class='text-center'>
+      <button type='submit' class='btn btn-primary'>内容確認</button>
+    </div>
   </form>
 
+
+  <!--
+  ----- 内容結果 -----
+  -->
   {% if sent_data %}
+  <!--
+  ----- 検索条件の表示 -----
+  -->
   <hr>
   <div class='my-2'>
     <p>作品名：{{ sent_data.get('name') }}</p>
   </div>
+
+  <hr>
+  <div class='float-right'>
+    <form action='/download/csv' method='post'>
+      <input type='hidden' name='dir_path' value='csv/khcoder'>
+      <input type='hidden' name='file_name' value={{ sent_data.get('file_name') }}>
+      <input type='hidden' name='new_name' value={{ sent_data.get('file_name') }}>
+      <button type='submit' class='btn btn-primary'>CSVダウンロード</button>
+    </form>
+  </div>
+
+  <!--
+  ----- テーブルデータ表示 -----
+  -->
   <table class='table table-sm table-striped table-hover'>
     <thead class='thead-dark'>
       <tr>
@@ -38,13 +71,6 @@
     </tr>
     {% endfor %}
   </table>
-  <hr>
-  <form action='/download/csv' method='post'>
-    <input type='hidden' name='dir_path' value='csv/khcoder'>
-    <input type='hidden' name='file_name' value={{ sent_data.get('file_name') }}>
-    <input type='hidden' name='new_name' value={{ sent_data.get('file_name') }}>
-    <button type='submit' class='btn btn-primary'>CSVダウンロード</button>
-  </form>
   {% endif %}
 </div>
 {% endblock %}

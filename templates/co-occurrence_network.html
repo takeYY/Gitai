@@ -52,10 +52,15 @@
         <button class='btn btn-info dropdown-toggle' aria-controls='remove-word-sample' aria-expanded='false'
           data-target='#remove-word-sample' data-toggle='collapse' type='button'>入力例</button>
         <div id='remove-word-sample' class='collapse'>
-          <textarea class='form-control' disabled placeholder=二十面相&#13;&#10;明智 rows=2></textarea>
+          <div class='bs-callout bs-callout-info mt-0 py-1'>
+            <p>
+            二十面相<br>
+            明智
+            </p>
+          </div>
         </div>
       </div>
-      <textarea class='form-control' rows=3
+      <textarea class='form-control' rows=2
         name='remove-words'>{{ sent_data.get('remove_words') if sent_data else ''}}</textarea>
     </div>
 
