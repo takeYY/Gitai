@@ -3,6 +3,86 @@
 <div class='container'>
   <h3 class='text-center'>{{basic_data.get('title')}}</h3>
 
-  江戸川乱歩作品の可視化システムです。
+  <p>江戸川乱歩作品の可視化システムです。</p>
+
+  <div class='container-fluid'>
+    <div class='row'>
+      <!--
+      ----- 作品情報 -----
+      -->
+      <div class='p-2 col-sm-6'>
+        <div class='card h-100'>
+          <div class='card-body'>
+            <h5 class='card-title'>作品情報</h5>
+            <p class='card-text'>江戸川乱歩作品の初出、底本、出版社などの情報がまとめられている。</p>
+          </div>
+          <div class='card-footer'>
+            <a href={{ url_for('information') }} class='card-link'>作品情報</a>
+          </div>
+        </div>
+      </div>
+      <!--
+      ----- テキストの前処理 -----
+      -->
+      <div class='p-2 col-sm-6'>
+        <div class='card h-100'>
+          <div class='card-body'>
+            <h5 class='card-title'>テキストの前処理</h5>
+            <p class='card-text'>テキストを分析するための前処理を施すことができます。</p>
+          </div>
+          <div class='card-footer'>
+            <a href={{ url_for('preprocessing') }} class='card-link'>テキストの前処理</a>
+          </div>
+        </div>
+      </div>
+      <!--
+      ----- 形態素解析 -----
+      -->
+      <div class='p-2 col-sm-6'>
+        <div class='card h-100'>
+          <div class='card-body'>
+            <h5 class='card-title'>形態素解析</h5>
+            <p class='card-text'>形態素解析とは、文法的な情報の注記の無い自然言語のテキストデータから、対象言語の文法や、辞書と呼ばれる単語の品詞等の情報にもとづき、
+            形態素の列に分割し、それぞれの形態素の品詞等を判別する作業である。</p>
+          </div>
+          <div class='card-footer'>
+            <a href={{ url_for('morphological') }} class='card-link'>形態素解析</a>
+          </div>
+        </div>
+      </div>
+      <!--
+      ----- 共起ネットワーク -----
+      -->
+      <div class='p-2 col-sm-6'>
+        <div class='card h-100'>
+          <div class='card-body'>
+            <h5 class='card-title'>共起ネットワーク</h5>
+            <p class='card-text'>共起ネットワークは、単語が共通に出現する関係（共起関係）を円と線で表示した図である。
+            どんな単語が同じコメント内に出現しやすいかが感覚的に把握できて、
+            一つ一つの文書を読んでいく方法とは一味違った解釈やひらめきを呼び込む。</p>
+          </div>
+          <div class='card-footer'>
+            <a href={{ url_for('co_occurrence_network') }} class='card-link'>共起ネットワーク</a>
+          </div>
+        </div>
+      </div>
+      <!--
+      ----- KE Coder -----
+      -->
+      <div class='p-2 col-sm-12'>
+        <div class='card h-100'>
+          <div class='card-body'>
+            <h5 class='card-title'>KH Coder</h5>
+            <p class='card-text'>KH Coderとは、テキスト型（文章型）データを統計的に分析するためのフリーソフトウェアです。
+            アンケートの自由記述・インタビュー記録・新聞記事など、さまざまな社会調査データを分析することができます。
+            「計量テキスト分析」または「テキストマイニング」と呼ばれる方法に対応しています。</p>
+          </div>
+          <div class='card-footer'>
+            <a href={{ url_for('khcoder') }} class='card-link'>KH Coder</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

@@ -18,7 +18,7 @@
     integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
     crossorigin="anonymous"></script>
   {% if basic_data.get('title') %}
-  <title>江戸川乱歩作品可視化システム | {{ basic_data.get('title') }}</title>
+  <title>{{ basic_data.get('title') }} - 江戸川乱歩作品可視化システム</title>
   {% else %}
   <title>江戸川乱歩作品可視化システム</title>
   {% endif %}
@@ -47,16 +47,16 @@
               url_for('preprocessing') }}>テキストの前処理</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link {{ 'active' if basic_data.get('active_url') == 'KH-coder' else '' }}" href={{
-              url_for('khcoder') }}>KH Coder</a>
+            <a class="nav-link {{ 'active' if basic_data.get('active_url') == 'morph_analysis' else '' }}" href={{
+              url_for('morphological') }}>形態素解析</a>
           </li>
           <li class="nav-item">
             <a class="nav-link {{ 'active' if basic_data.get('active_url') == 'co-oc_network' else '' }}" href={{
               url_for('co_occurrence_network') }}>共起ネットワーク</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link {{ 'active' if basic_data.get('active_url') == 'morph_analysis' else '' }}" href={{
-              url_for('morphological') }}>形態素解析</a>
+            <a class="nav-link {{ 'active' if basic_data.get('active_url') == 'KH-coder' else '' }}" href={{
+              url_for('khcoder') }}>KH Coder</a>
           </li>
         </ul>
       </div>
