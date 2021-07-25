@@ -72,10 +72,10 @@ def network_visualization():
     hinshi_jpn = [hinshi_dict.get(k) for k in hinshi_eng]
     remove_words = request.form['remove-words']
     # 共起ネットワーク作成
-    now, co_oc_df = create_network(file_name=file_name, target_hinshi=hinshi_jpn,
-                                   target_num=number, remove_words=remove_words)
+    csv_file_name, co_oc_df = create_network(file_name=file_name, target_hinshi=hinshi_jpn,
+                                             target_num=number, remove_words=remove_words)
     # 利用者から送られてきた情報を基に送る情報
-    sent_data = dict(name=name, file_name=now, number=number, hinshi=hinshi_jpn, hinshi_eng=hinshi_eng,
+    sent_data = dict(name=name, file_name=csv_file_name, number=number, hinshi=hinshi_jpn, hinshi_eng=hinshi_eng,
                      remove_words=remove_words, co_oc_df=co_oc_df)
 
     try:

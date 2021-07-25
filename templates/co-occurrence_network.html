@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class='container'>
+<div class='container mb-4'>
   <h3 class='text-center'>{{ basic_data.get('title') }}</h3>
 
   <!--
@@ -97,46 +97,53 @@
   <hr>
 
   <!--
-  ----- csvダウンロードボタン -----
+  ----- テーブル情報 -----
   -->
-  <div class='float-right'>
-    <form action='/download/csv' method='post'>
-      <input type='hidden' name='dir_path' value=tmp>
-      <input type='hidden' name='file_name' value={{ sent_data.get('file_name') }}>
-      <input type='hidden' name='new_name'
-        value={{ sent_data.get('name') }}_{{ '-'.join(sent_data.get('hinshi')) }}_{{ sent_data.get('number') }}>
-      <button type='submit' class='btn btn-primary'>CSVダウンロード</button>
-    </form>
-  </div>
+  <button class='btn btn-primary' data-toggle='collapse' data-target='#co-oc-table'
+  aria-expand='false' aria-controls='co-oc-table'>テーブル表示</button>
+  <div id='co-oc-table' class='collapse'>
+    <!--
+    ----- csvダウンロードボタン -----
+    -->
+    <div class='float-right'>
+      <form action='/download/csv' method='post'>
+        <input type='hidden' name='dir_path' value=tmp>
+        <input type='hidden' name='file_name' value={{ sent_data.get('file_name') }}>
+        <input type='hidden' name='new_name'
+          value={{ sent_data.get('name') }}_{{ '-'.join(sent_data.get('hinshi')) }}_{{ sent_data.get('number') }}>
+        <button type='submit' class='btn btn-primary'>CSVダウンロード</button>
+      </form>
+    </div>
 
-  <!--
-  ----- テーブルデータ表示 -----
-  -->
-  <div class='my-2'>
-    <table class='table table-sm table-striped table-hover'>
-      <thead class='thead-dark'>
+    <!--
+    ----- テーブルデータ表示 -----
+    -->
+    <div class='my-2'>
+      <table class='table table-sm table-striped table-hover'>
+        <thead class='thead-dark'>
+          <tr>
+            <th>NO.</th>
+            <th>first</th>
+            <th>second</th>
+            <th>count</th>
+          </tr>
+        </thead>
+        {% for index, rows in sent_data.get('co_oc_df')[:sent_data.get('number')].iterrows() %}
         <tr>
-          <th>NO.</th>
-          <th>first</th>
-          <th>second</th>
-          <th>count</th>
+          <td>{{ index+1 }}</td>
+          <td>{{ rows['first'] }}</td>
+          <td>{{ rows['second'] }}</td>
+          <td>{{ rows['count'] }}</td>
         </tr>
-      </thead>
-      {% for index, rows in sent_data.get('co_oc_df')[:sent_data.get('number')].iterrows() %}
-      <tr>
-        <td>{{ index+1 }}</td>
-        <td>{{ rows['first'] }}</td>
-        <td>{{ rows['second'] }}</td>
-        <td>{{ rows['count'] }}</td>
-      </tr>
-      {% endfor %}
-      <tr>
-        <td>...</td>
-        <td>...</td>
-        <td>...</td>
-        <td>...</td>
-      </tr>
-    </table>
+        {% endfor %}
+        <tr>
+          <td>...</td>
+          <td>...</td>
+          <td>...</td>
+          <td>...</td>
+        </tr>
+      </table>
+    </div>
   </div>
   {% endif %}
 </div>
