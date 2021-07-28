@@ -1,9 +1,43 @@
+from flask import flash
 import pandas as pd
 import itertools
 import collections
 import datetime
-from get_data import get_jumanpp_df
+from werkzeug.utils import secure_filename
+from get_data import get_jumanpp_df, get_datetime_now
+import os
 
+ALLOWED_EXTENSIONS = os.environ.get('ALLOWED_EXTENSIONS')
+
+# 拡張子の制限
+def allowed_csv_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# csvファイルのバリデーション
+def csv_file_invalid(request):
+    if 'file' not in request.files:
+        flash('ファイルが存在しません。', 'error')
+        return True
+    file = request.files['file']
+    if file.filename == '':
+        flash('ファイルが選択されていません。', 'error')
+        return True
+    if not allowed_csv_file(file.filename):
+        flash('ファイル形式がcsvではありません。', 'error')
+        return True
+
+    return False
+
+def get_csv_filename(app, request):
+    if csv_file_invalid(request):
+        return '', True
+
+    file = request.files['file']
+    filename = get_datetime_now() + '_input_' + secure_filename(file.filename)
+    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+    return filename, False
 
 # ネットワーク描画のメイン処理定義
 def kyoki_word_network(target_num=250, file_name='3742_9_3_11_02'):
@@ -45,7 +79,7 @@ def kyoki_word_network(target_num=250, file_name='3742_9_3_11_02'):
     return got_net
 
 
-def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], target_num=250, remove_words=''):
+def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], target_num=250, remove_words='', input_type='edogawa'):
     """
     共起ネットワークの作成
 
@@ -64,14 +98,25 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
         共起に含めたくない除去ワード集
 
     """
-    # jumanppにより形態素解析したDF取得
-    df = get_jumanpp_df(file_name)
+    if input_type == 'edogawa':
+        # jumanppにより形態素解析したDF取得
+        df = get_jumanpp_df(file_name)
+    else:
+        df = pd.read_csv(f'tmp/{file_name}')
     # 除去ワードリスト
     remove_words_list = remove_words.split('\r\n')
 
     # 形態素解析DFから各列の要素をリストで取得
-    midashi = list(df['見出し'])
-    genkei = list(df['原型'])
+    try:
+        # Jumanppによる形態素解析の場合
+        midashi = list(df['見出し'])
+    except:
+        # Mecabによる形態素解析の場合
+        midashi = list(df['表層形'])
+    try:
+        genkei = list(df['原型'])
+    except:
+        genkei = list(df['原形'])
     hinshi = list(df['品詞'])
     sentences = []
     for i in range(len(midashi)):
@@ -113,4 +158,4 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
         got_net.write_html(f'tmp/{now}.html')
         return now, co_oc_df
     except:
-        return ''
+        return '', ''

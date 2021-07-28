@@ -1,11 +1,18 @@
-from flask import Flask, render_template, request, redirect, url_for, send_file, send_from_directory
+from flask import Flask, flash, render_template, request, redirect, url_for, send_file, send_from_directory
 from waitress import serve
 from get_data import get_hinshi_dict, get_khcoder_df, get_basic_data, get_novels_tuple, get_edogawa_merge_df, get_juman_mrph, mecab_divide_dict, juman_divide_dict, dict_in_list2csv
-from co_oc_network import create_network
+from co_oc_network import create_network, get_csv_filename
 from preprocessing import texts_preprocessing, get_other_option_dict, get_other_option_description_dict
 import MeCab
+import os
 
 app = Flask(__name__)
+UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER')
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+# 16MBにデータ制限
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+# SECRET_KEYを設定
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 
 
 @app.route('/')
@@ -65,17 +72,45 @@ def network_visualization():
     hinshi_dict = get_hinshi_dict()
     edogawa_data = dict(hinshi_dict=hinshi_dict,
                         name_file=get_novels_tuple(col1='name', col2='file_name'))
-    # 利用者から送られてきた情報を基にデータ整理
-    name, file_name = request.form['name'].split('-')
+    # 利用者から送られてきた情報
     number = int(request.form['number'])
     hinshi_eng = request.form.getlist('hinshi')
     hinshi_jpn = [hinshi_dict.get(k) for k in hinshi_eng]
     remove_words = request.form['remove-words']
+    # エラーの有無判定
+    error = False
+    # 入力データ
+    input_type = request.form['input_type']
+    if input_type == 'csv':
+        name = 'csvからのインポート'
+        file_name, error = get_csv_filename(app, request)
+    else:
+        # 利用者から送られてきた情報を基にデータ整理
+        name, file_name = request.form['name'].split('-')
+    # 品詞が1つも選択されなかった場合
+    if not hinshi_eng:
+        flash('品詞が選択されていません。', 'error')
+        error = True
+    # 共起数が0以下だった場合
+    if number < 1:
+        flash('共起数が少なすぎます。', 'error')
+        error = True
+    # errorがあれば
+    if error:
+        sent_error_data = dict(input_type=input_type, name=name, number=number,
+            hinshi=hinshi_jpn, hinshi_eng=hinshi_eng, remove_words=remove_words)
+        return render_template('co-occurrence_network.html', basic_data=basic_data, edogawa_data=edogawa_data, sent_data=sent_error_data)
     # 共起ネットワーク作成
-    csv_file_name, co_oc_df = create_network(file_name=file_name, target_hinshi=hinshi_jpn,
-                                             target_num=number, remove_words=remove_words)
+    try:
+        csv_file_name, co_oc_df = create_network(
+            file_name=file_name, target_hinshi=hinshi_jpn, target_num=number, remove_words=remove_words, input_type=input_type)
+    except:
+        flash('ファイル形式が正しくありません。（入力形式に沿ってください）', 'error')
+        sent_error_data = dict(input_type=input_type, name=name, number=number,
+            hinshi=hinshi_jpn, hinshi_eng=hinshi_eng, remove_words=remove_words)
+        return render_template('co-occurrence_network.html', basic_data=basic_data, edogawa_data=edogawa_data, sent_data=sent_error_data)
     # 利用者から送られてきた情報を基に送る情報
-    sent_data = dict(name=name, file_name=csv_file_name, number=number, hinshi=hinshi_jpn, hinshi_eng=hinshi_eng,
+    sent_data = dict(input_type=input_type, name=name, file_name=csv_file_name, number=number, hinshi=hinshi_jpn, hinshi_eng=hinshi_eng,
                      remove_words=remove_words, co_oc_df=co_oc_df)
 
     try:

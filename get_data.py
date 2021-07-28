@@ -74,6 +74,10 @@ def juman_divide_dict():
             'katsuyou1': '活用型', 'katsuyou2': '活用形', 'imis': '意味情報', 'repname': '代表表記'}
 
 
+def get_datetime_now():
+    return datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
+
+
 def dict_in_list2csv(dict_in_list, divide_dict):
     # 分類される要素をキーとし、空のリストを初期値に設定
     df_cols = {}
@@ -86,7 +90,7 @@ def dict_in_list2csv(dict_in_list, divide_dict):
     # DataFrame作成
     df = pd.DataFrame(df_cols).rename(columns=divide_dict)
     # DataFrameをcsvとしてtmpに保存
-    now = datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
+    now = get_datetime_now()
     df.to_csv(f'tmp/{now}.csv', index=False, encoding='utf_8_sig')
     return df, now
 
