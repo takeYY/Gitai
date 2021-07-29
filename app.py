@@ -1,9 +1,9 @@
 from flask import Flask, flash, render_template, request, redirect, url_for, send_file, send_from_directory
 from waitress import serve
-from get_data import get_hinshi_dict, get_khcoder_df, get_basic_data, get_novels_tuple, get_edogawa_merge_df, get_juman_mrph, mecab_divide_dict, juman_divide_dict, dict_in_list2csv
+from get_data import get_hinshi_dict, get_khcoder_df, get_basic_data, get_novels_tuple, get_edogawa_merge_df, dict_in_list2csv
 from co_oc_network import create_network, get_csv_filename
 from preprocessing import texts_preprocessing, get_other_option_dict, get_other_option_description_dict
-import MeCab
+from morphological import mrph_analysis
 import os
 
 app = Flask(__name__)
@@ -98,7 +98,7 @@ def network_visualization():
     # errorがあれば
     if error:
         sent_error_data = dict(input_type=input_type, name=name, number=number,
-            hinshi=hinshi_jpn, hinshi_eng=hinshi_eng, remove_words=remove_words)
+                               hinshi=hinshi_jpn, hinshi_eng=hinshi_eng, remove_words=remove_words)
         return render_template('co-occurrence_network.html', basic_data=basic_data, edogawa_data=edogawa_data, sent_data=sent_error_data)
     # 共起ネットワーク作成
     try:
@@ -107,7 +107,7 @@ def network_visualization():
     except:
         flash('ファイル形式が正しくありません。（入力形式に沿ってください）', 'error')
         sent_error_data = dict(input_type=input_type, name=name, number=number,
-            hinshi=hinshi_jpn, hinshi_eng=hinshi_eng, remove_words=remove_words)
+                               hinshi=hinshi_jpn, hinshi_eng=hinshi_eng, remove_words=remove_words)
         return render_template('co-occurrence_network.html', basic_data=basic_data, edogawa_data=edogawa_data, sent_data=sent_error_data)
     # 利用者から送られてきた情報を基に送る情報
     sent_data = dict(input_type=input_type, name=name, file_name=csv_file_name, number=number, hinshi=hinshi_jpn, hinshi_eng=hinshi_eng,
@@ -192,41 +192,19 @@ def morphological_analysis():
 
     # 基本情報
     basic_data = get_basic_data(title='形態素解析', active_url='morph_analysis')
-    # 送信されたデータの取得と形態素解析
+    # 送信されたデータの取得と形態素解析器の種類
     text = request.form.get('mecab-words')
     mrph_type = request.form.get('mrph')
-
-    # MeCabによる解析
-    if mrph_type == 'mecab':
-        tagger = MeCab.Tagger(
-            '-d /usr/lib/x86_64-linux-gnu/mecab/dic/mecab-ipadic-neologd'
-        )
-        # MeCabの分類リスト取得
-        divide_keys = list(mecab_divide_dict().keys())
-        # MeCabの分類辞書
-        divide_dict = mecab_divide_dict()
-        # MeCabによる形態素解析
-        mecab_parse = tagger.parse(text)
-        mecab_line = [line for line in mecab_parse.split('\n')]
-        mrph_result = []
-        for line in mecab_line:
-            mecab_dict = {}
-            line_split = line.split('\t')
-            if line_split[0] == 'EOS':
-                break
-
-            mecab_dict['surface'] = line_split[0]
-            values = line_split[1].split(',')
-            for idx, value in enumerate(values):
-                mecab_dict[divide_keys[idx+1]] = value
-            mrph_result.append(mecab_dict)
-
-    # Jumanによる解析
-    elif mrph_type == 'juman':
-        # Jumanppによる形態素解析
-        mrph_result = get_juman_mrph(text)
-        # Jumanppの分類辞書
-        divide_dict = juman_divide_dict()
+    # テキストが入力されなかった場合
+    if not text:
+        flash('テキストが入力されていません。', 'error')
+        return render_template('morphological.html', basic_data=basic_data, mrph_type='None')
+    # 形態素解析
+    mrph_result, divide_dict = mrph_analysis(mrph_type, text)
+    # 形態素解析の結果が返ってこなかった場合
+    if not mrph_result:
+        flash('解析に失敗しました。', 'error')
+        return render_template('morphological.html', basic_data=basic_data, mrph_type='None')
 
     # mrph_resultをcsvとして保存し、df, csv_nameを取得
     result_df, csv_name = dict_in_list2csv(mrph_result, divide_dict)

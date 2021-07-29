@@ -1,7 +1,5 @@
 import pandas as pd
 import datetime
-import timeout_decorator
-from pyknp import Juman
 
 
 def get_hinshi_dict():
@@ -90,26 +88,6 @@ def dict_in_list2csv(dict_in_list, divide_dict):
     # DataFrame作成
     df = pd.DataFrame(df_cols).rename(columns=divide_dict)
     # DataFrameをcsvとしてtmpに保存
-    now = get_datetime_now()
-    df.to_csv(f'tmp/{now}.csv', index=False, encoding='utf_8_sig')
-    return df, now
-
-
-@timeout_decorator.timeout(5, use_signals=False)
-def get_juman_mrph(text):
-    juman = Juman()
-    result = juman.analysis(text)
-    mrph_list = []
-    for mrph in result.mrph_list():
-        juman_dict = {}
-        juman_dict['midashi'] = mrph.midasi
-        juman_dict['yomi'] = mrph.yomi
-        juman_dict['genkei'] = mrph.genkei
-        juman_dict['hinshi'] = mrph.hinsi
-        juman_dict['bunrui'] = mrph.bunrui
-        juman_dict['katsuyou1'] = mrph.katuyou1
-        juman_dict['katsuyou2'] = mrph.katuyou2
-        juman_dict['imis'] = mrph.imis
-        juman_dict['repname'] = mrph.repname
-        mrph_list.append(juman_dict)
-    return mrph_list
+    csv_name = f'{get_datetime_now()}_mrph'
+    df.to_csv(f'tmp/{csv_name}.csv', index=False, encoding='utf_8_sig')
+    return df, csv_name
