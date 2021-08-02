@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class='container'>
+<div class='container pb-4'>
   <h3 class='text-center'>{{basic_data.get('title')}}</h3>
 
   <form action='/morphological/analysis' method='post'>
@@ -80,7 +80,7 @@
             {% endfor %}
           </tr>
         </thead>
-        {% for index, mrph in mrph_data.get('result_df')[:50].iterrows() %}
+        {% for index, mrph in mrph_data.get('result_df').iterrows() %}
           <tr>
             {% for key in mrph_data.get('result_df').columns %}
               <td>{{ mrph.get(key, '*') }}</td>
