@@ -54,41 +54,46 @@
   <!--
   ----- 形態素解析結果 -----
   -->
-  {% if mrph_data %}
-  <!--
-  ----- csvダウンロードボタン -----
-  -->
-  <div class='float-right'>
-    <form action='/download/csv' method='post'>
-      <input type='hidden' name='dir_path' value=tmp>
-      <input type='hidden' name='file_name' value={{ mrph_data.get('csv_name') }}>
-      <input type='hidden' name='new_name'
-        value={{ mrph_type }}による形態素解析結果>
-      <button type='submit' class='btn btn-primary'>CSVダウンロード</button>
-    </form>
-  </div>
+  {% if mrph_data and mrph_data.get('csv_name') %}
+    <!--
+    ----- csvダウンロードボタン -----
+    -->
+    <div class='float-right'>
+      <form action='/download/csv' method='post'>
+        <input type='hidden' name='dir_path' value=tmp>
+        <input type='hidden' name='file_name' value={{ mrph_data.get('csv_name') }}>
+        <input type='hidden' name='new_name'
+          value={{ mrph_type }}による形態素解析結果>
+        <button type='submit' class='btn btn-primary'>CSVダウンロード</button>
+      </form>
+    </div>
 
-  <!--
-  ----- テーブルデータ表示 -----
-  -->
-  <div class='my-2'>
-    <table class='table table-sm table-striped table-hover'>
-      <thead class='thead-dark'>
-        <tr>
-          {% for column in mrph_data.get('result_df').columns %}
-          <th>{{ column }}</th>
-          {% endfor %}
-        </tr>
-      </thead>
-      {% for index, mrph in mrph_data.get('result_df').iterrows() %}
-      <tr>
-        {% for key in mrph_data.get('result_df').columns %}
-        <td>{{ mrph.get(key, '*') }}</td>
+    <!--
+    ----- テーブルデータ表示 -----
+    -->
+    <div class='my-2'>
+      <table class='table table-sm table-striped table-hover'>
+        <thead class='thead-dark'>
+          <tr>
+            {% for column in mrph_data.get('result_df').columns %}
+              <th>{{ column }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        {% for index, mrph in mrph_data.get('result_df')[:50].iterrows() %}
+          <tr>
+            {% for key in mrph_data.get('result_df').columns %}
+              <td>{{ mrph.get(key, '*') }}</td>
+            {% endfor %}
+          </tr>
         {% endfor %}
-      </tr>
-      {% endfor %}
-    </table>
-  </div>
+        {% if mrph_data.get('over50') %}
+          <tr>
+            <td colspan={{ mrph_data.get('columns_num') }} class='text-center text-danger'>《以下略》</td>
+          </tr>
+        {% endif %}
+      </table>
+    </div>
   {% endif %}
 </div>
 {% endblock %}
