@@ -24,9 +24,12 @@
     ----- 形態素解析用テキスト -----
     -->
     <div class='form-group'>
-      <label for='mecab-word' class='form-check-label'>解析テキスト</label>
+      <label for='words' class='form-check-label'>解析テキスト</label>
       <div class='p-2'>
-        <p>形態素解析したいテキストを入力してください。</p>
+        <p>
+          形態素解析したいテキストを入力してください。<br>
+          Jumanppを選択する場合、24,000字以内が推奨です。
+        </p>
         <button class='btn btn-info dropdown-toggle' aria-controls='mrph-word-sample' aria-expanded='false'
           data-target='#mrph-word-sample' data-toggle='collapse' type='button'>入力例</button>
         <div id='mrph-word-sample' class='collapse'>
@@ -38,8 +41,9 @@
           </div>
         </div>
       </div>
-      <textarea class='form-control' rows=2
-        name='mecab-words'>{{ mrph_data.get('words') if mrph_data else ''}}</textarea>
+      <div id='limited-words' class='text-right'>文字数：{{ mrph_data.get('words').replace('\n', '')|length if mrph_data else 0 }}/24000</div>
+      <textarea class='form-control' rows=14 name='words'
+      onKeyUp="countLength('limited-words', value, 24000);">{{ mrph_data.get('words') if mrph_data else ''}}</textarea>
     </div>
 
     <!--

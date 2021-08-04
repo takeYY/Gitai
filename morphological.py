@@ -4,6 +4,7 @@ from pyknp import Juman
 from get_data import mecab_divide_dict, juman_divide_dict
 
 
+@timeout_decorator.timeout(30, use_signals=False)
 def get_mecab_mrph(text):
     tagger = MeCab.Tagger(
         '-d /usr/lib/x86_64-linux-gnu/mecab/dic/mecab-ipadic-neologd'
@@ -33,34 +34,44 @@ def get_mecab_mrph(text):
     return mrph_list
 
 
-@timeout_decorator.timeout(25, use_signals=False)
+@timeout_decorator.timeout(30, use_signals=False)
 def get_juman_mrph(text):
-    juman = Juman()
-    result = juman.analysis(text.replace('\n', ''))
     mrph_list = []
-    # 分類をキー、結果をvalueとしたjuman_dictをmrph_listに追加
-    for mrph in result.mrph_list():
-        juman_dict = {}
-        if mrph.midasi == '\r':
+    for t in text.split('。'):
+        if not t:
             continue
-        juman_dict['midashi'] = mrph.midasi
-        juman_dict['yomi'] = mrph.yomi
-        juman_dict['genkei'] = mrph.genkei
-        juman_dict['hinshi'] = mrph.hinsi
-        juman_dict['bunrui'] = mrph.bunrui
-        juman_dict['katsuyou1'] = mrph.katuyou1
-        juman_dict['katsuyou2'] = mrph.katuyou2
-        juman_dict['imis'] = mrph.imis
-        juman_dict['repname'] = mrph.repname
-        mrph_list.append(juman_dict)
+        juman = Juman()
+        result = juman.analysis(t.replace('\n', '') + '。')
+        result_list = []
+        # 分類をキー、結果をvalueとしたjuman_dictをresult_listに追加
+        for mrph in result.mrph_list():
+            juman_dict = {}
+            if mrph.midasi == '\r':
+                continue
+            juman_dict['midashi'] = mrph.midasi
+            juman_dict['yomi'] = mrph.yomi
+            juman_dict['genkei'] = mrph.genkei
+            juman_dict['hinshi'] = mrph.hinsi
+            juman_dict['bunrui'] = mrph.bunrui
+            juman_dict['katsuyou1'] = mrph.katuyou1
+            juman_dict['katsuyou2'] = mrph.katuyou2
+            juman_dict['imis'] = mrph.imis
+            juman_dict['repname'] = mrph.repname
+            result_list.append(juman_dict)
+        mrph_list.extend(result_list)
+
     return mrph_list
 
 
 def mrph_analysis(mrph_type, text):
     # MeCabによる解析
     if mrph_type == 'mecab':
-        # MeCabによる形態素解析
-        mrph_result = get_mecab_mrph(text)
+        try:
+            # MeCabによる形態素解析
+            mrph_result = get_mecab_mrph(text)
+        except:
+            # 解析に30秒以上かかった場合
+            mrph_result = ''
         # MeCabの分類辞書
         divide_dict = mecab_divide_dict()
 
@@ -68,17 +79,9 @@ def mrph_analysis(mrph_type, text):
     elif mrph_type == 'juman':
         try:
             # Jumanppによる形態素解析
-            if 4096 < len(text.encode('utf-8')):
-                # 4096バイト以上の文字列の場合
-                mrph_result = []
-                for t in text.split('。'):
-                    if not t:
-                        continue
-                    mrph_result.extend(get_juman_mrph(f'{t}。'))
-            else:
-                mrph_result = get_juman_mrph(text)
+            mrph_result = get_juman_mrph(text)
         except:
-            # 25秒以上かかった場合
+            # 30秒以上かかった場合
             mrph_result = ''
         # Jumanppの分類辞書
         divide_dict = juman_divide_dict()

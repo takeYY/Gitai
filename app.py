@@ -193,7 +193,7 @@ def morphological_analysis():
     # 基本情報
     basic_data = get_basic_data(title='形態素解析', active_url='morph_analysis')
     # 送信されたデータの取得と形態素解析器の種類
-    text = request.form.get('mecab-words')
+    text = request.form.get('words')
     mrph_type = request.form.get('mrph')
     # テキストが入力されなかった場合
     if not text:
