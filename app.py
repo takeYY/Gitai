@@ -77,6 +77,7 @@ def network_visualization():
     hinshi_eng = request.form.getlist('hinshi')
     hinshi_jpn = [hinshi_dict.get(k) for k in hinshi_eng]
     remove_words = request.form['remove-words']
+    target_words = request.form['target-words']
     # エラーの有無判定
     error = False
     # 入力データ
@@ -103,15 +104,15 @@ def network_visualization():
     # 共起ネットワーク作成
     try:
         csv_file_name, co_oc_df = create_network(
-            file_name=file_name, target_hinshi=hinshi_jpn, target_num=number, remove_words=remove_words, input_type=input_type)
+            file_name=file_name, target_hinshi=hinshi_jpn, target_num=number, remove_words=remove_words, target_words=target_words, input_type=input_type)
     except:
         flash('ファイル形式が正しくありません。（入力形式に沿ってください）', 'error')
         sent_error_data = dict(input_type=input_type, name=name, number=number,
-                               hinshi=hinshi_jpn, hinshi_eng=hinshi_eng, remove_words=remove_words)
+                               hinshi=hinshi_jpn, hinshi_eng=hinshi_eng, remove_words=remove_words, target_words=target_words)
         return render_template('co-occurrence_network.html', basic_data=basic_data, edogawa_data=edogawa_data, sent_data=sent_error_data)
     # 利用者から送られてきた情報を基に送る情報
     sent_data = dict(input_type=input_type, name=name, file_name=csv_file_name, number=number, hinshi=hinshi_jpn, hinshi_eng=hinshi_eng,
-                     remove_words=remove_words, co_oc_df=co_oc_df)
+                     remove_words=remove_words, target_words=target_words, co_oc_df=co_oc_df)
 
     try:
         return render_template('co-occurrence_network.html', basic_data=basic_data, edogawa_data=edogawa_data, sent_data=sent_data)

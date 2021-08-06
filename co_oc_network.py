@@ -9,10 +9,12 @@ import os
 
 ALLOWED_EXTENSIONS = os.environ.get('ALLOWED_EXTENSIONS')
 
+
 # 拡張子の制限
 def allowed_csv_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 # csvファイルのバリデーション
 def csv_file_invalid(request):
@@ -29,6 +31,7 @@ def csv_file_invalid(request):
 
     return False
 
+
 def get_csv_filename(app, request):
     if csv_file_invalid(request):
         return '', True
@@ -38,6 +41,7 @@ def get_csv_filename(app, request):
     file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
     return filename, False
+
 
 # ネットワーク描画のメイン処理定義
 def kyoki_word_network(target_num=250, file_name='3742_9_3_11_02'):
@@ -79,7 +83,7 @@ def kyoki_word_network(target_num=250, file_name='3742_9_3_11_02'):
     return got_net
 
 
-def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], target_num=250, remove_words='', input_type='edogawa'):
+def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], target_num=250, remove_words='', target_words='', input_type='edogawa'):
     """
     共起ネットワークの作成
 
@@ -96,6 +100,9 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
 
     remove_words: str, default=''
         共起に含めたくない除去ワード集
+
+    target_words: str, default=''
+        指定した単語の共起のみ表示する
 
     """
     if input_type == 'edogawa':
@@ -146,10 +153,19 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
         target_combinations.extend(sentence)
     ct = collections.Counter(target_combinations)
 
+    # 指定ワードが含まれるレコードのみ抽出
+    cols = [{'first': i[0][0], 'second': i[0][1], 'count': i[1]}
+            for i in ct.most_common()]
+    co_oc_df = pd.DataFrame(cols)
+    if target_words:
+        new_co_oc_df = pd.DataFrame()
+        for tw in target_words.split('\r\n'):
+            new_co_oc_df = pd.concat(
+                [new_co_oc_df, co_oc_df.query(' @tw in first or @tw in second ')])
+        co_oc_df = new_co_oc_df.sort_values('count', ascending=False).drop_duplicates(
+            subset=['first', 'second']).reset_index(drop=True)
     # 所定の構造でCSVファイルに出力
     now = datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
-    co_oc_df = pd.DataFrame(
-        [{'first': i[0][0], 'second': i[0][1], 'count': i[1]} for i in ct.most_common()])
     co_oc_df.to_csv(f'tmp/{now}.csv', index=False, encoding='utf_8_sig')
 
     try:

@@ -138,6 +138,28 @@
     </div>
 
     <!--
+    ----- 指定ワード -----
+    -->
+    <div class='form-group'>
+      <label for='target-word' class='form-check-label'>指定ワード</label>
+      <div class='p-2'>
+        <p>指定した単語の共起のみ表示します。</p>
+        <button class='btn btn-info dropdown-toggle' aria-controls='target-word-sample' aria-expanded='false'
+          data-target='#target-word-sample' data-toggle='collapse' type='button'>入力例</button>
+        <div id='target-word-sample' class='collapse'>
+          <div class='bs-callout bs-callout-info mt-0 py-1'>
+            <p>
+            怪人<br>
+            面相
+            </p>
+          </div>
+        </div>
+      </div>
+      <textarea class='form-control' rows=2
+        name='target-words'>{{ sent_data.get('target_words') if sent_data else ''}}</textarea>
+    </div>
+
+    <!--
     ----- 可視化ボタン -----
     -->
     <div class='text-center'>
@@ -159,6 +181,7 @@
     <p>共起数上位：{{ sent_data.get('number') }}</p>
     <p>可視化対象の品詞：{{ ', '.join(sent_data.get('hinshi')) }}</p>
     <p>除去ワード：{{ ', '.join(sent_data.get('remove_words').split('\r\n')) }}</p>
+    <p>指定ワード：{{ ', '.join(sent_data.get('target_words').split('\r\n')) }}</p>
   </div>
 
   <!--
