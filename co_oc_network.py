@@ -4,7 +4,7 @@ import itertools
 import collections
 import datetime
 from werkzeug.utils import secure_filename
-from get_data import get_jumanpp_df, get_datetime_now
+from get_data import get_jumanpp_df, get_datetime_now, get_hinshi_dict
 import os
 
 ALLOWED_EXTENSIONS = os.environ.get('ALLOWED_EXTENSIONS')
@@ -30,6 +30,42 @@ def csv_file_invalid(request):
         return True
 
     return False
+
+
+# 選択された品詞である or 除去ワードリストにない単語であるか判定
+def can_add_genkei2words(sentence, target_hinshi, remove_words_list):
+    midashi = sentence[0]
+    genkei = sentence[1]
+    hinshi = sentence[2]
+
+    # 品詞が可視化対象の品詞に含まれていない場合
+    if not hinshi in target_hinshi:
+        return False
+    # 見出し や 原形が除去ワードリストに含まれている場合
+    if midashi in remove_words_list or genkei in remove_words_list:
+        return False
+
+    return True
+
+
+# 除去対象の品詞組み合わせであるか判定
+def has_not_remove_combinations(word1, word2, remove_dict, hinshi_dict):
+    has_combi = False
+    # 各品詞に対して、それぞれ2番目の品詞との組み合わせであるか判定
+    for key, value in hinshi_dict.items():
+        # 1番目の品詞が指定されていない時
+        if not remove_dict.get(key):
+            continue
+
+        # 1番目の品詞と2番目の品詞が合致した場合
+        if word1[1] in value and word2[1] in remove_dict.get(key):
+            has_combi = True
+            break
+    if has_combi:
+        return False
+
+    # 除去対象の品詞組み合わせの何にも合致しなかった場合
+    return True
 
 
 def get_csv_filename(app, request):
@@ -83,7 +119,7 @@ def kyoki_word_network(target_num=250, file_name='3742_9_3_11_02'):
     return got_net
 
 
-def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], target_num=250, remove_words='', target_words='', input_type='edogawa'):
+def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], target_num=250, remove_words='', remove_combi='', target_words='', input_type='edogawa'):
     """
     共起ネットワークの作成
 
@@ -100,6 +136,9 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
 
     remove_words: str, default=''
         共起に含めたくない除去ワード集
+
+    remove_combi: dict, default=''
+        除去対象の品詞組み合わせ
 
     target_words: str, default=''
         指定した単語の共起のみ表示する
@@ -129,6 +168,14 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
     for i in range(len(midashi)):
         sentences.append([midashi[i], genkei[i], hinshi[i]])
 
+    # 品詞の辞書を取得
+    hinshi_dict = get_hinshi_dict()
+    # 感動詞の削除
+    del hinshi_dict['kandoushi']
+    for key in remove_combi.keys():
+        if not remove_combi.get(key):
+            del hinshi_dict[key]
+
     # 同一文の中で設定に合致したwordsをkeywordsに含める
     keywords = []
     words = []
@@ -140,23 +187,34 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
             continue
 
         # 品詞がtarget_hinshiに含まれている and not (見出しが除去ワードリストに入っている or 原型が除去ワードリストに入っている)
-        if sentence[2] in target_hinshi and not (sentence[0] in remove_words_list or sentence[1] in remove_words_list):
-            words.append(sentence[1])
+        if can_add_genkei2words(sentence, target_hinshi, remove_words_list):
+            words.append((sentence[1], sentence[2]))
 
-    # keywordsを基にカウントベースで共起をカウント
+    # keywordsを基に単語の全組み合わせ作成
     sentence_combinations = [list(itertools.combinations(
         set(sentence), 2)) for sentence in keywords]
     sentence_combinations = [[tuple(sorted(words)) for words in sentence]
                              for sentence in sentence_combinations]
+    if hinshi_dict:
+        # 除去対象の品詞組み合わせを削除
+        new_sentence_combinations = []
+        for sc in sentence_combinations:
+            combination_list = []
+            for word1, word2 in sc:
+                if has_not_remove_combinations(word1, word2, remove_combi, hinshi_dict):
+                    combination_list.append((word1, word2))
+            new_sentence_combinations.append(combination_list)
+        sentence_combinations = new_sentence_combinations
+    # keywordsを基にカウントベースで共起数をカウント
     target_combinations = []
     for sentence in sentence_combinations:
         target_combinations.extend(sentence)
     ct = collections.Counter(target_combinations)
 
-    # 指定ワードが含まれるレコードのみ抽出
-    cols = [{'first': i[0][0], 'second': i[0][1], 'count': i[1]}
+    cols = [{'first': i[0][0][0], 'first_type': i[0][0][1], 'second': i[0][1][0], 'second_type': i[0][1][1], 'count': i[1]}
             for i in ct.most_common()]
     co_oc_df = pd.DataFrame(cols)
+    # 指定ワードが含まれるレコードのみ抽出
     if target_words:
         new_co_oc_df = pd.DataFrame()
         for tw in target_words.split('\r\n'):

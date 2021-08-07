@@ -116,25 +116,94 @@
     </div>
 
     <!--
-    ----- 除去ワード -----
+    ----- 除去設定 -----
     -->
-    <div class='form-group'>
-      <label for='remove-word' class='form-check-label'>除去ワード</label>
-      <div class='p-2'>
-        <p>共起ネットワークに含めない単語を指定可能です。</p>
-        <button class='btn btn-info dropdown-toggle' aria-controls='remove-word-sample' aria-expanded='false'
-          data-target='#remove-word-sample' data-toggle='collapse' type='button'>入力例</button>
-        <div id='remove-word-sample' class='collapse'>
-          <div class='bs-callout bs-callout-info mt-0 py-1'>
-            <p>
-            二十面相<br>
-            明智
-            </p>
+    <div class='card border-danger mb-3'>
+      <div class='card-header'>除去設定</div>
+      <div class='card-body'>
+        <!--
+        ----- 除去ワード -----
+        -->
+        <div class='form-group'>
+          <label for='remove-word' class='form-check-label'>除去ワード</label>
+          <div class='p-2'>
+            <p>共起ネットワークに含めない単語を指定可能です。</p>
+            <button class='btn btn-info dropdown-toggle' aria-controls='remove-word-sample' aria-expanded='false'
+              data-target='#remove-word-sample' data-toggle='collapse' type='button'>入力例</button>
+            <div id='remove-word-sample' class='collapse'>
+              <div class='bs-callout bs-callout-info mt-0 py-1'>
+                <p>
+                二十面相<br>
+                明智
+                </p>
+              </div>
+            </div>
+          </div>
+          <textarea class='form-control' rows=2
+            name='remove-words'>{{ sent_data.get('remove_words') if sent_data else ''}}</textarea>
+        </div>
+
+        <!--
+        ----- 除去対象の品詞組み合わせ -----
+        -->
+        <div class='form-group'>
+          <label class='form-check-label'>除去対象の品詞組み合わせ</label>
+          <div class='row px-4'>
+            <!--
+            ----- 名詞 -----
+            -->
+            <div class='col-3 card card-body'>
+              <div class='card-title'>名詞 - ?</div>
+              {% for key, value in edogawa_data.get('hinshi_dict').items() %}
+              <div class='form-check'>
+                <input type='checkbox' name='remove-combi-meishi' value={{key}} id=meishi-{{key}} class='form-check-input'
+                {{ 'checked' if ( sent_data and key in sent_data.get('remove_combi', {}).get('meishi', {}) ) else '' }}>
+                <label for=meishi-{{key}} class='form-check-label'>{{value}}</label>
+              </div>
+              {% endfor %}
+            </div>
+            <!--
+            ----- 動詞 -----
+            -->
+            <div class='col-3 card card-body'>
+              <div class='card-title'>動詞 - ?</div>
+              {% for key, value in edogawa_data.get('hinshi_dict').items() %}
+              <div class='form-check'>
+                <input type='checkbox' name='remove-combi-doushi' value={{key}} id=doushi-{{key}} class='form-check-input'
+                {{ 'checked' if ( sent_data and key in sent_data.get('remove_combi', {}).get('doushi', {}) ) else '' }}>
+                <label for=doushi-{{key}} class='form-check-label'>{{value}}</label>
+              </div>
+              {% endfor %}
+            </div>
+            <!--
+            ----- 形容詞 -----
+            -->
+            <div class='col-3 card card-body'>
+              <div class='card-title'>形容詞 - ?</div>
+              {% for key, value in edogawa_data.get('hinshi_dict').items() %}
+              <div class='form-check'>
+                <input type='checkbox' name='remove-combi-keiyoushi' value={{key}} id=keiyoushi-{{key}} class='form-check-input'
+                {{ 'checked' if ( sent_data and key in sent_data.get('remove_combi', {}).get('keiyoushi', {}) ) else '' }}>
+                <label for=keiyoushi-{{key}} class='form-check-label'>{{value}}</label>
+              </div>
+              {% endfor %}
+            </div>
+            <!--
+            ----- 副詞 -----
+            -->
+            <div class='col-3 card card-body'>
+              <div class='card-title'>副詞 - ?</div>
+              {% for key, value in edogawa_data.get('hinshi_dict').items() %}
+              <div class='form-check'>
+                <input type='checkbox' name='remove-combi-fukushi' value={{key}} id=fukushi-{{key}} class='form-check-input'
+                {{ 'checked' if ( sent_data and key in sent_data.get('remove_combi', {}).get('fukushi', {}) ) else '' }}>
+                <label for=fukushi-{{key}} class='form-check-label'>{{value}}</label>
+              </div>
+              {% endfor %}
+            </div>
           </div>
         </div>
       </div>
-      <textarea class='form-control' rows=2
-        name='remove-words'>{{ sent_data.get('remove_words') if sent_data else ''}}</textarea>
     </div>
 
     <!--
@@ -180,8 +249,12 @@
     <p>入力データ：{{ sent_data.get('name') }}</p>
     <p>共起数上位：{{ sent_data.get('number') }}</p>
     <p>可視化対象の品詞：{{ ', '.join(sent_data.get('hinshi')) }}</p>
-    <p>除去ワード：{{ ', '.join(sent_data.get('remove_words').split('\r\n')) }}</p>
-    <p>指定ワード：{{ ', '.join(sent_data.get('target_words').split('\r\n')) }}</p>
+    <p class={{ '' if sent_data.get('remove_words') else 'text-danger' }}>
+      {{ '除去ワード：' + ( ', '.join(sent_data.get('remove_words').split('\r\n')) if sent_data.get('remove_words') else '除去ワードなし' ) }}
+    </p>
+    <p class={{ '' if sent_data.get('target_words') else 'text-danger' }}>
+      {{ '指定ワード：' + ( ', '.join(sent_data.get('target_words').split('\r\n')) if sent_data.get('target_words') else '指定ワードなし' ) }}
+    </p>
   </div>
 
   <!--
@@ -220,7 +293,9 @@
           <tr>
             <th>NO.</th>
             <th>first</th>
+            <th>first_type</th>
             <th>second</th>
+            <th>second_type</th>
             <th>count</th>
           </tr>
         </thead>
@@ -228,15 +303,14 @@
         <tr>
           <td>{{ index+1 }}</td>
           <td>{{ rows['first'] }}</td>
+          <td>{{ rows['first_type'] }}</td>
           <td>{{ rows['second'] }}</td>
+          <td>{{ rows['second_type'] }}</td>
           <td>{{ rows['count'] }}</td>
         </tr>
         {% endfor %}
         <tr>
-          <td>...</td>
-          <td>...</td>
-          <td>...</td>
-          <td>...</td>
+          <td colspan={{ 1 + (sent_data.get('co_oc_df').columns | length) }} class='text-center text-danger'>《以下略》</td>
         </tr>
       </table>
     </div>

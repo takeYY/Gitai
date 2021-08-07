@@ -77,6 +77,12 @@ def network_visualization():
     hinshi_eng = request.form.getlist('hinshi')
     hinshi_jpn = [hinshi_dict.get(k) for k in hinshi_eng]
     remove_words = request.form['remove-words']
+    remove_combi_meishi = request.form.getlist('remove-combi-meishi')
+    remove_combi_doushi = request.form.getlist('remove-combi-doushi')
+    remove_combi_keiyoushi = request.form.getlist('remove-combi-keiyoushi')
+    remove_combi_fukushi = request.form.getlist('remove-combi-fukushi')
+    remove_combi_dict = dict(meishi=remove_combi_meishi, doushi=remove_combi_doushi,
+                             keiyoushi=remove_combi_keiyoushi, fukushi=remove_combi_fukushi)
     target_words = request.form['target-words']
     # エラーの有無判定
     error = False
@@ -98,21 +104,22 @@ def network_visualization():
         error = True
     # errorがあれば
     if error:
-        sent_error_data = dict(input_type=input_type, name=name, number=number,
-                               hinshi=hinshi_jpn, hinshi_eng=hinshi_eng, remove_words=remove_words)
+        sent_error_data = dict(input_type=input_type, name=name, number=number, hinshi=hinshi_jpn, hinshi_eng=hinshi_eng,
+                               remove_words=remove_words, remove_combi=remove_combi_dict, target_words=target_words)
         return render_template('co-occurrence_network.html', basic_data=basic_data, edogawa_data=edogawa_data, sent_data=sent_error_data)
     # 共起ネットワーク作成
     try:
-        csv_file_name, co_oc_df = create_network(
-            file_name=file_name, target_hinshi=hinshi_jpn, target_num=number, remove_words=remove_words, target_words=target_words, input_type=input_type)
+        csv_file_name, co_oc_df = create_network(file_name=file_name, target_hinshi=hinshi_jpn, target_num=number,
+                                                 remove_words=remove_words, remove_combi=remove_combi_dict,
+                                                 target_words=target_words, input_type=input_type)
     except:
         flash('ファイル形式が正しくありません。（入力形式に沿ってください）', 'error')
-        sent_error_data = dict(input_type=input_type, name=name, number=number,
-                               hinshi=hinshi_jpn, hinshi_eng=hinshi_eng, remove_words=remove_words, target_words=target_words)
+        sent_error_data = dict(input_type=input_type, name=name, number=number, hinshi=hinshi_jpn, hinshi_eng=hinshi_eng,
+                               remove_words=remove_words, remove_combi=remove_combi_dict, target_words=target_words)
         return render_template('co-occurrence_network.html', basic_data=basic_data, edogawa_data=edogawa_data, sent_data=sent_error_data)
     # 利用者から送られてきた情報を基に送る情報
     sent_data = dict(input_type=input_type, name=name, file_name=csv_file_name, number=number, hinshi=hinshi_jpn, hinshi_eng=hinshi_eng,
-                     remove_words=remove_words, target_words=target_words, co_oc_df=co_oc_df)
+                     remove_words=remove_words, remove_combi=remove_combi_dict, target_words=target_words, co_oc_df=co_oc_df)
 
     try:
         return render_template('co-occurrence_network.html', basic_data=basic_data, edogawa_data=edogawa_data, sent_data=sent_data)
