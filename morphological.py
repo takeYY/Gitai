@@ -4,7 +4,7 @@ from pyknp import Juman
 from get_data import mecab_divide_dict, juman_divide_dict
 
 
-@timeout_decorator.timeout(30, use_signals=False)
+@timeout_decorator.timeout(29, use_signals=False)
 def get_mecab_mrph(text):
     tagger = MeCab.Tagger(
         '-d /usr/lib/x86_64-linux-gnu/mecab/dic/mecab-ipadic-neologd'
@@ -34,7 +34,7 @@ def get_mecab_mrph(text):
     return mrph_list
 
 
-@timeout_decorator.timeout(30, use_signals=False)
+@timeout_decorator.timeout(29, use_signals=False)
 def get_juman_mrph(text):
     mrph_list = []
     for t in text.split('。'):
@@ -70,7 +70,7 @@ def mrph_analysis(mrph_type, text):
             # MeCabによる形態素解析
             mrph_result = get_mecab_mrph(text)
         except:
-            # 解析に30秒以上かかった場合
+            # 解析に29秒以上かかった場合
             mrph_result = ''
         # MeCabの分類辞書
         divide_dict = mecab_divide_dict()
@@ -81,7 +81,7 @@ def mrph_analysis(mrph_type, text):
             # Jumanppによる形態素解析
             mrph_result = get_juman_mrph(text)
         except:
-            # 30秒以上かかった場合
+            # 29秒以上かかった場合
             mrph_result = ''
         # Jumanppの分類辞書
         divide_dict = juman_divide_dict()
