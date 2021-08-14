@@ -78,8 +78,11 @@
                 <div class='form-group'>
                   <div class='input-group'>
                     <div class='custom-file'>
-                      <input type='file' name='file' class='custom-file-input' id='inputFile' disabled>
-                      <label class='custom-file-label' for='inputFile' data-browse='参照'>ファイルを選択...</label>
+                      <input type='file' name='file' class='custom-file-input' id='inputFile'>
+                      <label class='custom-file-label' for='inputFile' data-browse='参照'>
+                      {{ sent_data.get('name') if sent_data and sent_data.get('input_type')=='csv' and sent_data.get('name')
+                      else 'ファイルを選択...' }}
+                      </label>
                     </div>
                     <div class='input-group-append'>
                       <button type='button' class='btn btn-outline-secondary input-group-text' id='inputFileReset'>取消</button>
@@ -227,6 +230,14 @@
       <textarea class='form-control' rows=2
         name='target-words'>{{ sent_data.get('target_words') if sent_data else ''}}</textarea>
     </div>
+
+    <!--
+    ----- 隠しフィールド -----
+    -->
+    {% if sent_data and sent_data.get('input_type')=='csv' and sent_data.get('prev_csv_name') %}
+    <input type='hidden' name='previous_file_name' value={{ sent_data.get('name') }}>
+    <input type='hidden' name='previous_file_path' value={{ sent_data.get('prev_csv_name') }}>
+    {% endif %}
 
     <!--
     ----- 可視化ボタン -----

@@ -89,11 +89,15 @@ def network_visualization():
     # 入力データ
     input_type = request.form['input_type']
     if input_type == 'csv':
-        name = 'csvからのインポート'
-        file_name, error = get_csv_filename(app, request)
+        if request.form.get('previous_file_name'):
+            name = request.form['previous_file_name']
+            file_name = request.form['previous_file_path']
+        else:
+            name, file_name, error = get_csv_filename(app, request)
     else:
         # 利用者から送られてきた情報を基にデータ整理
         name, file_name = request.form['name'].split('-')
+    name = name.replace(' ', '')
     # 品詞が1つも選択されなかった場合
     if not hinshi_eng:
         flash('品詞が選択されていません。', 'error')
@@ -118,7 +122,7 @@ def network_visualization():
                                remove_words=remove_words, remove_combi=remove_combi_dict, target_words=target_words)
         return render_template('co-occurrence_network.html', basic_data=basic_data, edogawa_data=edogawa_data, sent_data=sent_error_data)
     # 利用者から送られてきた情報を基に送る情報
-    sent_data = dict(input_type=input_type, name=name, file_name=csv_file_name, number=number, hinshi=hinshi_jpn, hinshi_eng=hinshi_eng,
+    sent_data = dict(input_type=input_type, name=name, prev_csv_name=file_name, file_name=csv_file_name, number=number, hinshi=hinshi_jpn, hinshi_eng=hinshi_eng,
                      remove_words=remove_words, remove_combi=remove_combi_dict, target_words=target_words, co_oc_df=co_oc_df)
 
     try:
