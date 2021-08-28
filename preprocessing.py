@@ -16,20 +16,37 @@ def get_other_option_description_dict():
     return {value: description[idx] for idx, value in enumerate(get_other_option_dict().values())}
 
 
-def texts_preprocessing(texts, remove_words, replace_words, other_options):
+def texts_preprocessing(texts, remove_words, remove_word_in_texts, replace_words, other_options):
     # テキストを前処理
     preprocessed_text = []
+    # エラーの有無
+    errors = []
     for text in texts.split('\r\n'):
+        if errors:
+            break
+
         if remove_words:
             for rw in remove_words.split('\r\n'):
                 text = text.replace(rw, '')
+        if remove_word_in_texts:
+            for rwit in remove_word_in_texts.split('\r\n'):
+                try:
+                    alpha, omega = rwit.split(',')
+                    text = re.sub(f'\{alpha}.*?\{omega}', '', text)
+                except:
+                    errors.append('「指定文字列とその中身の削除設定」の入力形式が違います。')
+                    break
         if replace_words:
             for rw in replace_words.split('\r\n'):
                 try:
                     target, replace = rw.split(' ')
                     text = text.replace(target, replace)
                 except:
-                    continue
+                    errors.append('「置換設定」の入力形式が違います。')
+                    break
+        # エラーがある場合、処理終了
+        if errors:
+            return '', errors
         # 全角 => 半角
         if 'all2half' in other_options:
             text = text.translate(str.maketrans(
@@ -47,4 +64,4 @@ def texts_preprocessing(texts, remove_words, replace_words, other_options):
             text = re.sub('[0-9]+', '0', text)
         preprocessed_text.append(text)
 
-    return preprocessed_text
+    return preprocessed_text, errors

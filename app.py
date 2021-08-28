@@ -329,16 +329,24 @@ def preprocessing():
             flash('テキストが入力されていません。', 'error')
             return render_template('preprocessing.html', basic_data=basic_data, other_option=other_option, description=other_option_description)
         remove_words = request.form['remove-texts']
+        remove_word_in_texts = request.form['remove-text-in-texts']
         replace_words = request.form['replace-texts']
         other_options = request.form.getlist('other-option')
-        # 送られてきた情報を基にテキストを前処理
-        preprocessed_text = texts_preprocessing(
-            texts, remove_words, replace_words, other_options)
         # 選択されたその他設定を取得
         selected_option = [other_option.get(k) for k in other_options]
+        # 送られてきた情報を基にテキストを前処理
+        preprocessed_text, errors = texts_preprocessing(
+            texts, remove_words, remove_word_in_texts, replace_words, other_options)
+        # エラーがある場合
+        if errors:
+            for error in errors:
+                flash(error, 'error')
+            sent_data = dict(texts=texts, remove_texts=remove_words, remove_text_in_texts=remove_word_in_texts,
+                             other_option=selected_option, replace_texts=replace_words)
+            return render_template('preprocessing.html', basic_data=basic_data, sent_data=sent_data, other_option=other_option, description=other_option_description)
         # 送るデータをまとめる
-        sent_data = dict(texts=texts, remove_texts=remove_words, other_option=selected_option,
-                         replace_texts=replace_words, preprocessed_texts=preprocessed_text)
+        sent_data = dict(texts=texts, remove_texts=remove_words, remove_text_in_texts=remove_word_in_texts,
+                         other_option=selected_option, replace_texts=replace_words, preprocessed_texts=preprocessed_text)
         return render_template('preprocessing.html', basic_data=basic_data, sent_data=sent_data, other_option=other_option, description=other_option_description)
 
 
