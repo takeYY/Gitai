@@ -14,7 +14,7 @@
     -->
     <div class='form-group'>
       <label for='texts' class='form-check-label'>前処理対象テキスト</label>
-      <textarea class='form-control' rows=3
+      <textarea class='form-control' rows=5
         name='texts'>{{ sent_data.get('texts') if sent_data else ''}}</textarea>
     </div>
 
@@ -23,24 +23,9 @@
     -->
     <div class='form-group'>
       <label for='remove-texts' class='form-check-label'>削除設定</label>
-      <!-- 入力例 -->
-      <div class='p-2'>
-        <p>削除したい文字列を改行区切りで入力してください。</p>
-        <button class='btn btn-info dropdown-toggle' aria-controls='remove-word-sample' aria-expanded='false'
-          data-target='#remove-word-sample' data-toggle='collapse' type='button'>入力例</button>
-        <div id='remove-word-sample' class='collapse'>
-          <div class='bs-callout bs-callout-info mt-0 py-1'>
-            <p>
-            「<br>
-            怪人<br>
-            」
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <textarea class='form-control' rows=2
-        name='remove-texts'>{{ sent_data.get('remove_texts') if sent_data else ''}}</textarea>
+      <p class='pl-3'>削除したい文字列を改行区切りで入力してください。</p>
+      <textarea class='form-control' rows=3
+        name='remove-texts' placeholder='「&#13;怪人&#13;」'>{{ sent_data.get('remove_texts') if sent_data else ''}}</textarea>
     </div>
 
     <!--
@@ -48,24 +33,9 @@
     -->
     <div class='form-group'>
       <label for='replace-texts' class='form-check-label'>置換設定</label>
-      <!-- 入力例 -->
-      <div class='p-2'>
-        <p>「置換対象（半角スペース）置換後」という形式でそれぞれ改行区切りで入力してください。</p>
-        <button class='btn btn-info dropdown-toggle' aria-controls='replace-word-sample' aria-expanded='false'
-          data-target='#replace-word-sample' data-toggle='collapse' type='button'>入力例</button>
-        <div id='replace-word-sample' class='collapse'>
-          <div class='bs-callout bs-callout-info mt-0 py-1'>
-            <p>
-            ! 。<br>
-            ? 。<br>
-            かいじん 怪人
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <textarea class='form-control' rows=2
-        name='replace-texts'>{{ sent_data.get('replace_texts') if sent_data else ''}}</textarea>
+      <p class='pl-3'>「置換対象（半角スペース）置換後」という形式でそれぞれ改行区切りで入力してください。</p>
+      <textarea class='form-control' rows=3
+        name='replace-texts' placeholder='! 。&#13;? 。&#13;かいじん 怪人'>{{ sent_data.get('replace_texts') if sent_data else ''}}</textarea>
     </div>
 
     <!--
@@ -94,7 +64,7 @@
       {% for key, value in other_option.items() %}
       <div class='form-check'>
         <input type='checkbox' name='other-option' value={{key}} id={{key}} class='form-check-input' {{'checked' if 
-        (sent_data and value in sent_data.get('other_option') or not sent_data) else '' }}>
+        (sent_data and value in sent_data.get('other_option') or not sent_data and key not in ['replace_numbers2zero', 'big2small']) else '' }}>
         <label for={{key}} class='form-check-label'>{{value}}</label>
       </div>
       {% endfor %}
@@ -113,14 +83,8 @@
   -->
   {% if sent_data %}
   <hr>
-  <div class='card border-primary'>
-    <div class='card-body p-2'>
-      <p>
-        {% for preprocessed_text in sent_data.get('preprocessed_texts') %}
-        {{ preprocessed_text }}<br>
-        {% endfor %}
-      </p>
-    </div>
+  <div class='form-group'>
+    <textarea class='form-control' rows={{ sent_data.get('preprocessed_texts')|length }}>{{ '\r\n'.join(sent_data.get('preprocessed_texts'))}}</textarea>
   </div>
   {% endif %}
 </div>

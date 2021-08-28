@@ -324,6 +324,10 @@ def preprocessing():
     else:
         # 利用者から送られてきた情報を取得
         texts = request.form.get('texts')
+        # textsがない場合
+        if not texts:
+            flash('テキストが入力されていません。', 'error')
+            return render_template('preprocessing.html', basic_data=basic_data, other_option=other_option, description=other_option_description)
         remove_words = request.form['remove-texts']
         replace_words = request.form['replace-texts']
         other_options = request.form.getlist('other-option')

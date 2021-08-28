@@ -3,7 +3,7 @@ import string
 
 
 def get_other_option_dict():
-    return dict(all2half='全角を半角へ変換', big2small='英語大文字を小文字へ変換', remove_symbols='記号を削除', replace_numbers='数字を全て0に変換')
+    return dict(all2half='全角を半角へ変換', big2small='英語大文字を小文字へ変換', remove_symbols='記号を削除', replace_numbers2zero='数字を全て0に変換')
 
 
 def get_other_option_description_dict():
@@ -43,7 +43,7 @@ def texts_preprocessing(texts, remove_words, replace_words, other_options):
                                   ' '*len(string.punctuation))
             text = ' '.join(text.translate(table).split())
         # 数字列を0に置換
-        if 'replace_numbers' in other_options:
+        if 'replace_numbers2zero' in other_options:
             text = re.sub('[0-9]+', '0', text)
         preprocessed_text.append(text)
 
