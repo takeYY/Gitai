@@ -120,7 +120,7 @@ def kyoki_word_network(target_num=250, file_name='3742_9_3_11_02'):
     return got_net
 
 
-def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], target_num=250, remove_words='', remove_combi='', target_words='', input_type='edogawa'):
+def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], target_num=250, remove_words='', remove_combi='', target_words='', input_type='edogawa', is_used_3d=False):
     """
     共起ネットワークの作成
 
@@ -228,9 +228,10 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
     co_oc_df.to_csv(f'tmp/{now}.csv', index=False, encoding='utf_8_sig')
 
     try:
-        # 処理の実行
-        got_net = kyoki_word_network(target_num=target_num, file_name=now)
-        got_net.write_html(f'tmp/{now}.html')
+        # 2Dの共起ネットワークHTML作成
+        if not is_used_3d:
+            got_net = kyoki_word_network(target_num=target_num, file_name=now)
+            got_net.write_html(f'tmp/{now}.html')
         return now, co_oc_df
     except:
         return '', ''

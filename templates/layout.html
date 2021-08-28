@@ -57,6 +57,10 @@
               url_for('co_occurrence_network') }}>共起ネットワーク</a>
           </li>
           <li class="nav-item">
+            <a class="nav-link {{ 'active' if basic_data.get('active_url') == 'co-oc_3d_network' else '' }}" href={{
+              url_for('co_oc_3d_network') }}>共起ネットワーク（3D）</a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link {{ 'active' if basic_data.get('active_url') == 'KH-coder' else '' }}" href={{
               url_for('khcoder') }}>KH Coder</a>
           </li>

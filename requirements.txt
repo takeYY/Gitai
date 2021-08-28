@@ -8,3 +8,6 @@ mecab-python3==0.7
 gensim
 pyknp
 timeout-decorator
+matplotlib
+networkx
+plotly

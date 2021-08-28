@@ -1,0 +1,331 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class='container pb-4'>
+  <h3 class='text-center'>{{ basic_data.get('title') }}</h3>
+
+  <!--
+  ----- 作品検索フォーム -----
+  -->
+  <form action='/co-oc_3D-network' method='post' enctype=multipart/form-data>
+    <label class='form-check-label' for='input_type'>入力データ</label>
+    <div class='accordion mb-3' id='input-accordion'>
+      <div class='form-check'>
+        <div class='card'>
+          <div class='card-header pl-4' class='edogawa-header'>
+            <input class='form-check-input' type='radio' name='input_type' value='edogawa' id='input-edogawa'
+            {{ 'checked' if sent_data and sent_data.get('input_type')=='edogawa' or not sent_data else '' }}
+            data-toggle='collapse' data-target='#edogawa-collapse' aria-expanded='true' aria-controls='edogawa-collapse'>
+            <label class='form-check-label' for='input-edogawa'>江戸川乱歩作品</label>
+          </div>
+          <div id='edogawa-collapse' class='collapse {{ "show" if sent_data and sent_data.get("input_type")=="edogawa" or not sent_data else ""}}' aria-labelledby='edogawa-header' data-parent='#input-accordion'>
+            <div class='card-body'>
+            <!--
+            ----- 作品名（江戸川乱歩作品で分析） ------
+            -->
+              <div class='form-group w-50'>
+                <label for='name' class='form-check-label'>作品名</label>
+                <select name='name' class='form-control' id='edogawa-works'>
+                  {% for name, file in edogawa_data.get('name_file') %}
+                  <option value={{name}}-{{file}} {{'selected' if sent_data and sent_data.get('name')==name else '' }}>{{name}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!--
+        ----- 任意のCSVデータで分析 -----
+        -->
+        <div class='card'>
+          <div class='card-header pl-4' class='csv-header'>
+            <input class='form-check-input' type='radio' name='input_type' value='csv' id='input-csv'
+            {{ 'checked' if sent_data and sent_data.get('input_type')=='csv' else '' }}
+            data-toggle='collapse' data-target='#csv-collapse' aria-expanded='true' aria-controls='csv-collapse'>
+            <label class='form-check-label' for='input-csv'>CSVデータ</label>
+          </div>
+          <div id='csv-collapse' class='collapse {{ "show" if sent_data and sent_data.get("input_type")=="csv" else ""}}' aria-labelledby='csv-header' data-parent='#input-accordion'>
+            <div class='card-body'>
+              <div class='form-group'>
+                <p><a href={{ url_for('morphological') }} target=_blank>形態素解析</a>によって得られたcsvデータが対象（最大16MBまで）</p>
+                <!--
+                ----- 入力形式 -----
+                -->
+                <button class='btn btn-info dropdown-toggle' aria-controls='csv-sample' aria-expanded='false'
+                  data-target='#csv-sample' data-toggle='collapse' type='button'>入力形式</button>
+                <div id='csv-sample' class='collapse'>
+                  <div class='bs-callout bs-callout-info mt-0 py-1'>
+                    <p>
+                    例1）<br>
+                    表層形,品詞,原形<br>
+                    すもも,名詞,すもも<br>
+                    も,助詞,も<br>
+                    もも,名詞,もも<br>
+                    も,助詞,も<br>
+                    もも,名詞,もも<br><br>
+                    例2）<br>
+                    見出し,品詞,原形<br>
+                    くるま,名詞,くるま<br>
+                    で,助詞,で<br>
+                    まつ,動詞,まつ
+                    </p>
+                  </div>
+                </div>
+                <!--
+                ----- ファイル選択 -----
+                -->
+                <div class='form-group'>
+                  <div class='input-group'>
+                    <div class='custom-file'>
+                      <input type='file' name='file' class='custom-file-input' id='inputFile'>
+                      <label class='custom-file-label' for='inputFile' data-browse='参照'>
+                      {{ sent_data.get('name') if sent_data and sent_data.get('input_type')=='csv' and sent_data.get('name')
+                      else 'ファイルを選択...' }}
+                      </label>
+                    </div>
+                    <div class='input-group-append'>
+                      <button type='button' class='btn btn-outline-secondary input-group-text' id='inputFileReset'>取消</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--
+    ----- 表示する共起数上位 -----
+    -->
+    <div class='form-group w-25'>
+      <label for='number' class='form-check-label'>共起数上位</label>
+      <input type='number' class='form-control' name='number' value={{ sent_data.get('number') if sent_data else 50 }}>
+    </div>
+
+    <!--
+    ----- 可視化対象の品詞 -----
+    -->
+    <div class='form-group'>
+      <label for='hinshi' class='form-check-label'>可視化対象の品詞</label>
+      {% for key, value in edogawa_data.get('hinshi_dict').items() %}
+      <div class='form-check'>
+        <input type='checkbox' name='hinshi' value={{key}} id={{key}} class='form-check-input' {{'checked' if 
+        (sent_data and value in sent_data.get('hinshi') or not sent_data) else '' }}>
+        <label for={{key}} class='form-check-label'>{{value}}</label>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!--
+    ----- 除去設定 -----
+    -->
+    <div class='card border-danger mb-3'>
+      <div class='card-header'>除去設定</div>
+      <div class='card-body'>
+        <!--
+        ----- 除去ワード -----
+        -->
+        <div class='form-group'>
+          <label for='remove-word' class='form-check-label'>除去ワード</label>
+          <div class='p-2'>
+            <p>共起ネットワークに含めない単語を指定可能です。</p>
+            <button class='btn btn-info dropdown-toggle' aria-controls='remove-word-sample' aria-expanded='false'
+              data-target='#remove-word-sample' data-toggle='collapse' type='button'>入力例</button>
+            <div id='remove-word-sample' class='collapse'>
+              <div class='bs-callout bs-callout-info mt-0 py-1'>
+                <p>
+                二十面相<br>
+                明智
+                </p>
+              </div>
+            </div>
+          </div>
+          <textarea class='form-control' rows=2
+            name='remove-words'>{{ sent_data.get('remove_words') if sent_data else ''}}</textarea>
+        </div>
+
+        <!--
+        ----- 除去対象の品詞組み合わせ -----
+        -->
+        <div class='form-group'>
+          <label class='form-check-label'>除去対象の品詞組み合わせ</label>
+          <div class='row px-4'>
+            <!--
+            ----- 名詞 -----
+            -->
+            <div class='col-3 card card-body'>
+              <div class='card-title'>名詞 - ?</div>
+              {% for key, value in edogawa_data.get('hinshi_dict').items() %}
+              <div class='form-check'>
+                <input type='checkbox' name='remove-combi-meishi' value={{value}} id=meishi-{{key}} class='form-check-input'
+                {{ 'checked' if ( sent_data and value in sent_data.get('remove_combi', {}).get('meishi', {}) ) else '' }}>
+                <label for=meishi-{{key}} class='form-check-label'>{{value}}</label>
+              </div>
+              {% endfor %}
+            </div>
+            <!--
+            ----- 動詞 -----
+            -->
+            <div class='col-3 card card-body'>
+              <div class='card-title'>動詞 - ?</div>
+              {% for key, value in edogawa_data.get('hinshi_dict').items() %}
+              <div class='form-check'>
+                <input type='checkbox' name='remove-combi-doushi' value={{value}} id=doushi-{{key}} class='form-check-input'
+                {{ 'checked' if ( sent_data and value in sent_data.get('remove_combi', {}).get('doushi', {}) ) else '' }}>
+                <label for=doushi-{{key}} class='form-check-label'>{{value}}</label>
+              </div>
+              {% endfor %}
+            </div>
+            <!--
+            ----- 形容詞 -----
+            -->
+            <div class='col-3 card card-body'>
+              <div class='card-title'>形容詞 - ?</div>
+              {% for key, value in edogawa_data.get('hinshi_dict').items() %}
+              <div class='form-check'>
+                <input type='checkbox' name='remove-combi-keiyoushi' value={{value}} id=keiyoushi-{{key}} class='form-check-input'
+                {{ 'checked' if ( sent_data and value in sent_data.get('remove_combi', {}).get('keiyoushi', {}) ) else '' }}>
+                <label for=keiyoushi-{{key}} class='form-check-label'>{{value}}</label>
+              </div>
+              {% endfor %}
+            </div>
+            <!--
+            ----- 副詞 -----
+            -->
+            <div class='col-3 card card-body'>
+              <div class='card-title'>副詞 - ?</div>
+              {% for key, value in edogawa_data.get('hinshi_dict').items() %}
+              <div class='form-check'>
+                <input type='checkbox' name='remove-combi-fukushi' value={{value}} id=fukushi-{{key}} class='form-check-input'
+                {{ 'checked' if ( sent_data and value in sent_data.get('remove_combi', {}).get('fukushi', {}) ) else '' }}>
+                <label for=fukushi-{{key}} class='form-check-label'>{{value}}</label>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--
+    ----- 指定ワード -----
+    -->
+    <div class='form-group'>
+      <label for='target-word' class='form-check-label'>指定ワード</label>
+      <div class='p-2'>
+        <p>指定した単語の共起のみ表示します。</p>
+        <button class='btn btn-info dropdown-toggle' aria-controls='target-word-sample' aria-expanded='false'
+          data-target='#target-word-sample' data-toggle='collapse' type='button'>入力例</button>
+        <div id='target-word-sample' class='collapse'>
+          <div class='bs-callout bs-callout-info mt-0 py-1'>
+            <p>
+            怪人<br>
+            面相
+            </p>
+          </div>
+        </div>
+      </div>
+      <textarea class='form-control' rows=2
+        name='target-words'>{{ sent_data.get('target_words') if sent_data else ''}}</textarea>
+    </div>
+
+    <!--
+    ----- 隠しフィールド -----
+    -->
+    {% if sent_data and sent_data.get('input_type')=='csv' and sent_data.get('prev_csv_name') %}
+    <input type='hidden' name='previous_file_name' value={{ sent_data.get('name') }}>
+    <input type='hidden' name='previous_file_path' value={{ sent_data.get('prev_csv_name') }}>
+    {% endif %}
+
+    <!--
+    ----- 可視化ボタン -----
+    -->
+    <div class='text-center'>
+      <button type='submit' class='btn btn-primary'>可視化</button>
+    </div>
+  </form>
+
+
+  <!--
+  ----- 共起ネットワーク結果 -----
+  -->
+  {% if sent_data and sent_data.get('file_name') %}
+  <!--
+  ----- 検索条件の表示 -----
+  -->
+  <hr>
+  <div class='my-2'>
+    <p>入力データ：{{ sent_data.get('name') }}</p>
+    <p>共起数上位：{{ sent_data.get('number') }}</p>
+    <p>可視化対象の品詞：{{ ', '.join(sent_data.get('hinshi')) }}</p>
+    <p class={{ '' if sent_data.get('remove_words') else 'text-danger' }}>
+      {{ '除去ワード：' + ( ', '.join(sent_data.get('remove_words').split('\r\n')) if sent_data.get('remove_words') else '除去ワードなし' ) }}
+    </p>
+    <p class={{ '' if sent_data.get('target_words') else 'text-danger' }}>
+      {{ '指定ワード：' + ( ', '.join(sent_data.get('target_words').split('\r\n')) if sent_data.get('target_words') else '指定ワードなし' ) }}
+    </p>
+  </div>
+
+  <!--
+  ----- 共起ネットワークのグラフ -----
+  -->
+  <div class='border embed-responsive embed-responsive-16by9'>
+    <iframe src={{ url_for('show_co_oc_network', file_name=sent_data.get('html_file_name')) }}></iframe>
+  </div>
+  <hr>
+
+  <!--
+  ----- テーブル情報 -----
+  -->
+  <button class='btn btn-primary' data-toggle='collapse' data-target='#co-oc-table'
+  aria-expand='false' aria-controls='co-oc-table'>テーブル表示</button>
+  <div id='co-oc-table' class='collapse'>
+    <!--
+    ----- csvダウンロードボタン -----
+    -->
+    <div class='float-right'>
+      <form action='/download/csv' method='post'>
+        <input type='hidden' name='dir_path' value=tmp>
+        <input type='hidden' name='file_name' value={{ sent_data.get('file_name') }}>
+        <input type='hidden' name='new_name'
+          value={{ sent_data.get('name') }}_{{ '-'.join(sent_data.get('hinshi')) }}_{{ sent_data.get('number') }}>
+        <button type='submit' class='btn btn-primary'>CSVダウンロード</button>
+      </form>
+    </div>
+
+    <!--
+    ----- テーブルデータ表示 -----
+    -->
+    <div class='my-2'>
+      <table class='table table-sm table-striped table-hover'>
+        <thead class='thead-dark'>
+          <tr>
+            <th>NO.</th>
+            <th>first</th>
+            <th>first_type</th>
+            <th>second</th>
+            <th>second_type</th>
+            <th>count</th>
+          </tr>
+        </thead>
+        {% for index, rows in sent_data.get('co_oc_df')[:sent_data.get('number')].iterrows() %}
+        <tr>
+          <td>{{ index+1 }}</td>
+          <td>{{ rows['first'] }}</td>
+          <td>{{ rows['first_type'] }}</td>
+          <td>{{ rows['second'] }}</td>
+          <td>{{ rows['second_type'] }}</td>
+          <td>{{ rows['count'] }}</td>
+        </tr>
+        {% endfor %}
+        <tr>
+          <td colspan={{ 1 + (sent_data.get('co_oc_df').columns | length) }} class='text-center text-danger'>《以下略》</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -24,8 +24,14 @@ RUN wget https://github.com/ku-nlp/jumanpp/releases/download/v2.0.0-rc3/jumanpp-
   && cd jumanpp-2.0.0-rc3/ \
   && mkdir bld \
   && cd bld \
-  && cmake .. \
+  && cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local \
   && sudo make install
+
+# 日本語フォントの追加（noto）
+RUN apt-get update \
+  && apt-get -y install fonts-noto-cjk-extra \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /code
 WORKDIR /code
