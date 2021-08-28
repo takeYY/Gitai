@@ -4,7 +4,7 @@ from waitress import serve
 from get_data import get_hinshi_dict, get_khcoder_df, get_basic_data, get_novels_tuple, get_edogawa_merge_df, dict_in_list2csv
 from co_oc_network import create_network, get_csv_filename
 from preprocessing import texts_preprocessing, get_other_option_dict, get_other_option_description_dict
-from morphological import mrph_analysis
+from morphological import mrph_analysis, get_morphological_analysis_description_dict
 import os
 
 app = Flask(__name__)
@@ -266,8 +266,10 @@ def morphological():
     """
     # 基本情報
     basic_data = get_basic_data(title='形態素解析', active_url='morph_analysis')
+    # 形態素解析器の説明文
+    description = get_morphological_analysis_description_dict()
 
-    return render_template('morphological.html', basic_data=basic_data, mrph_type='None')
+    return render_template('morphological.html', basic_data=basic_data, mrph_type='None', description=description)
 
 
 @app.route('/morphological/analysis', methods=['GET', 'POST'])
@@ -282,19 +284,21 @@ def morphological_analysis():
 
     # 基本情報
     basic_data = get_basic_data(title='形態素解析', active_url='morph_analysis')
+    # 形態素解析器の説明文
+    description = get_morphological_analysis_description_dict()
     # 送信されたデータの取得と形態素解析器の種類
     text = request.form.get('words')
     mrph_type = request.form.get('mrph')
     # テキストが入力されなかった場合
     if not text:
         flash('テキストが入力されていません。', 'error')
-        return render_template('morphological.html', basic_data=basic_data, mrph_type='None')
+        return render_template('morphological.html', basic_data=basic_data, mrph_type='None', description=description)
     # 形態素解析
     mrph_result, divide_dict = mrph_analysis(mrph_type, text)
     # 形態素解析の結果が返ってこなかった場合
     if not mrph_result:
         flash('解析に失敗しました。テキストデータが大きすぎます。', 'error')
-        return render_template('morphological.html', basic_data=basic_data, mrph_type=mrph_type, mrph_data=dict(words=text))
+        return render_template('morphological.html', basic_data=basic_data, mrph_type=mrph_type, description=description, mrph_data=dict(words=text))
 
     # mrph_resultをcsvとして保存し、df, csv_nameを取得
     result_df, csv_name = dict_in_list2csv(mrph_result, divide_dict)
@@ -302,7 +306,7 @@ def morphological_analysis():
     mrph_data = dict(words=text, result_df=result_df[:50], csv_name=csv_name,
                      over50=50 < len(result_df), columns_num=len(result_df.columns))
 
-    return render_template('morphological.html', basic_data=basic_data, mrph_type=mrph_type, mrph_data=mrph_data)
+    return render_template('morphological.html', basic_data=basic_data, mrph_type=mrph_type, description=description, mrph_data=mrph_data)
 
 
 @app.route('/preprocessing', methods=['GET', 'POST'])
