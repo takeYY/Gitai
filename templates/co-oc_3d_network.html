@@ -7,11 +7,14 @@
   ----- 作品検索フォーム -----
   -->
   <form action='/co-oc_3D-network' method='post' enctype=multipart/form-data>
-    <label class='form-check-label' for='input_type'>入力データ</label>
+    <!--
+    ----- 入力データ -----
+    -->
+    <h5><div class='badge badge-danger'>必須</div> 入力データ</h5>
     <div class='accordion mb-3' id='input-accordion'>
       <div class='form-check'>
         <div class='card'>
-          <div class='card-header pl-4' class='edogawa-header'>
+          <div class='card-header px-4' class='edogawa-header'>
             <input class='form-check-input' type='radio' name='input_type' value='edogawa' id='input-edogawa'
             {{ 'checked' if sent_data and sent_data.get('input_type')=='edogawa' or not sent_data else '' }}
             data-toggle='collapse' data-target='#edogawa-collapse' aria-expanded='true' aria-controls='edogawa-collapse'>
@@ -19,17 +22,30 @@
           </div>
           <div id='edogawa-collapse' class='collapse {{ "show" if sent_data and sent_data.get("input_type")=="edogawa" or not sent_data else ""}}' aria-labelledby='edogawa-header' data-parent='#input-accordion'>
             <div class='card-body'>
-            <!--
-            ----- 作品名（江戸川乱歩作品で分析） ------
-            -->
+              <!--
+              ----- 作品名（江戸川乱歩作品で分析） ------
+              -->
               <div class='form-group w-50'>
                 <label for='name' class='form-check-label'>作品名</label>
-                <select name='name' class='form-control' id='edogawa-works'>
-                  {% for name, file in edogawa_data.get('name_file') %}
-                  <option value={{name}}-{{file}} {{'selected' if sent_data and sent_data.get('name')==name else '' }}>{{name}}
-                  </option>
-                  {% endfor %}
-                </select>
+                <div class='px-4'>
+                  <select name='name' class='form-control' id='edogawa-works'>
+                    {% for name, file in edogawa_data.get('name_file') %}
+                    <option value={{name}}-{{file}} {{'selected' if sent_data and sent_data.get('name')==name else '' }}>{{name}}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class='form-group'>
+                <label for='is_used_category' class='form-check-label'>章ごとのカテゴリ分割</label>
+                <div class='form-check'>
+                  <input type='radio' name='is_used_category' value=0 id='not-used-category' {{ 'checked' if sent_data and sent_data.get('is_used_category')==0 or not sent_data else '' }}>
+                  <label class='form-check-label' for='not-used-category'>しない</label>
+                </div>
+                <div class='form-check'>
+                  <input type='radio' name='is_used_category' value=1 id='used-category' {{ 'checked' if sent_data and sent_data.get('is_used_category')==1 else '' }}>
+                  <label class='form-check-label' for='used-category'>する</label>
+                </div>
               </div>
             </div>
           </div>
@@ -39,7 +55,7 @@
         ----- 任意のCSVデータで分析 -----
         -->
         <div class='card'>
-          <div class='card-header pl-4' class='csv-header'>
+          <div class='card-header px-4' class='csv-header'>
             <input class='form-check-input' type='radio' name='input_type' value='csv' id='input-csv'
             {{ 'checked' if sent_data and sent_data.get('input_type')=='csv' else '' }}
             data-toggle='collapse' data-target='#csv-collapse' aria-expanded='true' aria-controls='csv-collapse'>
@@ -100,36 +116,64 @@
     ----- 表示する共起数上位 -----
     -->
     <div class='form-group w-25'>
-      <label for='number' class='form-check-label'>共起数上位</label>
-      <input type='number' class='form-control' name='number' value={{ sent_data.get('number') if sent_data else 50 }}>
+      <h5><div class='badge badge-danger'>必須</div> 共起数上位</h5>
+      <div class='px-4'>
+        <input type='number' class='form-control' name='number' value={{ sent_data.get('number') if sent_data else 10 }}>
+      </div>
     </div>
 
     <!--
     ----- 可視化対象の品詞 -----
     -->
     <div class='form-group'>
-      <label for='hinshi' class='form-check-label'>可視化対象の品詞</label>
-      {% for key, value in edogawa_data.get('hinshi_dict').items() %}
-      <div class='form-check'>
-        <input type='checkbox' name='hinshi' value={{key}} id={{key}} class='form-check-input' {{'checked' if 
-        (sent_data and value in sent_data.get('hinshi') or not sent_data) else '' }}>
-        <label for={{key}} class='form-check-label'>{{value}}</label>
+      <h5><div class='badge badge-danger'>必須</div> 可視化対象の品詞</h5>
+      <div class='px-4'>
+        {% for key, value in edogawa_data.get('hinshi_dict').items() %}
+        <div class='form-check'>
+          <input type='checkbox' name='hinshi' value={{key}} id={{key}} class='form-check-input' {{'checked' if 
+          (sent_data and value in sent_data.get('hinshi') or not sent_data) else '' }}>
+          <label for={{key}} class='form-check-label'>{{value}}</label>
+        </div>
+        {% endfor %}
       </div>
-      {% endfor %}
+    </div>
+
+    <!--
+    ----- 指定ワード -----
+    -->
+    <div class='form-group'>
+      <h5><div class='badge badge-secondary'>任意</div> 指定ワード</h5>
+      <div class='p-4'>
+        <p>指定した単語の共起のみ表示します。</p>
+        <button class='btn btn-info dropdown-toggle' aria-controls='target-word-sample' aria-expanded='false'
+          data-target='#target-word-sample' data-toggle='collapse' type='button'>入力例</button>
+        <div id='target-word-sample' class='collapse'>
+          <div class='bs-callout bs-callout-info mt-0 py-1'>
+            <p>
+            怪人<br>
+            面相
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class='px-4'>
+        <textarea class='form-control' rows=2
+          name='target-words'>{{ sent_data.get('target_words') if sent_data else ''}}</textarea>
+      </div>
     </div>
 
     <!--
     ----- 除去設定 -----
     -->
     <div class='card border-danger mb-3'>
-      <div class='card-header'>除去設定</div>
+      <h5 class='card-header'><div class='badge badge-secondary'>任意</div> 除去設定</h5>
       <div class='card-body'>
         <!--
         ----- 除去ワード -----
         -->
         <div class='form-group'>
           <label for='remove-word' class='form-check-label'>除去ワード</label>
-          <div class='p-2'>
+          <div class='p-4'>
             <p>共起ネットワークに含めない単語を指定可能です。</p>
             <button class='btn btn-info dropdown-toggle' aria-controls='remove-word-sample' aria-expanded='false'
               data-target='#remove-word-sample' data-toggle='collapse' type='button'>入力例</button>
@@ -142,8 +186,10 @@
               </div>
             </div>
           </div>
-          <textarea class='form-control' rows=2
-            name='remove-words'>{{ sent_data.get('remove_words') if sent_data else ''}}</textarea>
+          <div class='px-4'>
+            <textarea class='form-control' rows=2
+              name='remove-words'>{{ sent_data.get('remove_words') if sent_data else ''}}</textarea>
+          </div>
         </div>
 
         <!--
@@ -151,7 +197,7 @@
         -->
         <div class='form-group'>
           <label class='form-check-label'>除去対象の品詞組み合わせ</label>
-          <div class='row px-4'>
+          <div class='row px-5'>
             <!--
             ----- 名詞 -----
             -->
@@ -207,28 +253,6 @@
           </div>
         </div>
       </div>
-    </div>
-
-    <!--
-    ----- 指定ワード -----
-    -->
-    <div class='form-group'>
-      <label for='target-word' class='form-check-label'>指定ワード</label>
-      <div class='p-2'>
-        <p>指定した単語の共起のみ表示します。</p>
-        <button class='btn btn-info dropdown-toggle' aria-controls='target-word-sample' aria-expanded='false'
-          data-target='#target-word-sample' data-toggle='collapse' type='button'>入力例</button>
-        <div id='target-word-sample' class='collapse'>
-          <div class='bs-callout bs-callout-info mt-0 py-1'>
-            <p>
-            怪人<br>
-            面相
-            </p>
-          </div>
-        </div>
-      </div>
-      <textarea class='form-control' rows=2
-        name='target-words'>{{ sent_data.get('target_words') if sent_data else ''}}</textarea>
     </div>
 
     <!--
@@ -308,6 +332,9 @@
             <th>second</th>
             <th>second_type</th>
             <th>count</th>
+            {% if 'カテゴリー' in sent_data.get('co_oc_df').columns %}
+            <th>カテゴリー</th>
+            {% endif %}
           </tr>
         </thead>
         {% for index, rows in sent_data.get('co_oc_df')[:sent_data.get('number')].iterrows() %}
@@ -318,6 +345,9 @@
           <td>{{ rows['second'] }}</td>
           <td>{{ rows['second_type'] }}</td>
           <td>{{ rows['count'] }}</td>
+          {% if 'カテゴリー' in sent_data.get('co_oc_df').columns %}
+          <td>{{ rows['カテゴリー'] }}</td>
+          {% endif %}
         </tr>
         {% endfor %}
         <tr>

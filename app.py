@@ -180,9 +180,11 @@ def co_oc_3d_network():
             file_name = request.form['previous_file_path']
         else:
             name, file_name, error = get_csv_filename(app, request)
+        used_category = 0
     else:
         # 利用者から送られてきた情報を基にデータ整理
         name, file_name = request.form['name'].split('-')
+        used_category = int(request.form['is_used_category'])
     name = name.replace(' ', '')
     # 品詞が1つも選択されなかった場合
     if not hinshi_eng:
@@ -195,22 +197,24 @@ def co_oc_3d_network():
     # errorがあれば
     if error:
         sent_error_data = dict(input_type=input_type, name=name, number=number, hinshi=hinshi_jpn, hinshi_eng=hinshi_eng,
-                               remove_words=remove_words, remove_combi=remove_combi_dict, target_words=target_words)
+                               remove_words=remove_words, remove_combi=remove_combi_dict, target_words=target_words, is_used_category=used_category)
         return render_template('co-oc_3d_network.html', basic_data=basic_data, edogawa_data=edogawa_data, sent_data=sent_error_data)
     # 共起ネットワーク作成
     try:
         csv_file_name, co_oc_df = create_network(file_name=file_name, target_hinshi=hinshi_jpn, target_num=number,
                                                  remove_words=remove_words, remove_combi=remove_combi_dict,
-                                                 target_words=target_words, input_type=input_type, is_used_3d=True)
-        html_file_name = create_3d_network(co_oc_df, number)
+                                                 target_words=target_words, input_type=input_type,
+                                                 is_used_3d=True, used_category=used_category)
+        html_file_name = create_3d_network(
+            co_oc_df, target_num=number, used_category=used_category)
     except:
         flash('ファイル形式が正しくありません。（入力形式に沿ってください）', 'error')
         sent_error_data = dict(input_type=input_type, name=name, number=number, hinshi=hinshi_jpn, hinshi_eng=hinshi_eng,
-                               remove_words=remove_words, remove_combi=remove_combi_dict, target_words=target_words)
+                               remove_words=remove_words, remove_combi=remove_combi_dict, target_words=target_words, is_used_category=used_category)
         return render_template('co-oc_3d_network.html', basic_data=basic_data, edogawa_data=edogawa_data, sent_data=sent_error_data)
     # 利用者から送られてきた情報を基に送る情報
     sent_data = dict(input_type=input_type, name=name, prev_csv_name=file_name, file_name=csv_file_name, html_file_name=html_file_name, number=number, hinshi=hinshi_jpn, hinshi_eng=hinshi_eng,
-                     remove_words=remove_words, remove_combi=remove_combi_dict, target_words=target_words, co_oc_df=co_oc_df)
+                     remove_words=remove_words, remove_combi=remove_combi_dict, target_words=target_words, co_oc_df=co_oc_df, is_used_category=used_category)
 
     try:
         return render_template('co-oc_3d_network.html', basic_data=basic_data, edogawa_data=edogawa_data, sent_data=sent_data)

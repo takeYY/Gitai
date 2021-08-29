@@ -4,7 +4,7 @@ import itertools
 import collections
 import datetime
 from werkzeug.utils import secure_filename
-from get_data import get_jumanpp_df, get_datetime_now, get_hinshi_dict
+from get_data import get_jumanpp_df, get_mecab_with_category_df, get_datetime_now, get_hinshi_dict
 import os
 
 ALLOWED_EXTENSIONS = os.environ.get('ALLOWED_EXTENSIONS')
@@ -120,7 +120,7 @@ def kyoki_word_network(target_num=250, file_name='3742_9_3_11_02'):
     return got_net
 
 
-def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], target_num=250, remove_words='', remove_combi='', target_words='', input_type='edogawa', is_used_3d=False):
+def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], target_num=250, remove_words='', remove_combi='', target_words='', input_type='edogawa', is_used_3d=False, used_category=0):
     """
     共起ネットワークの作成
 
@@ -146,8 +146,12 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
 
     """
     if input_type == 'edogawa':
-        # jumanppにより形態素解析したDF取得
-        df = get_jumanpp_df(file_name)
+        if used_category == 0:
+            # jumanppにより形態素解析したDF取得
+            df = get_jumanpp_df(file_name)
+        else:
+            # MeCabにより形態素解析されたDF取得
+            df = get_mecab_with_category_df(file_name)
     else:
         df = pd.read_csv(f'tmp/{file_name}')
     # 除去ワードリスト
@@ -166,9 +170,13 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
         genkei = list(df['原形'])
     hinshi = list(df['品詞'])
     sentences = []
-    for i in range(len(midashi)):
-        sentences.append([midashi[i], genkei[i], hinshi[i]])
-
+    if used_category == 0:
+        for i in range(len(midashi)):
+            sentences.append([midashi[i], genkei[i], hinshi[i]])
+    else:
+        category = list(df['カテゴリー'])
+        for i in range(len(midashi)):
+            sentences.append([midashi[i], genkei[i], hinshi[i], category[i]])
     # 品詞の辞書を取得
     hinshi_dict = get_hinshi_dict()
     # 感動詞の削除
@@ -187,9 +195,14 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
             words = []
             continue
 
-        # 品詞がtarget_hinshiに含まれている and not (見出しが除去ワードリストに入っている or 原型が除去ワードリストに入っている)
-        if can_add_genkei2words(sentence, target_hinshi, remove_words_list):
-            words.append((sentence[1], sentence[2]))
+        if used_category == 1:
+            # 品詞がtarget_hinshiに含まれている and not (見出しが除去ワードリストに入っている or 原型が除去ワードリストに入っている)
+            if can_add_genkei2words(sentence, target_hinshi, remove_words_list):
+                words.append((sentence[1], sentence[2], sentence[3]))
+        else:
+            # 品詞がtarget_hinshiに含まれている and not (見出しが除去ワードリストに入っている or 原型が除去ワードリストに入っている)
+            if can_add_genkei2words(sentence, target_hinshi, remove_words_list):
+                words.append((sentence[1], sentence[2]))
 
     # keywordsを基に単語の全組み合わせ作成
     sentence_combinations = [list(itertools.combinations(
@@ -211,9 +224,14 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
     for sentence in sentence_combinations:
         target_combinations.extend(sentence)
     ct = collections.Counter(target_combinations)
-
-    cols = [{'first': i[0][0][0], 'first_type': i[0][0][1], 'second': i[0][1][0], 'second_type': i[0][1][1], 'count': i[1]}
-            for i in ct.most_common()]
+    if used_category == 1:
+        cols = [{'first': i[0][0][0], 'first_type': i[0][0][1],
+                 'second': i[0][1][0], 'second_type': i[0][1][1], 'count': i[1], 'カテゴリー': i[0][0][2]}
+                for i in ct.most_common()]
+    else:
+        cols = [{'first': i[0][0][0], 'first_type': i[0][0][1],
+                 'second': i[0][1][0], 'second_type': i[0][1][1], 'count': i[1]}
+                for i in ct.most_common()]
     co_oc_df = pd.DataFrame(cols)
     # 指定ワードが含まれるレコードのみ抽出
     if target_words:
@@ -224,7 +242,7 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
         co_oc_df = new_co_oc_df.sort_values('count', ascending=False).drop_duplicates(
             subset=['first', 'second']).reset_index(drop=True)
     # 所定の構造でCSVファイルに出力
-    now = datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
+    now = datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S%f')
     co_oc_df.to_csv(f'tmp/{now}.csv', index=False, encoding='utf_8_sig')
 
     try:
