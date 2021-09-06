@@ -48,7 +48,7 @@
           <div id='csv-collapse' class='collapse {{ "show" if sent_data and sent_data.get("input_type")=="csv" else ""}}' aria-labelledby='csv-header' data-parent='#input-accordion'>
             <div class='card-body'>
               <div class='form-group'>
-                <p><a href={{ url_for('morphological') }} target=_blank>形態素解析</a>によって得られたcsvデータが対象（最大16MBまで）</p>
+                <p><a href={{ url_for('morph_analysis.show') }} target=_blank>形態素解析</a>によって得られたcsvデータが対象（最大16MBまで）</p>
                 <!--
                 ----- 入力形式 -----
                 -->
@@ -272,7 +272,7 @@
   ----- 共起ネットワークのグラフ -----
   -->
   <div class='border embed-responsive embed-responsive-16by9'>
-    <iframe src={{ url_for('show_co_oc_network', file_name=sent_data.get('file_name')) }}></iframe>
+    <iframe src={{ url_for('others.show_co_oc_network', file_name=sent_data.get('file_name')) }}></iframe>
   </div>
   <hr>
 

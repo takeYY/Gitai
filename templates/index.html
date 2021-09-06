@@ -17,7 +17,7 @@
             <p class='card-text'>江戸川乱歩作品の初出、底本、出版社などの情報がまとめられている。</p>
           </div>
           <div class='card-footer'>
-            <a href={{ url_for('information') }} class='card-link'>作品情報</a>
+            <a href={{ url_for('information.show') }} class='card-link'>作品情報</a>
           </div>
         </div>
       </div>
@@ -31,7 +31,7 @@
             <p class='card-text'>テキストを分析するための前処理を施すことができます。</p>
           </div>
           <div class='card-footer'>
-            <a href={{ url_for('preprocessing') }} class='card-link'>テキストの前処理</a>
+            <a href={{ url_for('text_preprocessing.show') }} class='card-link'>テキストの前処理</a>
           </div>
         </div>
       </div>
@@ -46,7 +46,7 @@
             形態素の列に分割し、それぞれの形態素の品詞等を判別する作業である。</p>
           </div>
           <div class='card-footer'>
-            <a href={{ url_for('morphological') }} class='card-link'>形態素解析</a>
+            <a href={{ url_for('morph_analysis.show') }} class='card-link'>形態素解析</a>
           </div>
         </div>
       </div>
@@ -78,7 +78,7 @@
             「計量テキスト分析」または「テキストマイニング」と呼ばれる方法に対応しています。</p>
           </div>
           <div class='card-footer'>
-            <a href={{ url_for('khcoder') }} class='card-link'>KH Coder</a>
+            <a href={{ url_for('khcoder.show') }} class='card-link'>KH Coder</a>
           </div>
         </div>
       </div>

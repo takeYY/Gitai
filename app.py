@@ -1,13 +1,11 @@
 from co_oc_3d_network import create_3d_network
-from flask import Flask, flash, render_template, request, redirect, url_for, send_file, send_from_directory
+from flask import flash, render_template, request, redirect, url_for
 from waitress import serve
-from get_data import get_hinshi_dict, get_khcoder_df, get_basic_data, get_novels_tuple, get_edogawa_merge_df, dict_in_list2csv
+from get_data import get_hinshi_dict, get_basic_data, get_novels_tuple
 from co_oc_network import create_network, get_csv_filename
-from preprocessing import texts_preprocessing, get_other_option_dict, get_other_option_description_dict
-from morphological import mrph_analysis, get_morphological_analysis_description_dict
 import os
+from route import app
 
-app = Flask(__name__)
 UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # 16MBにデータ制限
@@ -16,38 +14,9 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 
 
-@app.route('/')
-def index():
-    """
-    ホーム
-
-    """
-    # 基本情報
-    basic_data = get_basic_data()
-
-    return render_template('index.html', basic_data=basic_data)
-
-
-@app.route('/information')
-def information():
-    """
-    作品情報
-
-    """
-    # 基本情報
-    basic_data = get_basic_data(title='作品情報', active_url='information')
-    # 江戸川乱歩作品関連の情報
-    edogawa_merge_df = get_edogawa_merge_df()
-
-    return render_template('information.html', basic_data=basic_data, edogawa_merge_df=edogawa_merge_df)
-
-
 @app.route('/co-occurrence_network')
 def co_occurrence_network():
-    """
-    共起ネットワーク
-
-    """
+    # 共起ネットワーク
     # 基本情報
     basic_data = get_basic_data(title='共起ネットワーク', active_url='co-oc_network')
     # 江戸川乱歩作品関連の情報
@@ -59,10 +28,7 @@ def co_occurrence_network():
 
 @app.route('/co-occurrence_network/visualization', methods=['GET', 'POST'])
 def network_visualization():
-    """
-    共起ネットワーク（「可視化」ボタン押下後）
-
-    """
+    # 共起ネットワーク（「可視化」ボタン押下後）
     # エラーなどでリダイレクトしたい場合
     if not request.method == 'POST':
         return redirect(url_for('co_occurrence_network'))
@@ -130,15 +96,6 @@ def network_visualization():
         return render_template('co-occurrence_network.html', basic_data=basic_data, edogawa_data=edogawa_data, sent_data=sent_data)
     except:
         return redirect(url_for('co_occurrence_network'))
-
-
-@app.route('/co-occurrence_network/visualization/<file_name>')
-def show_co_oc_network(file_name):
-    """
-    共起ネットワーク用htmlファイル
-
-    """
-    return send_file(f'tmp/{file_name}.html')
 
 
 @app.route('/co-oc_3D-network', methods=['GET', 'POST'])
@@ -222,140 +179,9 @@ def co_oc_3d_network():
         return redirect(url_for('co_oc_3d_network'))
 
 
-@app.route('/khcoder', methods=['GET', 'POST'])
-def khcoder():
-    """
-    KH Coder
-
-    """
-    # 基本情報
-    basic_data = get_basic_data(title='KH Coder', active_url='KH-coder')
-    # 江戸川乱歩作品関連の情報
-    novels_data = get_novels_tuple(col1='name', col2='file_name')
-
-    if request.method == 'GET':
-        return render_template('khcoder.html', basic_data=basic_data, novels_data=novels_data)
-    else:
-        # 利用者から送られてきた情報を基にデータ整理
-        name, file_name = request.form['name'].split('-')
-        sent_data = dict(name=name, file_name=file_name,
-                         text_chapter=get_novels_tuple(novels=get_khcoder_df(file_name), col1='テキスト', col2='章'))
-
-        return render_template('khcoder.html', basic_data=basic_data, novels_data=novels_data, sent_data=sent_data)
-
-
-@app.route('/download/csv', methods=['POST'])
-def download_csv():
-    """
-    csvデータのダウンロード
-
-    """
-    dir_path = request.form.get('dir_path')
-    file_name = request.form.get('file_name')
-    new_name = request.form.get('new_name')
-
-    return send_from_directory(
-        dir_path,
-        f'{file_name}.csv',
-        as_attachment=True,
-        attachment_filename=f'{new_name}.csv',
-    )
-
-
-@app.route('/morphological')
-def morphological():
-    """
-    形態素解析
-
-    """
-    # 基本情報
-    basic_data = get_basic_data(title='形態素解析', active_url='morph_analysis')
-    # 形態素解析器の説明文
-    description = get_morphological_analysis_description_dict()
-
-    return render_template('morphological.html', basic_data=basic_data, mrph_type='None', description=description)
-
-
-@app.route('/morphological/analysis', methods=['GET', 'POST'])
-def morphological_analysis():
-    """
-    形態素解析の結果
-
-    """
-    # エラーなどでリダイレクトしたい場合
-    if not request.method == 'POST':
-        return redirect(url_for('morphological'))
-
-    # 基本情報
-    basic_data = get_basic_data(title='形態素解析', active_url='morph_analysis')
-    # 形態素解析器の説明文
-    description = get_morphological_analysis_description_dict()
-    # 送信されたデータの取得と形態素解析器の種類
-    text = request.form.get('words')
-    mrph_type = request.form.get('mrph')
-    # テキストが入力されなかった場合
-    if not text:
-        flash('テキストが入力されていません。', 'error')
-        return render_template('morphological.html', basic_data=basic_data, mrph_type='None', description=description)
-    # 形態素解析
-    mrph_result, divide_dict = mrph_analysis(mrph_type, text)
-    # 形態素解析の結果が返ってこなかった場合
-    if not mrph_result:
-        flash('解析に失敗しました。テキストデータが大きすぎます。', 'error')
-        return render_template('morphological.html', basic_data=basic_data, mrph_type=mrph_type, description=description, mrph_data=dict(words=text))
-
-    # mrph_resultをcsvとして保存し、df, csv_nameを取得
-    result_df, csv_name = dict_in_list2csv(mrph_result, divide_dict)
-    # 形態素解析結果をまとめるデータ群
-    mrph_data = dict(words=text, result_df=result_df[:50], csv_name=csv_name,
-                     over50=50 < len(result_df), columns_num=len(result_df.columns))
-
-    return render_template('morphological.html', basic_data=basic_data, mrph_type=mrph_type, description=description, mrph_data=mrph_data)
-
-
-@app.route('/preprocessing', methods=['GET', 'POST'])
-def preprocessing():
-    """
-    テキストの前処理
-
-    """
-    # 基本情報
-    basic_data = get_basic_data(
-        title='テキストの前処理', active_url='preprocessing')
-    # その他設定の項目取得
-    other_option = get_other_option_dict()
-    # その他設定の説明を{ other_option.value: description[i] }で取得
-    other_option_description = get_other_option_description_dict()
-
-    if request.method == 'GET':
-        return render_template('preprocessing.html', basic_data=basic_data, other_option=other_option, description=other_option_description)
-    else:
-        # 利用者から送られてきた情報を取得
-        texts = request.form.get('texts')
-        # textsがない場合
-        if not texts:
-            flash('テキストが入力されていません。', 'error')
-            return render_template('preprocessing.html', basic_data=basic_data, other_option=other_option, description=other_option_description)
-        remove_words = request.form['remove-texts']
-        remove_word_in_texts = request.form['remove-text-in-texts']
-        replace_words = request.form['replace-texts']
-        other_options = request.form.getlist('other-option')
-        # 選択されたその他設定を取得
-        selected_option = [other_option.get(k) for k in other_options]
-        # 送られてきた情報を基にテキストを前処理
-        preprocessed_text, errors = texts_preprocessing(
-            texts, remove_words, remove_word_in_texts, replace_words, other_options)
-        # エラーがある場合
-        if errors:
-            for error in errors:
-                flash(error, 'error')
-            sent_data = dict(texts=texts, remove_texts=remove_words, remove_text_in_texts=remove_word_in_texts,
-                             other_option=selected_option, replace_texts=replace_words)
-            return render_template('preprocessing.html', basic_data=basic_data, sent_data=sent_data, other_option=other_option, description=other_option_description)
-        # 送るデータをまとめる
-        sent_data = dict(texts=texts, remove_texts=remove_words, remove_text_in_texts=remove_word_in_texts,
-                         other_option=selected_option, replace_texts=replace_words, preprocessed_texts=preprocessed_text)
-        return render_template('preprocessing.html', basic_data=basic_data, sent_data=sent_data, other_option=other_option, description=other_option_description)
+@app.errorhandler(404)
+def not_found(error):
+    return redirect(url_for('index.show'), code=200)
 
 
 # おまじない

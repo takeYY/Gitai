@@ -29,7 +29,7 @@
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container-fluid">
-      <a class="navbar-brand" href={{ url_for('index') }}>江戸川乱歩作品可視化システム</a>
+      <a class="navbar-brand" href={{ url_for('index.show') }}>江戸川乱歩作品可視化システム</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
         aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -38,19 +38,19 @@
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
             <a class="nav-link {{ 'active' if basic_data.get('active_url') == 'home' else '' }}" href={{
-              url_for('index') }}>ホーム</a>
+              url_for('index.show') }}>ホーム</a>
           </li>
           <li class="nav-item">
             <a class="nav-link {{ 'active' if basic_data.get('active_url') == 'information' else '' }}" href={{
-              url_for('information') }}>作品情報</a>
+              url_for('information.show') }}>作品情報</a>
           </li>
           <li class="nav-item">
             <a class="nav-link {{ 'active' if basic_data.get('active_url') == 'preprocessing' else '' }}" href={{
-              url_for('preprocessing') }}>テキストの前処理</a>
+              url_for('text_preprocessing.show') }}>テキストの前処理</a>
           </li>
           <li class="nav-item">
             <a class="nav-link {{ 'active' if basic_data.get('active_url') == 'morph_analysis' else '' }}" href={{
-              url_for('morphological') }}>形態素解析</a>
+              url_for('morph_analysis.show') }}>形態素解析</a>
           </li>
           <li class="nav-item">
             <a class="nav-link {{ 'active' if basic_data.get('active_url') == 'co-oc_network' else '' }}" href={{
@@ -62,7 +62,7 @@
           </li>
           <li class="nav-item">
             <a class="nav-link {{ 'active' if basic_data.get('active_url') == 'KH-coder' else '' }}" href={{
-              url_for('khcoder') }}>KH Coder</a>
+              url_for('khcoder.show') }}>KH Coder</a>
           </li>
         </ul>
       </div>
