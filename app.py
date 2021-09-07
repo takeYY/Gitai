@@ -53,7 +53,7 @@ def co_oc_network():
             name = request.form['previous_file_name']
             file_name = request.form['previous_file_path']
         else:
-            name, file_name, error = get_csv_filename(app, request)
+            name, file_name, error = get_csv_filename(request)
         used_category = 0
     else:
         # 利用者から送られてきた情報を基にデータ整理

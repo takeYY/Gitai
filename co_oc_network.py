@@ -8,6 +8,7 @@ from get_data import get_jumanpp_df, get_mecab_with_category_df, get_datetime_no
 import os
 
 ALLOWED_EXTENSIONS = os.environ.get('ALLOWED_EXTENSIONS')
+UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER')
 
 
 # 拡張子の制限
@@ -68,14 +69,14 @@ def has_not_remove_combinations(word1, word2, remove_dict, hinshi_dict):
     return True
 
 
-def get_csv_filename(app, request):
+def get_csv_filename(request):
     if csv_file_invalid(request):
         return '', '', True
 
     file = request.files['file']
     filename = file.filename
     save_filename = get_datetime_now() + '_input_' + secure_filename(file.filename)
-    file.save(os.path.join(app.config['UPLOAD_FOLDER'], save_filename))
+    file.save(os.path.join(UPLOAD_FOLDER, save_filename))
 
     return filename, save_filename, False
 
