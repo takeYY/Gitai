@@ -146,7 +146,7 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
 
     """
     if input_type == 'edogawa':
-        if used_category == 0:
+        if used_category == 0 or not is_used_3d:
             # jumanppにより形態素解析したDF取得
             df = get_jumanpp_df(file_name)
         else:
@@ -170,7 +170,7 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
         genkei = list(df['原形'])
     hinshi = list(df['品詞'])
     sentences = []
-    if used_category == 0:
+    if used_category == 0 or not is_used_3d:
         for i in range(len(midashi)):
             sentences.append([midashi[i], genkei[i], hinshi[i]])
     else:
@@ -195,7 +195,7 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
             words = []
             continue
 
-        if used_category == 1:
+        if used_category == 1 and is_used_3d:
             # 品詞がtarget_hinshiに含まれている and not (見出しが除去ワードリストに入っている or 原型が除去ワードリストに入っている)
             if can_add_genkei2words(sentence, target_hinshi, remove_words_list):
                 words.append((sentence[1], sentence[2], sentence[3]))
@@ -224,7 +224,7 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
     for sentence in sentence_combinations:
         target_combinations.extend(sentence)
     ct = collections.Counter(target_combinations)
-    if used_category == 1:
+    if used_category == 1 and is_used_3d:
         cols = [{'first': i[0][0][0], 'first_type': i[0][0][1],
                  'second': i[0][1][0], 'second_type': i[0][1][1], 'count': i[1], 'カテゴリー': i[0][0][2]}
                 for i in ct.most_common()]

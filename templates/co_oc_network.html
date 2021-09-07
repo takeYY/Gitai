@@ -6,7 +6,24 @@
   <!--
   ----- 作品検索フォーム -----
   -->
-  <form action='/co-oc_3D-network' method='post' enctype=multipart/form-data>
+  <form action='/co-oc-network' method='post' enctype=multipart/form-data>
+    <!--
+    ----- 表示形式 -----
+    -->
+    <div class='form-group'>
+      <h5><div class='badge badge-danger'>必須</div> 表示形式</h5>
+      <div class='px-4'>
+        <div class='form-check'>
+          <input type='radio' name='dimension' value=2 id='2d-network' {{ 'checked' if sent_data and sent_data.get('dimension')==2 or not sent_data else '' }}>
+          <label class='form-check-label' for='2d-network'>2D</label>
+        </div>
+        <div class='form-check'>
+          <input type='radio' name='dimension' value=3 id='3d-network' {{ 'checked' if sent_data and sent_data.get('dimension')==3 else '' }}>
+          <label class='form-check-label' for='3d-network'>3D</label>
+        </div>
+      </div>
+    </div>
+
     <!--
     ----- 入力データ -----
     -->
