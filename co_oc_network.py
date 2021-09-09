@@ -81,6 +81,38 @@ def get_csv_filename(request):
     return filename, save_filename, False
 
 
+def modify_df_with_synonym(df, synonym):
+    # key:置換対象の文字列, value:置換後の文字列
+    synonym_dict = {}
+    synonym_items = [s for s in synonym.split('・') if s != '']
+    for item in synonym_items:
+        item_split = [s for s in item.split('\r\n') if s != '']
+        replace_word = item_split[0]
+        target_word = item_split[1]
+        for tw in target_word.split(','):
+            synonym_dict[tw] = replace_word
+
+    # 同義語設定
+    if '原形' in df.columns:
+        df_match = df.query(' 原形 in @synonym_dict.keys() ', engine='python')
+        df_unmatch = df.query(
+            ' 原形 not in @synonym_dict.keys() ', engine='python')
+        # 同義語に指定された単語を置き換え
+        df_match = df_match.replace({'原形': synonym_dict})
+    else:
+        df_match = df.query(' 原型 in @synonym_dict.keys() ', engine='python')
+        df_unmatch = df.query(
+            ' 原型 not in @synonym_dict.keys() ', engine='python')
+        # 同義語に指定された単語を置き換え
+        df_match = df_match.replace({'原型': synonym_dict})
+    # 品詞を固有名詞に設定
+    df_match['品詞'] = '固有名詞'
+    # 結合
+    df = pd.concat([df_match, df_unmatch]).sort_index()
+
+    return df
+
+
 # ネットワーク描画のメイン処理定義
 def kyoki_word_network(target_num=250, file_name='3742_9_3_11_02'):
     from pyvis.network import Network
@@ -121,7 +153,7 @@ def kyoki_word_network(target_num=250, file_name='3742_9_3_11_02'):
     return got_net
 
 
-def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], target_num=250, remove_words='', remove_combi='', target_words='', input_type='edogawa', is_used_3d=False, used_category=0):
+def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], target_num=250, remove_words='', remove_combi='', target_words='', input_type='edogawa', is_used_3d=False, used_category=0, synonym=''):
     """
     共起ネットワークの作成
 
@@ -157,6 +189,11 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
         df = pd.read_csv(f'tmp/{file_name}')
     # 除去ワードリスト
     remove_words_list = remove_words.split('\r\n')
+
+    # 同義語設定
+    if synonym:
+        df = modify_df_with_synonym(df, synonym)
+        target_hinshi.append('固有名詞')
 
     # 形態素解析DFから各列の要素をリストで取得
     try:

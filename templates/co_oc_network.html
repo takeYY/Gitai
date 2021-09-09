@@ -180,6 +180,33 @@
     </div>
 
     <!--
+    ----- 同義語指定 -----
+    -->
+    <div class='form-group'>
+      <h5><div class='badge badge-secondary'>任意</div> 同義語指定</h5>
+      <div class='p-4'>
+        <p>指定した単語群を同一の単語として可視化します。</p>
+        <button class='btn btn-info dropdown-toggle' aria-controls='synonym-sample' aria-expanded='false'
+          data-target='#synonym-sample' data-toggle='collapse' type='button'>入力例</button>
+        <div id='synonym-sample' class='collapse'>
+          <div class='bs-callout bs-callout-info mt-0 py-1'>
+            <p>
+            ・怪人二十面相<br>
+            怪人,二十,面相<br>
+            <br>
+            ・明智探偵<br>
+            明智,小五郎,探偵
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class='px-4'>
+        <textarea class='form-control' rows=2
+          name='synonym'>{{ sent_data.get('synonym') if sent_data else ''}}</textarea>
+      </div>
+    </div>
+
+    <!--
     ----- 除去設定 -----
     -->
     <div class='card border-danger mb-3'>

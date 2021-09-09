@@ -38,6 +38,7 @@ def show():
     remove_combi_dict = dict(meishi=remove_combi_meishi, doushi=remove_combi_doushi,
                              keiyoushi=remove_combi_keiyoushi, fukushi=remove_combi_fukushi)
     target_words = request.form['target-words']
+    synonym = request.form['synonym']
     # エラーの有無判定
     error = False
     # 入力データ
@@ -75,7 +76,7 @@ def show():
         csv_file_name, co_oc_df = create_network(file_name=file_name, target_hinshi=hinshi_jpn, target_num=number,
                                                  remove_words=remove_words, remove_combi=remove_combi_dict,
                                                  target_words=target_words, input_type=input_type,
-                                                 is_used_3d=is_used_3d, used_category=used_category)
+                                                 is_used_3d=is_used_3d, used_category=used_category, synonym=synonym)
         if is_used_3d:
             html_file_name = create_3d_network(
                 co_oc_df, target_num=number, used_category=used_category)
@@ -86,14 +87,14 @@ def show():
         sent_error_data = dict(input_type=input_type, name=name, dimension=dimension, number=number,
                                hinshi=hinshi_jpn, hinshi_eng=hinshi_eng,
                                remove_words=remove_words, remove_combi=remove_combi_dict, target_words=target_words,
-                               is_used_category=used_category)
+                               is_used_category=used_category, synonym=synonym)
         return render_template('co_oc_network.html', basic_data=basic_data, edogawa_data=edogawa_data, sent_data=sent_error_data)
     # 利用者から送られてきた情報を基に送る情報
     sent_data = dict(input_type=input_type, name=name,
                      prev_csv_name=file_name, file_name=csv_file_name, html_file_name=html_file_name,
                      dimension=dimension, number=number, hinshi=hinshi_jpn, hinshi_eng=hinshi_eng,
                      remove_words=remove_words, remove_combi=remove_combi_dict, target_words=target_words,
-                     co_oc_df=co_oc_df, is_used_category=used_category)
+                     co_oc_df=co_oc_df, is_used_category=used_category, synonym=synonym)
 
     try:
         return render_template('co_oc_network.html', basic_data=basic_data, edogawa_data=edogawa_data, sent_data=sent_data)
