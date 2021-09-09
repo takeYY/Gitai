@@ -156,143 +156,152 @@
     </div>
 
     <!--
-    ----- 指定ワード -----
+    ----- 詳細設定 -----
     -->
     <div class='form-group'>
-      <h5><div class='badge badge-secondary'>任意</div> 指定ワード</h5>
-      <div class='p-4'>
-        <p>指定した単語の共起のみ表示します。</p>
-        <button class='btn btn-info dropdown-toggle' aria-controls='target-word-sample' aria-expanded='false'
-          data-target='#target-word-sample' data-toggle='collapse' type='button'>入力例</button>
-        <div id='target-word-sample' class='collapse'>
-          <div class='bs-callout bs-callout-info mt-0 py-1'>
-            <p>
-            怪人<br>
-            面相
-            </p>
-          </div>
-        </div>
-      </div>
-      <div class='px-4'>
-        <textarea class='form-control' rows=2
-          name='target-words'>{{ sent_data.get('target_words') if sent_data else ''}}</textarea>
-      </div>
-    </div>
-
-    <!--
-    ----- 同義語指定 -----
-    -->
-    <div class='form-group'>
-      <h5><div class='badge badge-secondary'>任意</div> 同義語指定</h5>
-      <div class='p-4'>
-        <p>指定した単語群を同一の単語として可視化します。</p>
-        <button class='btn btn-info dropdown-toggle' aria-controls='synonym-sample' aria-expanded='false'
-          data-target='#synonym-sample' data-toggle='collapse' type='button'>入力例</button>
-        <div id='synonym-sample' class='collapse'>
-          <div class='bs-callout bs-callout-info mt-0 py-1'>
-            <p>
-            ・怪人二十面相<br>
-            怪人,二十,面相<br>
-            <br>
-            ・明智探偵<br>
-            明智,小五郎,探偵
-            </p>
-          </div>
-        </div>
-      </div>
-      <div class='px-4'>
-        <textarea class='form-control' rows=2
-          name='synonym'>{{ sent_data.get('synonym') if sent_data else ''}}</textarea>
-      </div>
-    </div>
-
-    <!--
-    ----- 除去設定 -----
-    -->
-    <div class='card border-danger mb-3'>
-      <h5 class='card-header'><div class='badge badge-secondary'>任意</div> 除去設定</h5>
-      <div class='card-body'>
+      <button class='btn btn-info dropdown-toggle' aria-controls='detail-options' aria-expanded='false'
+        data-target='#detail-options' data-toggle='collapse' type='button'>詳細設定</button>
+      <div id='detail-options' class='collapse border border-info rounded px-4 py-2'>
         <!--
-        ----- 除去ワード -----
+        ----- 指定ワード -----
         -->
         <div class='form-group'>
-          <label for='remove-word' class='form-check-label'>除去ワード</label>
+          <h5><div class='badge badge-secondary'>任意</div> 指定ワード</h5>
           <div class='p-4'>
-            <p>共起ネットワークに含めない単語を指定可能です。</p>
-            <button class='btn btn-info dropdown-toggle' aria-controls='remove-word-sample' aria-expanded='false'
-              data-target='#remove-word-sample' data-toggle='collapse' type='button'>入力例</button>
-            <div id='remove-word-sample' class='collapse'>
+            <p>指定した単語の共起のみ表示します。</p>
+            <button class='btn btn-info dropdown-toggle' aria-controls='target-word-sample' aria-expanded='false'
+              data-target='#target-word-sample' data-toggle='collapse' type='button'>入力例</button>
+            <div id='target-word-sample' class='collapse'>
               <div class='bs-callout bs-callout-info mt-0 py-1'>
                 <p>
-                二十面相<br>
-                明智
+                怪人<br>
+                面相
                 </p>
               </div>
             </div>
           </div>
           <div class='px-4'>
             <textarea class='form-control' rows=2
-              name='remove-words'>{{ sent_data.get('remove_words') if sent_data else ''}}</textarea>
+              name='target-words'>{{ sent_data.get('target_words') if sent_data else ''}}</textarea>
           </div>
         </div>
 
         <!--
-        ----- 除去対象の品詞組み合わせ -----
+        ----- 同義語指定 -----
         -->
         <div class='form-group'>
-          <label class='form-check-label'>除去対象の品詞組み合わせ</label>
-          <div class='row px-5'>
-            <!--
-            ----- 名詞 -----
-            -->
-            <div class='col-3 card card-body'>
-              <div class='card-title'>名詞 - ?</div>
-              {% for key, value in edogawa_data.get('hinshi_dict').items() %}
-              <div class='form-check'>
-                <input type='checkbox' name='remove-combi-meishi' value={{value}} id=meishi-{{key}} class='form-check-input'
-                {{ 'checked' if ( sent_data and value in sent_data.get('remove_combi', {}).get('meishi', {}) ) else '' }}>
-                <label for=meishi-{{key}} class='form-check-label'>{{value}}</label>
+          <h5><div class='badge badge-secondary'>任意</div> 同義語指定</h5>
+          <div class='p-4'>
+            <p>指定した単語群を同一の単語として可視化します。</p>
+            <button class='btn btn-info dropdown-toggle' aria-controls='synonym-sample' aria-expanded='false'
+              data-target='#synonym-sample' data-toggle='collapse' type='button'>入力例</button>
+            <div id='synonym-sample' class='collapse'>
+              <div class='bs-callout bs-callout-info mt-0 py-1'>
+                <p>
+                ・怪人二十面相<br>
+                怪人,二十,面相<br>
+                <br>
+                ・明智探偵<br>
+                明智,小五郎,探偵
+                </p>
               </div>
-              {% endfor %}
             </div>
+          </div>
+          <div class='px-4'>
+            <textarea class='form-control' rows=2
+              name='synonym'>{{ sent_data.get('synonym') if sent_data else ''}}</textarea>
+          </div>
+        </div>
+
+        <!--
+        ----- 除去設定 -----
+        -->
+        <div class='card border-danger mb-3'>
+          <h5 class='card-header'><div class='badge badge-secondary'>任意</div> 除去設定</h5>
+          <div class='card-body'>
             <!--
-            ----- 動詞 -----
+            ----- 除去ワード -----
             -->
-            <div class='col-3 card card-body'>
-              <div class='card-title'>動詞 - ?</div>
-              {% for key, value in edogawa_data.get('hinshi_dict').items() %}
-              <div class='form-check'>
-                <input type='checkbox' name='remove-combi-doushi' value={{value}} id=doushi-{{key}} class='form-check-input'
-                {{ 'checked' if ( sent_data and value in sent_data.get('remove_combi', {}).get('doushi', {}) ) else '' }}>
-                <label for=doushi-{{key}} class='form-check-label'>{{value}}</label>
+            <div class='form-group'>
+              <label for='remove-word' class='form-check-label'>除去ワード</label>
+              <div class='p-4'>
+                <p>共起ネットワークに含めない単語を指定可能です。</p>
+                <button class='btn btn-info dropdown-toggle' aria-controls='remove-word-sample' aria-expanded='false'
+                  data-target='#remove-word-sample' data-toggle='collapse' type='button'>入力例</button>
+                <div id='remove-word-sample' class='collapse'>
+                  <div class='bs-callout bs-callout-info mt-0 py-1'>
+                    <p>
+                    二十面相<br>
+                    明智
+                    </p>
+                  </div>
+                </div>
               </div>
-              {% endfor %}
+              <div class='px-4'>
+                <textarea class='form-control' rows=2
+                  name='remove-words'>{{ sent_data.get('remove_words') if sent_data else ''}}</textarea>
+              </div>
             </div>
+
             <!--
-            ----- 形容詞 -----
+            ----- 除去対象の品詞組み合わせ -----
             -->
-            <div class='col-3 card card-body'>
-              <div class='card-title'>形容詞 - ?</div>
-              {% for key, value in edogawa_data.get('hinshi_dict').items() %}
-              <div class='form-check'>
-                <input type='checkbox' name='remove-combi-keiyoushi' value={{value}} id=keiyoushi-{{key}} class='form-check-input'
-                {{ 'checked' if ( sent_data and value in sent_data.get('remove_combi', {}).get('keiyoushi', {}) ) else '' }}>
-                <label for=keiyoushi-{{key}} class='form-check-label'>{{value}}</label>
+            <div class='form-group'>
+              <label class='form-check-label'>除去対象の品詞組み合わせ</label>
+              <div class='row px-5'>
+                <!--
+                ----- 名詞 -----
+                -->
+                <div class='col-3 card card-body'>
+                  <div class='card-title'>名詞 - ?</div>
+                  {% for key, value in edogawa_data.get('hinshi_dict').items() %}
+                  <div class='form-check'>
+                    <input type='checkbox' name='remove-combi-meishi' value={{value}} id=meishi-{{key}} class='form-check-input'
+                    {{ 'checked' if ( sent_data and value in sent_data.get('remove_combi', {}).get('meishi', {}) ) else '' }}>
+                    <label for=meishi-{{key}} class='form-check-label'>{{value}}</label>
+                  </div>
+                  {% endfor %}
+                </div>
+                <!--
+                ----- 動詞 -----
+                -->
+                <div class='col-3 card card-body'>
+                  <div class='card-title'>動詞 - ?</div>
+                  {% for key, value in edogawa_data.get('hinshi_dict').items() %}
+                  <div class='form-check'>
+                    <input type='checkbox' name='remove-combi-doushi' value={{value}} id=doushi-{{key}} class='form-check-input'
+                    {{ 'checked' if ( sent_data and value in sent_data.get('remove_combi', {}).get('doushi', {}) ) else '' }}>
+                    <label for=doushi-{{key}} class='form-check-label'>{{value}}</label>
+                  </div>
+                  {% endfor %}
+                </div>
+                <!--
+                ----- 形容詞 -----
+                -->
+                <div class='col-3 card card-body'>
+                  <div class='card-title'>形容詞 - ?</div>
+                  {% for key, value in edogawa_data.get('hinshi_dict').items() %}
+                  <div class='form-check'>
+                    <input type='checkbox' name='remove-combi-keiyoushi' value={{value}} id=keiyoushi-{{key}} class='form-check-input'
+                    {{ 'checked' if ( sent_data and value in sent_data.get('remove_combi', {}).get('keiyoushi', {}) ) else '' }}>
+                    <label for=keiyoushi-{{key}} class='form-check-label'>{{value}}</label>
+                  </div>
+                  {% endfor %}
+                </div>
+                <!--
+                ----- 副詞 -----
+                -->
+                <div class='col-3 card card-body'>
+                  <div class='card-title'>副詞 - ?</div>
+                  {% for key, value in edogawa_data.get('hinshi_dict').items() %}
+                  <div class='form-check'>
+                    <input type='checkbox' name='remove-combi-fukushi' value={{value}} id=fukushi-{{key}} class='form-check-input'
+                    {{ 'checked' if ( sent_data and value in sent_data.get('remove_combi', {}).get('fukushi', {}) ) else '' }}>
+                    <label for=fukushi-{{key}} class='form-check-label'>{{value}}</label>
+                  </div>
+                  {% endfor %}
+                </div>
               </div>
-              {% endfor %}
-            </div>
-            <!--
-            ----- 副詞 -----
-            -->
-            <div class='col-3 card card-body'>
-              <div class='card-title'>副詞 - ?</div>
-              {% for key, value in edogawa_data.get('hinshi_dict').items() %}
-              <div class='form-check'>
-                <input type='checkbox' name='remove-combi-fukushi' value={{value}} id=fukushi-{{key}} class='form-check-input'
-                {{ 'checked' if ( sent_data and value in sent_data.get('remove_combi', {}).get('fukushi', {}) ) else '' }}>
-                <label for=fukushi-{{key}} class='form-check-label'>{{value}}</label>
-              </div>
-              {% endfor %}
             </div>
           </div>
         </div>
