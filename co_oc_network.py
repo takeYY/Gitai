@@ -71,14 +71,14 @@ def has_not_remove_combinations(word1, word2, remove_dict, hinshi_dict):
 
 def get_csv_filename(request):
     if csv_file_invalid(request):
-        return '', '', True
+        return '', '', dict(csv_file_invalid='csvファイルが適切ではありません。')
 
     file = request.files['file']
     filename = file.filename
     save_filename = get_datetime_now() + '_input_' + secure_filename(file.filename)
     file.save(os.path.join(UPLOAD_FOLDER, save_filename))
 
-    return filename, save_filename, False
+    return filename, save_filename, dict()
 
 
 def modify_df_with_synonym(df, synonym):

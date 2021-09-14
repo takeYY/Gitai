@@ -26,50 +26,52 @@ def show():
         return render_template('co_oc_network.html', basic_data=basic_data, edogawa_data=edogawa_data)
 
     # 利用者から送られてきた情報
-    dimension = int(request.form['dimension'])
-    number = int(request.form['number'])
+    dimension = int(request.form.get('dimension'))
+    input_type = request.form.get('input_type')
+    number = int(request.form.get('number'))
     hinshi_eng = request.form.getlist('hinshi')
     hinshi_jpn = [hinshi_dict.get(k) for k in hinshi_eng]
-    remove_words = request.form['remove-words']
+    remove_words = request.form.get('remove-words')
     remove_combi_meishi = request.form.getlist('remove-combi-meishi')
     remove_combi_doushi = request.form.getlist('remove-combi-doushi')
     remove_combi_keiyoushi = request.form.getlist('remove-combi-keiyoushi')
     remove_combi_fukushi = request.form.getlist('remove-combi-fukushi')
     remove_combi_dict = dict(meishi=remove_combi_meishi, doushi=remove_combi_doushi,
                              keiyoushi=remove_combi_keiyoushi, fukushi=remove_combi_fukushi)
-    target_words = request.form['target-words']
-    synonym = request.form['synonym']
+    target_words = request.form.get('target-words')
+    synonym = request.form.get('synonym')
     # エラーの有無判定
-    error = False
+    error_dict = dict()
     # 入力データ
-    input_type = request.form['input_type']
     if input_type == 'csv':
         if request.form.get('previous_file_name'):
-            name = request.form['previous_file_name']
-            file_name = request.form['previous_file_path']
+            name = request.form.get('previous_file_name')
+            file_name = request.form.get('previous_file_path')
         else:
-            name, file_name, error = get_csv_filename(request)
+            name, file_name, error_dict = get_csv_filename(request)
         used_category = 0
     else:
         # 利用者から送られてきた情報を基にデータ整理
-        name, file_name = request.form['name'].split('-')
-        used_category = int(request.form['is_used_category'])
+        name, file_name = request.form.get('name').split('-')
+        used_category = int(request.form.get('is_used_category'))
     name = name.replace(' ', '')
+    # 送るデータの辞書
+    sent_data_dict = dict(input_type=input_type, name=name, dimension=dimension, number=number,
+                          hinshi=hinshi_jpn, hinshi_eng=hinshi_eng,
+                          remove_words=remove_words, remove_combi=remove_combi_dict, target_words=target_words,
+                          is_used_category=used_category, synonym=synonym)
     # 品詞が1つも選択されなかった場合
     if not hinshi_eng:
         flash('品詞が選択されていません。', 'error')
-        error = True
+        error_dict['hinshi'] = '品詞が選択されていません。'
     # 共起数が0以下だった場合
     if number < 1:
         flash('共起数が少なすぎます。', 'error')
-        error = True
+        error_dict['number'] = '共起数が少なすぎます。'
     # errorがあれば
-    if error:
-        sent_error_data = dict(input_type=input_type, name=name, dimension=dimension, number=number,
-                               hinshi=hinshi_jpn, hinshi_eng=hinshi_eng,
-                               remove_words=remove_words, remove_combi=remove_combi_dict, target_words=target_words,
-                               is_used_category=used_category)
-        return render_template('co_oc_network.html', basic_data=basic_data, edogawa_data=edogawa_data, sent_data=sent_error_data)
+    if error_dict:
+        sent_data_dict['error'] = error_dict
+        return render_template('co_oc_network.html', basic_data=basic_data, edogawa_data=edogawa_data, sent_data=sent_data_dict)
     # 共起ネットワーク作成
     is_used_3d = True if dimension == 3 else False
     try:
@@ -84,19 +86,16 @@ def show():
             html_file_name = csv_file_name
     except:
         flash('ファイル形式が正しくありません。（入力形式に沿ってください）', 'error')
-        sent_error_data = dict(input_type=input_type, name=name, dimension=dimension, number=number,
-                               hinshi=hinshi_jpn, hinshi_eng=hinshi_eng,
-                               remove_words=remove_words, remove_combi=remove_combi_dict, target_words=target_words,
-                               is_used_category=used_category, synonym=synonym)
-        return render_template('co_oc_network.html', basic_data=basic_data, edogawa_data=edogawa_data, sent_data=sent_error_data)
-    # 利用者から送られてきた情報を基に送る情報
-    sent_data = dict(input_type=input_type, name=name,
-                     prev_csv_name=file_name, file_name=csv_file_name, html_file_name=html_file_name,
-                     dimension=dimension, number=number, hinshi=hinshi_jpn, hinshi_eng=hinshi_eng,
-                     remove_words=remove_words, remove_combi=remove_combi_dict, target_words=target_words,
-                     co_oc_df=co_oc_df, is_used_category=used_category, synonym=synonym)
+        sent_data_dict['error'] = dict(
+            csv_file_invalid='ファイル形式が正しくありません。（入力形式に沿ってください）')
+        return render_template('co_oc_network.html', basic_data=basic_data, edogawa_data=edogawa_data, sent_data=sent_data_dict)
+    # 利用者から送られてきた情報を基に送る情報を格納
+    sent_data_dict['prev_csv_name'] = file_name
+    sent_data_dict['file_name'] = csv_file_name
+    sent_data_dict['html_file_name'] = html_file_name
+    sent_data_dict['co_oc_df'] = co_oc_df
 
     try:
-        return render_template('co_oc_network.html', basic_data=basic_data, edogawa_data=edogawa_data, sent_data=sent_data)
+        return render_template('co_oc_network.html', basic_data=basic_data, edogawa_data=edogawa_data, sent_data=sent_data_dict)
     except:
         return redirect(url_for('network.show'))

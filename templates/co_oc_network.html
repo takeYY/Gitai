@@ -111,7 +111,9 @@
                 <div class='form-group'>
                   <div class='input-group'>
                     <div class='custom-file'>
-                      <input type='file' name='file' class='custom-file-input' id='inputFile'>
+                      <input type='file' name='file'
+                        class='custom-file-input {{ "is-invalid" if sent_data and sent_data.get("error", {}).get("csv_file_invalid") else "" }}'
+                        id='inputFile'>
                       <label class='custom-file-label' for='inputFile' data-browse='参照'>
                       {{ sent_data.get('name') if sent_data and sent_data.get('input_type')=='csv' and sent_data.get('name')
                       else 'ファイルを選択...' }}
@@ -121,6 +123,11 @@
                       <button type='button' class='btn btn-outline-secondary input-group-text' id='inputFileReset'>取消</button>
                     </div>
                   </div>
+                  {% if sent_data and sent_data.get('error', {}).get('csv_file_invalid') %}
+                    <small class='text-danger'>
+                      {{ sent_data.get('error').get('csv_file_invalid') }}
+                    </small>
+                  {% endif %}
                 </div>
               </div>
             </div>
@@ -135,7 +142,13 @@
     <div class='form-group w-25'>
       <h5><div class='badge badge-danger'>必須</div> 共起数上位</h5>
       <div class='px-4'>
-        <input type='number' class='form-control' name='number' value={{ sent_data.get('number') if sent_data else 10 }}>
+        <input type='number' class='form-control {{ "is-invalid" if sent_data and sent_data.get("error", {}).get("number") else "" }}'
+          name='number' value={{ sent_data.get('number') if sent_data else 10 }}>
+        {% if sent_data and sent_data.get('error', {}).get('number') %}
+          <div class='invalid-feedback'>
+            {{ sent_data.get('error').get('number') }}
+          </div>
+        {% endif %}
       </div>
     </div>
 
@@ -147,9 +160,15 @@
       <div class='px-4'>
         {% for key, value in edogawa_data.get('hinshi_dict').items() %}
         <div class='form-check'>
-          <input type='checkbox' name='hinshi' value={{key}} id={{key}} class='form-check-input' {{'checked' if 
-          (sent_data and value in sent_data.get('hinshi') or not sent_data) else '' }}>
+          <input type='checkbox' name='hinshi' value={{key}} id={{key}}
+            class='form-check-input {{ "is-invalid" if sent_data and sent_data.get("error", {}).get("hinshi") else "" }}'
+            {{'checked' if (sent_data and value in sent_data.get('hinshi') or not sent_data) else '' }}>
           <label for={{key}} class='form-check-label'>{{value}}</label>
+          {% if value == '感動詞' and sent_data and sent_data.get('error', {}).get('hinshi') %}
+            <div class='invalid-feedback'>
+              {{ sent_data.get('error').get('hinshi') }}
+            </div>
+          {% endif %}
         </div>
         {% endfor %}
       </div>
