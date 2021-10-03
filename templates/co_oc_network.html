@@ -330,9 +330,8 @@
     <!--
     ----- 隠しフィールド -----
     -->
-    {% if sent_data and sent_data.get('input_type')=='csv' and sent_data.get('prev_csv_name') %}
-    <input type='hidden' name='previous_file_name' value={{ sent_data.get('name') }}>
-    <input type='hidden' name='previous_file_path' value={{ sent_data.get('prev_csv_name') }}>
+    {% if sent_data and sent_data.get('input_type')=='csv' and sent_data.get('file_name') %}
+    <input type='hidden' name='has_previous' value=1>
     {% endif %}
 
     <!--
@@ -383,10 +382,6 @@
     -->
     <div class='float-right'>
       <form action='/download/csv' method='post'>
-        <input type='hidden' name='dir_path' value=tmp>
-        <input type='hidden' name='file_name' value={{ sent_data.get('file_name') }}>
-        <input type='hidden' name='new_name'
-          value={{ sent_data.get('name') }}_{{ '-'.join(sent_data.get('hinshi')) }}_{{ sent_data.get('number') }}>
         <button type='submit' class='btn btn-primary'>CSVダウンロード</button>
       </form>
     </div>

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash
+from flask import Blueprint, render_template, request, flash, session
 from get_data import get_basic_data, dict_in_list2csv
 from morphological import mrph_analysis, get_morphological_analysis_description_dict
 
@@ -18,6 +18,7 @@ def show():
     description = get_morphological_analysis_description_dict()
     # リクエストがGETならば
     if request.method == 'GET':
+        session.clear()
         return render_template('morphological.html', basic_data=basic_data, mrph_type='None', description=description)
 
     # 送信されたデータの取得と形態素解析器の種類
@@ -36,6 +37,10 @@ def show():
 
     # mrph_resultをcsvとして保存し、df, csv_nameを取得
     result_df, csv_name = dict_in_list2csv(mrph_result, divide_dict)
+    # session登録
+    session['file_name'] = csv_name
+    session['dir_path'] = 'tmp'
+    session['new_name'] = f'{mrph_type}による形態素解析結果'
     # 形態素解析結果をまとめるデータ群
     mrph_data = dict(words=text, result_df=result_df[:50], csv_name=csv_name,
                      over50=50 < len(result_df), columns_num=len(result_df.columns))

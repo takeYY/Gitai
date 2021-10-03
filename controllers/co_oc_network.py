@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from get_data import get_basic_data, get_novels_tuple, get_hinshi_dict
 from co_oc_network import create_network, get_csv_filename
 from co_oc_3d_network import create_3d_network
@@ -23,6 +23,7 @@ def show():
                         name_file=get_novels_tuple(col1='name', col2='file_name'))
 
     if request.method == 'GET':
+        session.clear()
         return render_template('co_oc_network.html', basic_data=basic_data, edogawa_data=edogawa_data)
 
     # 利用者から送られてきた情報
@@ -44,9 +45,9 @@ def show():
     error_dict = dict()
     # 入力データ
     if input_type == 'csv':
-        if request.form.get('previous_file_name'):
-            name = request.form.get('previous_file_name')
-            file_name = request.form.get('previous_file_path')
+        if session.get('previous_file_name'):
+            name = session.get('previous_file_name')
+            file_name = session.get('previous_file_path')
         else:
             name, file_name, error_dict = get_csv_filename(request)
         used_category = 0
@@ -57,7 +58,7 @@ def show():
     name = name.replace(' ', '')
     # 送るデータの辞書
     sent_data_dict = dict(input_type=input_type, name=name, dimension=dimension, number=number,
-                          hinshi=hinshi_jpn, hinshi_eng=hinshi_eng,
+                          hinshi=hinshi_jpn,
                           remove_words=remove_words, remove_combi=remove_combi_dict, target_words=target_words,
                           is_used_category=used_category, synonym=synonym)
     # 品詞が1つも選択されなかった場合
@@ -68,6 +69,9 @@ def show():
     if number < 1:
         flash('共起数が少なすぎます。', 'error')
         error_dict['number'] = '共起数が少なすぎます。'
+    # sessionが切れている場合
+    if request.form.get('has_previous') and not session.get('previous_file_name'):
+        flash('セッション切れです。ファイルを再度アップロードしてください。', 'error')
     # errorがあれば
     if error_dict:
         sent_data_dict['error'] = error_dict
@@ -89,8 +93,14 @@ def show():
         sent_data_dict['error'] = dict(
             csv_file_invalid='ファイル形式が正しくありません。（入力形式に沿ってください）')
         return render_template('co_oc_network.html', basic_data=basic_data, edogawa_data=edogawa_data, sent_data=sent_data_dict)
+    # sessionの登録
+    if input_type == 'csv':
+        session['previous_file_name'] = name
+        session['previous_file_path'] = file_name
+    session['file_name'] = csv_file_name
+    session['dir_path'] = 'tmp'
+    session['new_name'] = f'{name}_{"-".join(hinshi_jpn)}_{number}'
     # 利用者から送られてきた情報を基に送る情報を格納
-    sent_data_dict['prev_csv_name'] = file_name
     sent_data_dict['file_name'] = csv_file_name
     sent_data_dict['html_file_name'] = html_file_name
     sent_data_dict['co_oc_df'] = co_oc_df

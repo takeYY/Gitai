@@ -1,4 +1,5 @@
-from flask import Blueprint, request, send_from_directory, send_file
+from flask import Blueprint, request, render_template, send_from_directory, send_file, session
+from get_data import get_basic_data
 
 
 others_page = Blueprint('others', __name__)
@@ -10,9 +11,16 @@ def download_csv():
     csvデータのダウンロード
 
     """
-    dir_path = request.form.get('dir_path')
-    file_name = request.form.get('file_name')
-    new_name = request.form.get('new_name')
+    dir_path = session.get('dir_path')
+    file_name = session.get('file_name')
+    new_name = session.get('new_name')
+
+    # sessionが切れた場合
+    if not file_name:
+        # 基本情報
+        basic_data = get_basic_data(
+            title='セッション切れ', active_url='session_timeout_error')
+        return render_template('session_timeout.html', basic_data=basic_data)
 
     return send_from_directory(
         dir_path,
