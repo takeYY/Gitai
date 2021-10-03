@@ -267,12 +267,11 @@ def create_3d_network_figure(df, target_num, fig, category_list=[], current_ctg_
     return fig
 
 
-def create_3d_network(df, target_num=50, used_category=0):
+def create_3d_network(df, target_num=50, used_category=0, category_list=[]):
     fig = go.Figure()
     if used_category == 0:
         fig = create_3d_network_figure(df, target_num, fig)
     else:
-        category_list = df['カテゴリー'].unique().tolist()
         for idx, category in enumerate(category_list):
             fig = create_3d_network_figure(
                 df.query(' カテゴリー == @category '), target_num, fig, category_list, idx)

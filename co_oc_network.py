@@ -178,6 +178,8 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
         指定した単語の共起のみ表示する
 
     """
+    # カテゴリーごとに表示する際の並び順を取得
+    category_list = []
     if input_type == 'edogawa':
         if used_category == 0 or not is_used_3d:
             # jumanppにより形態素解析したDF取得
@@ -185,6 +187,7 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
         else:
             # MeCabにより形態素解析されたDF取得
             df = get_mecab_with_category_df(file_name)
+            category_list = df['カテゴリー'].unique().tolist()
     else:
         df = pd.read_csv(f'tmp/{file_name}')
     # 除去ワードリスト
@@ -288,6 +291,6 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
         if not is_used_3d:
             got_net = kyoki_word_network(target_num=target_num, file_name=now)
             got_net.write_html(f'tmp/{now}.html')
-        return now, co_oc_df
+        return now, co_oc_df, category_list
     except:
-        return '', ''
+        return '', '', ''

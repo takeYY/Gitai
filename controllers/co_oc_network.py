@@ -79,13 +79,13 @@ def show():
     # 共起ネットワーク作成
     is_used_3d = True if dimension == 3 else False
     try:
-        csv_file_name, co_oc_df = create_network(file_name=file_name, target_hinshi=hinshi_jpn, target_num=number,
-                                                 remove_words=remove_words, remove_combi=remove_combi_dict,
-                                                 target_words=target_words, input_type=input_type,
-                                                 is_used_3d=is_used_3d, used_category=used_category, synonym=synonym)
+        csv_file_name, co_oc_df, category_list = create_network(file_name=file_name, target_hinshi=hinshi_jpn, target_num=number,
+                                                                remove_words=remove_words, remove_combi=remove_combi_dict,
+                                                                target_words=target_words, input_type=input_type,
+                                                                is_used_3d=is_used_3d, used_category=used_category, synonym=synonym)
         if is_used_3d:
-            html_file_name = create_3d_network(
-                co_oc_df, target_num=number, used_category=used_category)
+            html_file_name = create_3d_network(co_oc_df, target_num=number,
+                                               used_category=used_category, category_list=category_list)
         else:
             html_file_name = csv_file_name
     except:
