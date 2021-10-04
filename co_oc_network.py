@@ -74,11 +74,11 @@ def get_csv_filename(request):
         return '', '', dict(csv_file_invalid='csvファイルが適切ではありません。')
 
     file = request.files['file']
-    filename = file.filename
-    save_filename = get_datetime_now() + '_input_' + secure_filename(file.filename)
-    file.save(os.path.join(UPLOAD_FOLDER, save_filename))
+    input_filename = file.filename
+    csv_filename = get_datetime_now() + '_input_' + secure_filename(file.input_filename)
+    file.save(os.path.join(UPLOAD_FOLDER, csv_filename))
 
-    return filename, save_filename, dict()
+    return input_filename, csv_filename, dict()
 
 
 def modify_df_with_synonym(df, synonym):

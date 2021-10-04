@@ -77,7 +77,7 @@ def juman_divide_dict():
 
 
 def get_datetime_now():
-    return datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
+    return datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S%f')
 
 
 def dict_in_list2csv(dict_in_list, divide_dict):
