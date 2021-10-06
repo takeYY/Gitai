@@ -3,7 +3,7 @@ from get_data import get_basic_data
 from preprocessing import texts_preprocessing, get_other_option_dict, get_other_option_description_dict
 
 preprocessing_page = Blueprint(
-    'text_preprocessing', __name__, url_prefix='/text-preprocessing')
+    'text_preprocessing', __name__, url_prefix='/rikkyo-edogawa/text-preprocessing')
 
 
 @preprocessing_page.route('', methods=['GET', 'POST'])

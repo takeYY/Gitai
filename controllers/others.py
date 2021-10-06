@@ -5,7 +5,7 @@ from get_data import get_basic_data
 others_page = Blueprint('others', __name__)
 
 
-@others_page.route('/download/csv', methods=['POST'])
+@others_page.route('/rikkyo-edogawa/download/csv', methods=['POST'])
 def download_csv():
     """
     csvデータのダウンロード
@@ -30,7 +30,7 @@ def download_csv():
     )
 
 
-@others_page.route('/co-occurrence_network/visualization/<file_name>')
+@others_page.route('/rikkyo-edogawa/co-occurrence_network/visualization/<file_name>')
 def show_co_oc_network(file_name):
     """
     共起ネットワーク用htmlファイル

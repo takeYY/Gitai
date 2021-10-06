@@ -3,7 +3,7 @@ from get_data import get_basic_data, dict_in_list2csv
 from morphological import mrph_analysis, get_morphological_analysis_description_dict
 
 morph_analysis_page = Blueprint(
-    'morph_analysis', __name__, url_prefix='/morphological-analysis')
+    'morph_analysis', __name__, url_prefix='/rikkyo-edogawa/morphological-analysis')
 
 
 @morph_analysis_page.route('', methods=['GET', 'POST'])

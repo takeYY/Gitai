@@ -5,7 +5,7 @@ from co_oc_3d_network import create_3d_network
 
 
 network_page = Blueprint(
-    'network', __name__, url_prefix='/co-oc-network')
+    'network', __name__, url_prefix='/rikkyo-edogawa/co-oc-network')
 
 
 @network_page.route('', methods=['GET', 'POST'])
