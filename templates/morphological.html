@@ -5,7 +5,7 @@
 
   <p>形態素解析とは、文を単語に分割し、品詞や活用形・基本形などを判別することである。</p>
 
-  <form action='/rikkyo-edogawa/morphological-analysis' method='post'>
+  <form action={{ url_for('morph_analysis.show') }} method='post'>
     <!--
     ----- 形態素解析器 -----
     -->
@@ -89,7 +89,7 @@
     ----- csvダウンロードボタン -----
     -->
     <div class='float-right'>
-      <form action='/rikkyo-edogawa/download/csv' method='post'>
+      <form action={{ url_for('others.download_csv') }} method='post'>
         <button type='submit' class='btn btn-primary'>CSVダウンロード</button>
       </form>
     </div>
