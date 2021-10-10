@@ -2,9 +2,8 @@ from flask import flash
 import pandas as pd
 import itertools
 import collections
-import datetime
 from werkzeug.utils import secure_filename
-from get_data import get_jumanpp_df, get_mecab_with_category_df, get_datetime_now, get_hinshi_dict
+from get_data import get_jumanpp_df, get_mecab_with_category_df, get_datetime_now, get_hinshi_dict, create_random_string
 import os
 
 ALLOWED_EXTENSIONS = os.environ.get('ALLOWED_EXTENSIONS')
@@ -75,7 +74,7 @@ def get_csv_filename(request):
 
     file = request.files['file']
     input_filename = file.filename
-    csv_filename = get_datetime_now() + '_input_' + secure_filename(file.input_filename)
+    csv_filename = get_datetime_now() + '_input_' + secure_filename(input_filename)
     file.save(os.path.join(UPLOAD_FOLDER, csv_filename))
 
     return input_filename, csv_filename, dict()
@@ -283,14 +282,16 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
         co_oc_df = new_co_oc_df.sort_values('count', ascending=False).drop_duplicates(
             subset=['first', 'second']).reset_index(drop=True)
     # 所定の構造でCSVファイルに出力
-    now = datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S%f')
-    co_oc_df.to_csv(f'tmp/{now}.csv', index=False, encoding='utf_8_sig')
+    file_random_name = create_random_string(32)
+    co_oc_df.to_csv(f'tmp/{file_random_name}.csv',
+                    index=False, encoding='utf_8_sig')
 
     try:
         # 2Dの共起ネットワークHTML作成
         if not is_used_3d:
-            got_net = kyoki_word_network(target_num=target_num, file_name=now)
-            got_net.write_html(f'tmp/{now}.html')
-        return now, co_oc_df, category_list
+            got_net = kyoki_word_network(target_num=target_num,
+                                         file_name=file_random_name)
+            got_net.write_html(f'tmp/{file_random_name}.html')
+        return file_random_name, co_oc_df, category_list
     except:
         return '', '', ''

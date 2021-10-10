@@ -8,27 +8,112 @@ network_page = Blueprint(
     'network', __name__, url_prefix='/rikkyo-edogawa/co-oc-network')
 
 
-@network_page.route('', methods=['GET', 'POST'])
-def show():
+@network_page.route('/data-selection', methods=['GET'])
+def data_selection():
     """
     共起ネットワーク
+        データの選択画面
 
     """
     # 基本情報
-    basic_data = get_basic_data(
-        title='共起ネットワーク', active_url='co_oc_network')
+    basic_data = get_basic_data(title='共起ネットワーク：データ選択',
+                                active_url='co_oc_network')
+    # 江戸川乱歩作品関連の情報
+    edogawa_data = dict(hinshi_dict=get_hinshi_dict(),
+                        name_file=get_novels_tuple(col1='name',
+                                                   col2='file_name'))
+    # セッションをクリア
+    session.clear()
+    return render_template('co_oc_network/data_selection.html',
+                           basic_data=basic_data,
+                           edogawa_data=edogawa_data)
+
+
+@network_page.route('/options', methods=['POST'])
+def options():
+    """
+    共起ネットワーク
+        設定画面
+
+    """
+    # 基本情報
+    basic_data = get_basic_data(title='共起ネットワーク：設定画面',
+                                active_url='co_oc_network')
+    # 江戸川乱歩作品関連の情報
+    edogawa_data = dict(hinshi_dict=get_hinshi_dict(),
+                        name_file=get_novels_tuple(col1='name',
+                                                   col2='file_name'))
+    # 入力データの形式
+    input_type = request.form.get('input_type', session.get('input_type'))
+    # セッション切れの場合
+    if not input_type:
+        session.clear()
+        flash('セッションが切れました。再度データを選択してください。', 'error')
+        return render_template('co_oc_network/data_selection.html',
+                               basic_data=basic_data,
+                               edogawa_data=edogawa_data)
+    # エラーの有無判定
+    error_dict = dict()
+    # 入力データ
+    if input_type == 'csv':
+        if session.get('input_name'):
+            input_name = session.get('input_name')
+            input_csv_name = session.get('input_csv_name')
+        else:
+            input_name, input_csv_name, error_dict = get_csv_filename(request)
+    else:
+        # 利用者から送られてきた情報を基にデータ整理
+        input_name, input_csv_name = request.form.get('name').split('-')
+    input_name = input_name.replace(' ', '')
+    is_used_category = request.form.get('is_used_category',
+                                        session.get('is_used_category'))
+    # errorがあれば
+    if error_dict:
+        return render_template('co_oc_network/data_selection.html',
+                               basic_data=basic_data,
+                               edogawa_data=edogawa_data,
+                               error_data=error_dict)
+
+    # sessionの登録
+    session['input_type'] = input_type
+    session['input_name'] = input_name
+    session['input_csv_name'] = input_csv_name
+    session['is_used_category'] = is_used_category
+
+    return render_template('co_oc_network/options.html',
+                           basic_data=basic_data,
+                           edogawa_data=edogawa_data)
+
+
+@network_page.route('/result', methods=['POST'])
+def result():
+    """
+    共起ネットワーク
+        結果表示画面
+
+    """
+    # 基本情報
+    basic_data = get_basic_data(title='共起ネットワーク：結果画面',
+                                active_url='co_oc_network')
     # 江戸川乱歩作品関連の情報
     hinshi_dict = get_hinshi_dict()
     edogawa_data = dict(hinshi_dict=get_hinshi_dict(),
                         name_file=get_novels_tuple(col1='name', col2='file_name'))
 
-    if request.method == 'GET':
+    # 入力データの形式
+    input_type = session.get('input_type')
+    # セッション切れの場合
+    if not input_type:
         session.clear()
-        return render_template('co_oc_network.html', basic_data=basic_data, edogawa_data=edogawa_data)
-
-    # 利用者から送られてきた情報
+        flash('セッションが切れました。再度データを選択してください。', 'error')
+        return render_template('co_oc_network/data_selection.html',
+                               basic_data=basic_data,
+                               edogawa_data=edogawa_data)
+    # 利用者から送られてきた情報の取得
+    name = session.get('input_name')
+    file_name = session.get('input_csv_name')
+    used_category = int(session.get('is_used_category'))
     dimension = int(request.form.get('dimension'))
-    input_type = request.form.get('input_type')
     number = int(request.form.get('number'))
     hinshi_eng = request.form.getlist('hinshi')
     hinshi_jpn = [hinshi_dict.get(k) for k in hinshi_eng]
@@ -43,18 +128,6 @@ def show():
     synonym = request.form.get('synonym')
     # エラーの有無判定
     error_dict = dict()
-    # 入力データ
-    if input_type == 'csv':
-        if session.get('previous_file_name'):
-            name = session.get('previous_file_name')
-            file_name = session.get('previous_file_path')
-        else:
-            name, file_name, error_dict = get_csv_filename(request)
-        used_category = 0
-    else:
-        # 利用者から送られてきた情報を基にデータ整理
-        name, file_name = request.form.get('name').split('-')
-        used_category = int(request.form.get('is_used_category'))
     name = name.replace(' ', '')
     # 送るデータの辞書
     sent_data_dict = dict(input_type=input_type, name=name, dimension=dimension, number=number,
@@ -69,13 +142,13 @@ def show():
     if number < 1:
         flash('共起数が少なすぎます。', 'error')
         error_dict['number'] = '共起数が少なすぎます。'
-    # sessionが切れている場合
-    if request.form.get('has_previous') and not session.get('previous_file_name'):
-        flash('セッション切れです。ファイルを再度アップロードしてください。', 'error')
     # errorがあれば
     if error_dict:
         sent_data_dict['error'] = error_dict
-        return render_template('co_oc_network.html', basic_data=basic_data, edogawa_data=edogawa_data, sent_data=sent_data_dict)
+        return render_template('co_oc_network/data_selection.html',
+                               basic_data=basic_data,
+                               edogawa_data=edogawa_data,
+                               sent_data=sent_data_dict)
     # 共起ネットワーク作成
     is_used_3d = True if dimension == 3 else False
     try:
@@ -92,11 +165,11 @@ def show():
         flash('ファイル形式が正しくありません。（入力形式に沿ってください）', 'error')
         sent_data_dict['error'] = dict(
             csv_file_invalid='ファイル形式が正しくありません。（入力形式に沿ってください）')
-        return render_template('co_oc_network.html', basic_data=basic_data, edogawa_data=edogawa_data, sent_data=sent_data_dict)
+        return render_template('co_oc_network/data_selection.html',
+                               basic_data=basic_data,
+                               edogawa_data=edogawa_data,
+                               sent_data=sent_data_dict)
     # sessionの登録
-    if input_type == 'csv':
-        session['previous_file_name'] = name
-        session['previous_file_path'] = file_name
     session['file_name'] = csv_file_name
     session['dir_path'] = 'tmp'
     session['new_name'] = f'{name}_{"-".join(hinshi_jpn)}_{number}'
@@ -106,6 +179,9 @@ def show():
     sent_data_dict['co_oc_df'] = co_oc_df
 
     try:
-        return render_template('co_oc_network.html', basic_data=basic_data, edogawa_data=edogawa_data, sent_data=sent_data_dict)
+        return render_template('co_oc_network/result.html',
+                               basic_data=basic_data,
+                               edogawa_data=edogawa_data,
+                               sent_data=sent_data_dict)
     except:
-        return redirect(url_for('network.show'))
+        return redirect(url_for('network.data_selection'))

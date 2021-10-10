@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 import plotly
-import datetime
+from get_data import create_random_string
 
 
 def apply_js(fig, filename):
@@ -273,8 +273,9 @@ def create_3d_network(df, target_num=50, used_category=0, category_list=[]):
         fig = create_3d_network_figure(df, target_num, fig)
     else:
         for idx, category in enumerate(category_list):
-            fig = create_3d_network_figure(
-                df.query(' カテゴリー == @category '), target_num, fig, category_list, idx)
+            fig = create_3d_network_figure(df.query(' カテゴリー == @category '),
+                                           target_num, fig,
+                                           category_list, idx)
 
     layout = go.Layout(
         showlegend=True,
@@ -296,8 +297,7 @@ def create_3d_network(df, target_num=50, used_category=0, category_list=[]):
     # plotly_click.jsを適用する
     # apply_js(fig, 'test3')
 
-    now = datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S%f')
-    html_file_name = f'{now}_3D_network'
-    fig.write_html(f'tmp/{html_file_name}.html', auto_open=False)
+    html_random_name = create_random_string(32)
+    fig.write_html(f'tmp/{html_random_name}.html', auto_open=False)
 
-    return html_file_name
+    return html_random_name

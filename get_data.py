@@ -1,5 +1,7 @@
 import pandas as pd
 import datetime
+import random
+import string
 
 
 def get_hinshi_dict():
@@ -78,6 +80,12 @@ def juman_divide_dict():
 
 def get_datetime_now():
     return datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S%f')
+
+
+def create_random_string(n):
+    rand_str_list = [random.choice(string.ascii_letters + string.digits)
+                     for i in range(n)]
+    return ''.join(rand_str_list)
 
 
 def dict_in_list2csv(dict_in_list, divide_dict):

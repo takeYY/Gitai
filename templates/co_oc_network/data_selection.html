@@ -1,0 +1,130 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class='container pb-4'>
+  <h3 class='text-center'>{{ basic_data.get('title') }}</h3>
+
+  <!--
+  ----- 作品検索フォーム -----
+  -->
+  <form action={{ url_for('network.options') }} method=post enctype=multipart/form-data>
+    <!--
+    ----- 入力データ -----
+    -->
+    <h5><div class='badge badge-danger'>必須</div> 入力データ</h5>
+    <div class='accordion mb-3' id='input-accordion'>
+      <div class='form-check'>
+        <div class='card'>
+          <div class='card-header px-4' class='edogawa-header'>
+            <input class='form-check-input' type='radio' name='input_type' value='edogawa' id='input-edogawa'
+            {{ 'checked' if sent_data and sent_data.get('input_type')=='edogawa' or not sent_data else '' }}
+            data-toggle='collapse' data-target='#edogawa-collapse' aria-expanded='true' aria-controls='edogawa-collapse'>
+            <label class='form-check-label' for='input-edogawa'>江戸川乱歩作品</label>
+          </div>
+          <div id='edogawa-collapse' class='collapse {{ "show" if sent_data and sent_data.get("input_type")=="edogawa" or not sent_data else ""}}' aria-labelledby='edogawa-header' data-parent='#input-accordion'>
+            <div class='card-body'>
+              <!--
+              ----- 作品名（江戸川乱歩作品で分析） ------
+              -->
+              <div class='form-group w-50'>
+                <label for='name' class='form-check-label'>作品名</label>
+                <div class='px-4'>
+                  <select name='name' class='form-control' id='edogawa-works'>
+                    {% for name, file in edogawa_data.get('name_file') %}
+                    <option value={{name}}-{{file}} {{'selected' if sent_data and sent_data.get('name')==name else '' }}>{{name}}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class='form-group'>
+                <label for='is_used_category' class='form-check-label'>章ごとのカテゴリ分割</label>
+                <div class='form-check'>
+                  <input type='radio' name='is_used_category' value=0 id='not-used-category' {{ 'checked' if sent_data and sent_data.get('is_used_category')==0 or not sent_data else '' }}>
+                  <label class='form-check-label' for='not-used-category'>しない</label>
+                </div>
+                <div class='form-check'>
+                  <input type='radio' name='is_used_category' value=1 id='used-category' {{ 'checked' if sent_data and sent_data.get('is_used_category')==1 else '' }}>
+                  <label class='form-check-label' for='used-category'>する</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!--
+        ----- 任意のCSVデータで分析 -----
+        -->
+        <div class='card'>
+          <div class='card-header px-4' class='csv-header'>
+            <input class='form-check-input' type='radio' name='input_type' value='csv' id='input-csv'
+            {{ 'checked' if sent_data and sent_data.get('input_type')=='csv' else '' }}
+            data-toggle='collapse' data-target='#csv-collapse' aria-expanded='true' aria-controls='csv-collapse'>
+            <label class='form-check-label' for='input-csv'>CSVデータ</label>
+          </div>
+          <div id='csv-collapse' class='collapse {{ "show" if sent_data and sent_data.get("input_type")=="csv" else ""}}' aria-labelledby='csv-header' data-parent='#input-accordion'>
+            <div class='card-body'>
+              <div class='form-group'>
+                <p><a href={{ url_for('morph_analysis.show') }} target=_blank>形態素解析</a>によって得られたcsvデータが対象（最大16MBまで）</p>
+                <!--
+                ----- 入力形式 -----
+                -->
+                <button class='btn btn-info dropdown-toggle' aria-controls='csv-sample' aria-expanded='false'
+                  data-target='#csv-sample' data-toggle='collapse' type='button'>入力形式</button>
+                <div id='csv-sample' class='collapse'>
+                  <div class='bs-callout bs-callout-info mt-0 py-1'>
+                    <p>
+                    例1）<br>
+                    表層形,品詞,原形<br>
+                    すもも,名詞,すもも<br>
+                    も,助詞,も<br>
+                    もも,名詞,もも<br>
+                    も,助詞,も<br>
+                    もも,名詞,もも<br><br>
+                    例2）<br>
+                    見出し,品詞,原形<br>
+                    くるま,名詞,くるま<br>
+                    で,助詞,で<br>
+                    まつ,動詞,まつ
+                    </p>
+                  </div>
+                </div>
+                <!--
+                ----- ファイル選択 -----
+                -->
+                <div class='form-group'>
+                  <div class='input-group'>
+                    <div class='custom-file'>
+                      <input type='file' name='file'
+                        class='custom-file-input {{ "is-invalid" if sent_data and sent_data.get("error", {}).get("csv_file_invalid") else "" }}'
+                        id='inputFile'>
+                      <label class='custom-file-label' for='inputFile' data-browse='参照'>
+                      {{ sent_data.get('name') if sent_data and sent_data.get('input_type')=='csv' and sent_data.get('name')
+                      else 'ファイルを選択...' }}
+                      </label>
+                    </div>
+                    <div class='input-group-append'>
+                      <button type='button' class='btn btn-outline-secondary input-group-text' id='inputFileReset'>取消</button>
+                    </div>
+                  </div>
+                  {% if sent_data and sent_data.get('error', {}).get('csv_file_invalid') %}
+                    <small class='text-danger'>
+                      {{ sent_data.get('error').get('csv_file_invalid') }}
+                    </small>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--
+    ----- ネットワーク設定ボタン -----
+    -->
+    <div class='text-center'>
+      <button type='submit' class='btn btn-primary'>可視化設定へ</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

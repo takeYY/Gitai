@@ -1,0 +1,87 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class='container pb-4'>
+  <h3 class='text-center'>{{ basic_data.get('title') }}</h3>
+  <!--
+  ----- 共起ネットワーク結果 -----
+  -->
+  {% if sent_data and sent_data.get('file_name') %}
+  <!--
+  ----- 検索条件の表示 -----
+  -->
+  <hr>
+  <div class='my-2'>
+    <p>入力データ：{{ sent_data.get('name') }}</p>
+    <p>共起数上位：{{ sent_data.get('number') }}</p>
+    <p>可視化対象の品詞：{{ ', '.join(sent_data.get('hinshi')) }}</p>
+    <p class={{ '' if sent_data.get('remove_words') else 'text-danger' }}>
+      {{ '除去ワード：' + ( ', '.join(sent_data.get('remove_words').split('\r\n')) if sent_data.get('remove_words') else '除去ワードなし' ) }}
+    </p>
+    <p class={{ '' if sent_data.get('target_words') else 'text-danger' }}>
+      {{ '指定ワード：' + ( ', '.join(sent_data.get('target_words').split('\r\n')) if sent_data.get('target_words') else '指定ワードなし' ) }}
+    </p>
+  </div>
+
+  <!--
+  ----- 共起ネットワークのグラフ -----
+  -->
+  <div class='border embed-responsive embed-responsive-16by9'>
+    <iframe src={{ url_for('others.show_co_oc_network', file_name=sent_data.get('html_file_name')) }}></iframe>
+  </div>
+  <hr>
+
+  <!--
+  ----- テーブル情報 -----
+  -->
+  <button class='btn btn-primary' data-toggle='collapse' data-target='#co-oc-table'
+  aria-expand='false' aria-controls='co-oc-table'>テーブル表示</button>
+  <div id='co-oc-table' class='collapse'>
+    <!--
+    ----- csvダウンロードボタン -----
+    -->
+    <div class='float-right'>
+      <form action={{ url_for('others.download_csv') }} method='post'>
+        <button type='submit' class='btn btn-primary'>CSVダウンロード</button>
+      </form>
+    </div>
+
+    <!--
+    ----- テーブルデータ表示 -----
+    -->
+    <div class='my-2'>
+      <table class='table table-sm table-striped table-hover'>
+        <thead class='thead-dark'>
+          <tr>
+            <th>NO.</th>
+            <th>first</th>
+            <th>first_type</th>
+            <th>second</th>
+            <th>second_type</th>
+            <th>count</th>
+            {% if 'カテゴリー' in sent_data.get('co_oc_df').columns %}
+            <th>カテゴリー</th>
+            {% endif %}
+          </tr>
+        </thead>
+        {% for index, rows in sent_data.get('co_oc_df')[:sent_data.get('number')].iterrows() %}
+        <tr>
+          <td>{{ index+1 }}</td>
+          <td>{{ rows['first'] }}</td>
+          <td>{{ rows['first_type'] }}</td>
+          <td>{{ rows['second'] }}</td>
+          <td>{{ rows['second_type'] }}</td>
+          <td>{{ rows['count'] }}</td>
+          {% if 'カテゴリー' in sent_data.get('co_oc_df').columns %}
+          <td>{{ rows['カテゴリー'] }}</td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+        <tr>
+          <td colspan={{ 1 + (sent_data.get('co_oc_df').columns | length) }} class='text-center text-danger'>《以下略》</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
