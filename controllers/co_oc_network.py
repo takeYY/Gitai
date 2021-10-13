@@ -88,11 +88,16 @@ def options():
         session['has_category'] = 0
     else:
         session['has_category'] = 1
+    # 入力データの取得
+    input_data_dict = {'入力データタイプ': '江戸川乱歩作品' if input_type == 'edogawa' else 'CSVデータ',
+                       '入力データ名': input_name,
+                       '章ごとのカテゴリ分割': 'する' if is_used_category == '1' else 'しない'}
 
     return render_template('co_oc_network/options.html',
                            basic_data=basic_data,
                            edogawa_data=edogawa_data,
-                           category_list=category_list)
+                           category_list=category_list,
+                           input_data=input_data_dict)
 
 
 @network_page.route('/result', methods=['POST'])
@@ -194,11 +199,29 @@ def result():
     sent_data_dict['file_name'] = csv_file_name
     sent_data_dict['html_file_name'] = html_file_name
     sent_data_dict['co_oc_df'] = co_oc_df
+    # 入力データの取得
+    input_data_dict = {'入力データタイプ': '江戸川乱歩作品' if input_type == 'edogawa' else 'CSVデータ',
+                       '入力データ名': name,
+                       '章ごとのカテゴリ分割': 'する' if used_category == '1' else 'しない'}
+    # 設定データの取得
+    options_dict = {'表示形式': '2D' if dimension == 2 else '3D',
+                    '共起数上位': number,
+                    '可視化対象の品詞': ', '.join(hinshi_jpn),
+                    'カテゴリー選択（3Dのみ）': ', '.join(selected_category_list) if selected_category_list else '',
+                    '指定ワード': ', '.join(target_words.split('\r\n')),
+                    '同義語指定': synonym,
+                    '除去ワード': ', '.join(remove_words),
+                    '除去対象の品詞組み合わせ（名詞）': ', '.join(remove_combi_meishi),
+                    '除去対象の品詞組み合わせ（動詞）': ', '.join(remove_combi_doushi),
+                    '除去対象の品詞組み合わせ（形容詞）': ', '.join(remove_combi_keiyoushi),
+                    '除去対象の品詞組み合わせ（副詞）': ', '.join(remove_combi_fukushi)}
 
     try:
         return render_template('co_oc_network/result.html',
                                basic_data=basic_data,
                                edogawa_data=edogawa_data,
-                               sent_data=sent_data_dict)
+                               sent_data=sent_data_dict,
+                               input_data=input_data_dict,
+                               options=options_dict)
     except:
         return redirect(url_for('network.data_selection'))
