@@ -145,7 +145,7 @@ def kyoki_word_network(target_num=250, file_name='3742_9_3_11_02'):
 
     # add neighbor data to node hover data
     for node in got_net.nodes:
-        node["title"] += " Neighbors:<br>" + \
+        node["title"] += "<br>共起:<br>" + \
             "<br>".join(neighbor_map[node["id"]])
         node["value"] = len(neighbor_map[node["id"]])
 

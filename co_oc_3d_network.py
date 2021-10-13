@@ -106,11 +106,11 @@ def create_3d_network_figure(df, target_num, fig, category_list=[], current_ctg_
     # 各ノード情報を記載
     for idx, text in enumerate(list(G.nodes())):
         G.nodes[text]['node_info'] = {
-            'id': idx+1,
-            'category': category_list[current_ctg_idx] if category_list else 'カテゴリーなし',
-            'word': text,
-            'frequency': word_frequency[text],
-            'neighbors': f'<br>{neighbors_list[idx]}',
+            '単語ID': idx+1,
+            'カテゴリー': category_list[current_ctg_idx] if category_list else 'カテゴリーなし',
+            '単語': text,
+            '出現頻度': word_frequency[text],
+            '共起': f'<br>{neighbors_list[idx]}',
         }
 
     # 図のレイアウトを決める。kの値が小さい程図が密集
