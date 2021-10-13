@@ -152,7 +152,7 @@ def kyoki_word_network(target_num=250, file_name='3742_9_3_11_02'):
     return got_net
 
 
-def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], target_num=250, remove_words='', remove_combi='', target_words='', input_type='edogawa', is_used_3d=False, used_category=0, synonym=''):
+def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], target_num=250, remove_words='', remove_combi='', target_words='', input_type='edogawa', is_used_3d=False, used_category=0, synonym='', selected_category=[]):
     """
     共起ネットワークの作成
 
@@ -178,7 +178,7 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
 
     """
     # カテゴリーごとに表示する際の並び順を取得
-    category_list = []
+    category_list = selected_category
     if input_type == 'edogawa':
         if used_category == 0 or not is_used_3d:
             # jumanppにより形態素解析したDF取得
@@ -186,7 +186,10 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
         else:
             # MeCabにより形態素解析されたDF取得
             df = get_mecab_with_category_df(file_name)
-            category_list = df['カテゴリー'].unique().tolist()
+            if selected_category:
+                df = df.query(' カテゴリー in @selected_category ')
+            else:
+                category_list = df['カテゴリー'].unique().tolist()
     else:
         df = pd.read_csv(f'tmp/{file_name}')
     # 除去ワードリスト

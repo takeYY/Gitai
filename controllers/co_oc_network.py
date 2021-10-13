@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
-from get_data import get_basic_data, get_novels_tuple, get_hinshi_dict
+from get_data import get_basic_data, get_novels_tuple, get_hinshi_dict, get_category_list
 from co_oc_network import create_network, get_csv_filename
 from co_oc_3d_network import create_3d_network
 
@@ -65,24 +65,34 @@ def options():
         # 利用者から送られてきた情報を基にデータ整理
         input_name, input_csv_name = request.form.get('name').split('-')
     input_name = input_name.replace(' ', '')
-    is_used_category = request.form.get('is_used_category',
-                                        session.get('is_used_category'))
     # errorがあれば
     if error_dict:
         return render_template('co_oc_network/data_selection.html',
                                basic_data=basic_data,
                                edogawa_data=edogawa_data,
                                error_data=error_dict)
-
+    # カテゴリごとの表示有無
+    is_used_category = request.form.get('is_used_category',
+                                        session.get('is_used_category'))
+    # カテゴリごとの表示を希望する場合
+    if is_used_category == '1':
+        category_list = get_category_list(input_csv_name)
+    else:
+        category_list = []
     # sessionの登録
     session['input_type'] = input_type
     session['input_name'] = input_name
     session['input_csv_name'] = input_csv_name
     session['is_used_category'] = is_used_category
+    if category_list and category_list[0] == '< 章なし >':
+        session['has_category'] = 0
+    else:
+        session['has_category'] = 1
 
     return render_template('co_oc_network/options.html',
                            basic_data=basic_data,
-                           edogawa_data=edogawa_data)
+                           edogawa_data=edogawa_data,
+                           category_list=category_list)
 
 
 @network_page.route('/result', methods=['POST'])
@@ -117,6 +127,7 @@ def result():
     number = int(request.form.get('number'))
     hinshi_eng = request.form.getlist('hinshi')
     hinshi_jpn = [hinshi_dict.get(k) for k in hinshi_eng]
+    selected_category_list = request.form.getlist('category')
     remove_words = request.form.get('remove-words')
     remove_combi_meishi = request.form.getlist('remove-combi-meishi')
     remove_combi_doushi = request.form.getlist('remove-combi-doushi')
@@ -131,7 +142,7 @@ def result():
     name = name.replace(' ', '')
     # 送るデータの辞書
     sent_data_dict = dict(input_type=input_type, name=name, dimension=dimension, number=number,
-                          hinshi=hinshi_jpn,
+                          hinshi=hinshi_jpn, category=selected_category_list,
                           remove_words=remove_words, remove_combi=remove_combi_dict, target_words=target_words,
                           is_used_category=used_category, synonym=synonym)
     # 品詞が1つも選択されなかった場合
@@ -142,20 +153,26 @@ def result():
     if number < 1:
         flash('共起数が少なすぎます。', 'error')
         error_dict['number'] = '共起数が少なすぎます。'
+    # edogawa選択、カテゴリごとの表示選択、章がある作品において、チェックが一つもなかった場合
+    if input_type == 'edogawa' and used_category and int(session.get('has_category')) and not selected_category_list:
+        flash('カテゴリが選択されていません。', 'error')
+        error_dict['category'] = 'カテゴリが選択されていません。'
     # errorがあれば
     if error_dict:
         sent_data_dict['error'] = error_dict
-        return render_template('co_oc_network/data_selection.html',
+        return render_template('co_oc_network/options.html',
                                basic_data=basic_data,
                                edogawa_data=edogawa_data,
-                               sent_data=sent_data_dict)
+                               sent_data=sent_data_dict,
+                               category_list=get_category_list(file_name))
     # 共起ネットワーク作成
     is_used_3d = True if dimension == 3 else False
     try:
         csv_file_name, co_oc_df, category_list = create_network(file_name=file_name, target_hinshi=hinshi_jpn, target_num=number,
                                                                 remove_words=remove_words, remove_combi=remove_combi_dict,
                                                                 target_words=target_words, input_type=input_type,
-                                                                is_used_3d=is_used_3d, used_category=used_category, synonym=synonym)
+                                                                is_used_3d=is_used_3d, used_category=used_category, synonym=synonym,
+                                                                selected_category=selected_category_list)
         if is_used_3d:
             html_file_name = create_3d_network(co_oc_df, target_num=number,
                                                used_category=used_category, category_list=category_list)

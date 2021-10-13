@@ -82,6 +82,11 @@ def get_datetime_now():
     return datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S%f')
 
 
+def get_category_list(csv_filename):
+    csv_path = 'csv/mecab_with_category'
+    return pd.read_csv(f'{csv_path}/{csv_filename}.csv')['カテゴリー'].unique().tolist()
+
+
 def create_random_string(n):
     rand_str_list = [random.choice(string.ascii_letters + string.digits)
                      for i in range(n)]

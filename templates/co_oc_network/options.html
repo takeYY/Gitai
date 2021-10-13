@@ -52,7 +52,7 @@
             class='form-check-input {{ "is-invalid" if sent_data and sent_data.get("error", {}).get("hinshi") else "" }}'
             {{'checked' if (sent_data and value in sent_data.get('hinshi') or not sent_data) else '' }}>
           <label for={{key}} class='form-check-label'>{{value}}</label>
-          {% if value == '感動詞' and sent_data and sent_data.get('error', {}).get('hinshi') %}
+          {% if loop.index == edogawa_data.get('hinshi_dict')|length and sent_data and sent_data.get('error', {}).get('hinshi') %}
             <div class='invalid-feedback'>
               {{ sent_data.get('error').get('hinshi') }}
             </div>
@@ -61,6 +61,30 @@
         {% endfor %}
       </div>
     </div>
+
+    <!--
+    ----- カテゴリー選択 -----
+    -->
+    {% if category_list and category_list[0] != '< 章なし >' %}
+      <div class='form-group'>
+        <h5><div class='badge badge-danger'>必須</div> カテゴリー選択（3Dのみ）</h5>
+        <div class='px-4'>
+          {% for category in category_list %}
+          <div class='form-check'>
+            <input type='checkbox' name='category' value={{category}} id={{loop.index}}
+              class='form-check-input {{ "is-invalid" if sent_data and sent_data.get("error", {}).get("category") else "" }}'
+              {{'checked' if (sent_data and category in sent_data.get('category') or not sent_data and loop.index == 1) else '' }}>
+            <label for={{loop.index}} class='form-check-label'>{{category}}</label>
+            {% if loop.index == category_list|length and sent_data and sent_data.get('error', {}).get('category') %}
+              <div class='invalid-feedback'>
+                {{ sent_data.get('error').get('category') }}
+              </div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
 
     <!--
     ----- 詳細設定 -----
