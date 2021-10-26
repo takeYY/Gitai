@@ -17,10 +17,12 @@
       </thead>
       <tbody>
         {% for key, value in input_data.items() %}
-          <tr>
-            <th>{{ key }}</th>
-            <th>{{ value }}</th>
-          </tr>
+          {% if value %}
+            <tr>
+              <th>{{ key }}</th>
+              <th>{{ value }}</th>
+            </tr>
+          {% endif %}
         {% endfor %}
       </tbody>
     </table>
@@ -56,23 +58,31 @@
   {% endif %}
 
   <!--
-  ----- 共起ネットワーク結果 -----
+  ----- 集計結果 -----
   -->
-  {% if sent_data and sent_data.get('file_name') %}
+  {% if sent_data and sent_data.get('file_name')%}
   <!--
-  ----- 共起ネットワークのグラフ -----
+  ----- 検索条件の表示 -----
+  -->
+  <hr>
+  <div class='my-2'>
+    <p>作品名：{{ sent_data.get('name') }}</p>
+  </div>
+
+  <!--
+  ----- 集計結果のグラフ -----
   -->
   <div class='border embed-responsive embed-responsive-16by9'>
-    <iframe src={{ url_for('others.show_co_oc_network', file_name=sent_data.get('html_file_name')) }}></iframe>
+    <iframe src={{ url_for('others.show_co_oc_network', file_name=sent_data.get('file_name')) }}></iframe>
   </div>
   <hr>
 
   <!--
   ----- テーブル情報 -----
   -->
-  <button class='btn btn-primary' data-toggle='collapse' data-target='#co-oc-table'
-  aria-expand='false' aria-controls='co-oc-table'>テーブル表示</button>
-  <div id='co-oc-table' class='collapse'>
+  <button class='btn btn-primary' data-toggle='collapse' data-target='#agg-table'
+  aria-expand='false' aria-controls='agg-table'>テーブル表示</button>
+  <div id='agg-table' class='collapse'>
     <!--
     ----- csvダウンロードボタン -----
     -->
@@ -89,33 +99,24 @@
       <table class='table table-sm table-striped table-hover'>
         <thead class='thead-dark'>
           <tr>
-            <th>NO.</th>
-            <th>first</th>
-            <th>first_type</th>
-            <th>second</th>
-            <th>second_type</th>
-            <th>count</th>
-            {% if 'カテゴリー' in sent_data.get('co_oc_df').columns %}
-            <th>カテゴリー</th>
-            {% endif %}
+            {% for column in sent_data.get('df').columns %}
+              <th>{{ column }}</th>
+            {% endfor %}
           </tr>
         </thead>
-        {% for index, rows in sent_data.get('co_oc_df')[:sent_data.get('number')].iterrows() %}
-        <tr>
-          <td>{{ index+1 }}</td>
-          <td>{{ rows['first'] }}</td>
-          <td>{{ rows['first_type'] }}</td>
-          <td>{{ rows['second'] }}</td>
-          <td>{{ rows['second_type'] }}</td>
-          <td>{{ rows['count'] }}</td>
-          {% if 'カテゴリー' in sent_data.get('co_oc_df').columns %}
-          <td>{{ rows['カテゴリー'] }}</td>
-          {% endif %}
-        </tr>
+        {% for index, rows in sent_data.get('df')[:50].iterrows() %}
+          <tr>
+            <td>{{ rows['ランキング'] }}</td>
+            <td>{{ rows['単語'] }}</td>
+            <td>{{ rows['品詞'] }}</td>
+            <td>{{ rows['出現頻度'] }}</td>
+          </tr>
         {% endfor %}
-        <tr>
-          <td colspan={{ 1 + (sent_data.get('co_oc_df').columns | length) }} class='text-center text-danger'>《以下略》</td>
-        </tr>
+        {% if 50 < sent_data.get('df')|length %}
+          <tr>
+            <td colspan={{ 1 + (sent_data.get('df').columns|length) }} class='text-center text-danger'>《以下略》</td>
+          </tr>
+        {% endif %}
       </table>
     </div>
   </div>
