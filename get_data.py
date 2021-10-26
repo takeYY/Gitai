@@ -78,6 +78,21 @@ def juman_divide_dict():
             'katsuyou1': '活用型', 'katsuyou2': '活用形', 'imis': '意味情報', 'repname': '代表表記'}
 
 
+def get_plotly_symbols():
+    return ['circle', 'square', 'diamond', 'cross', 'x', 'star', 'hexagram',
+            'star-triangle-up', 'star-triangle-down', 'star-square', 'star-diamond',
+            'circle-open', 'square-open', 'diamond-open', 'cross-open', 'x-open', 'star-open', 'hexagram-open',
+            'star-triangle-up-open', 'star-triangle-down-open', 'star-square-open', 'star-diamond-open',
+            'circle-dot', 'square-dot', 'diamond-dot', 'cross-dot', 'x-dot', 'star-dot', 'hexagram-dot',
+            'star-triangle-up-dot', 'star-triangle-down-dot', 'star-square-dot', 'star-diamond-dot',
+            'circle-open-dot', 'square-open-dot', 'diamond-open-dot', 'cross-open-dot', 'x-open-dot', 'star-open-dot', 'hexagram-open-dot',
+            'star-triangle-up-open-dot', 'star-triangle-down-open-dot', 'star-square-open-dot', 'star-diamond-open-dot']
+
+
+def get_plotly_text_positions():
+    return ['top center', 'top right', 'middle right', 'bottom center', 'bottom right']
+
+
 def get_datetime_now():
     return datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S%f')
 
