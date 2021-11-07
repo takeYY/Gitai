@@ -1,5 +1,6 @@
 from flask import flash
 import pandas as pd
+import numpy as np
 import itertools
 import collections
 from werkzeug.utils import secure_filename
@@ -92,24 +93,141 @@ def modify_df_with_synonym(df, synonym):
             synonym_dict[tw] = replace_word
 
     # 同義語設定
-    if '原形' in df.columns:
-        df_match = df.query(' 原形 in @synonym_dict.keys() ', engine='python')
-        df_unmatch = df.query(
-            ' 原形 not in @synonym_dict.keys() ', engine='python')
-        # 同義語に指定された単語を置き換え
-        df_match = df_match.replace({'原形': synonym_dict})
-    else:
-        df_match = df.query(' 原型 in @synonym_dict.keys() ', engine='python')
-        df_unmatch = df.query(
-            ' 原型 not in @synonym_dict.keys() ', engine='python')
-        # 同義語に指定された単語を置き換え
-        df_match = df_match.replace({'原型': synonym_dict})
+    df_match = df.query(' 原形 in @synonym_dict.keys() ', engine='python')
+    df_unmatch = df.query(' 原形 not in @synonym_dict.keys() ', engine='python')
+    # 同義語に指定された単語を置き換え
+    df_match = df_match.replace({'原形': synonym_dict})
     # 品詞を固有名詞に設定
     df_match['品詞'] = '固有名詞'
     # 結合
     df = pd.concat([df_match, df_unmatch]).sort_index()
 
     return df
+
+
+def create_keywords(df, remove_words_list, target_hinshi):
+    # 形態素解析DFから各列の要素をリストで取得
+    midashi = list(df['表層形'])
+    genkei = list(df['原形'])
+    hinshi = list(df['品詞'])
+
+    # sentences: [[midashi_1, genkei_1, hinshi_1], [midashi_2, ...], ...]
+    sentences = [midashi]
+    sentences.append(genkei)
+    sentences.append(hinshi)
+    sentences = np.array(sentences).T
+
+    # 同一文の中で設定に合致したwordsをkeywordsに含める
+    keywords = []
+    words = set()
+    for idx, sentence in enumerate(sentences):
+        # 句点があれば
+        if sentence[0] == '。':
+            keywords.append(list(words))
+            words = set()
+            continue
+
+        # 品詞がtarget_hinshiに含まれている and not (見出しが除去ワードリストに入っている or 原型が除去ワードリストに入っている)
+        # and not (除去対象の品詞組み合わせである)
+        if can_add_genkei2words(sentence, target_hinshi, remove_words_list):
+            words.add((sentence[1], sentence[2]))
+    return keywords
+
+
+def create_sentence_combinations(keywords, remove_combi):
+    # keywordsを基に単語ごとの組み合わせを計算
+    sentence_combinations = [list(itertools.combinations(
+        set(sentence), 2)) for sentence in keywords]
+    sentence_combinations = [[tuple(sorted(words)) for words in sentence]
+                             for sentence in sentence_combinations]
+
+    # 品詞の辞書を取得
+    hinshi_dict = get_hinshi_dict()
+    # 感動詞の削除
+    del hinshi_dict['kandoushi']
+    for key in remove_combi.keys():
+        if not remove_combi.get(key):
+            del hinshi_dict[key]
+
+    if hinshi_dict:
+        # 除去対象の品詞組み合わせを削除
+        new_sentence_combinations = []
+        for sc in sentence_combinations:
+            combination_list = []
+            for word1, word2 in sc:
+                if has_not_remove_combinations(word1, word2, remove_combi, hinshi_dict):
+                    combination_list.append((word1, word2))
+            new_sentence_combinations.append(combination_list)
+        sentence_combinations = new_sentence_combinations
+
+    return sentence_combinations
+
+
+def create_jaccard_coef_df(keywords, sentence_combinations, category=''):
+    combi_count = collections.Counter(sum(sentence_combinations, []))
+
+    if not category:
+        columns = ['first', 'first_type', 'second', 'second_type',
+                   'intersection_count']
+        (on1_list, on2_list) = (['first', 'first_type'],
+                                ['second', 'second_type'])
+    else:
+        columns = ['first', 'first_type', 'second', 'second_type',
+                   'category', 'intersection_count']
+        (on1_list, on2_list) = (['first', 'first_type', 'category'],
+                                ['second', 'second_type', 'category'])
+
+    word_associates = []
+    for key, value in combi_count.items():
+        if not category:
+            word_associates.append(
+                [key[0][0], key[0][1], key[1][0], key[1][1], value])
+        else:
+            word_associates.append(
+                [key[0][0], key[0][1], key[1][0], key[1][1], category, value])
+
+    word_associates = pd.DataFrame(word_associates, columns=columns)
+
+    word_count = collections.Counter(sum(keywords, []))
+    if not category:
+        word_count = [[key[0], key[1], value]
+                      for key, value in word_count.items()]
+        word_count = pd.DataFrame(word_count,
+                                  columns=['word', 'word_type', 'count'])
+    else:
+        word_count = [[key[0], key[1], category, value]
+                      for key, value in word_count.items()]
+        word_count = pd.DataFrame(word_count,
+                                  columns=['word', 'word_type', 'category', 'count'])
+
+    word_associates = pd.merge(
+        word_associates,
+        word_count.rename(columns={'word': 'first',
+                                   'word_type': 'first_type'}),
+        on=on1_list,
+        how='left'
+    ).rename(
+        columns={'count': 'count1'}
+    ).merge(
+        word_count.rename(columns={'word': 'second',
+                                   'word_type': 'second_type'}),
+        on=on2_list,
+        how='left'
+    ).rename(
+        columns={'count': 'count2'}
+    ).assign(
+        union_count=lambda x: x.count1 + x.count2 - x.intersection_count
+    ).assign(
+        jaccard_coef=lambda x: x.intersection_count / x.union_count
+    ).sort_values(
+        ['jaccard_coef', 'intersection_count'],
+        ascending=[False,
+                   False]
+    ).reset_index(
+        drop=True
+    )
+
+    return word_associates
 
 
 # ネットワーク描画のメイン処理定義
@@ -125,6 +243,9 @@ def kyoki_word_network(target_num=250, file_name='3742_9_3_11_02'):
     # got_net.barnes_hut()
     got_net.force_atlas_2based()
     got_data = pd.read_csv(f'tmp/{file_name}.csv')[:target_num]
+
+    # カラム名変更
+    got_data = got_data.rename(columns={'jaccard_coef': 'count'})
 
     sources = got_data['first']  # count
     targets = got_data['second']  # first
@@ -152,7 +273,9 @@ def kyoki_word_network(target_num=250, file_name='3742_9_3_11_02'):
     return got_net
 
 
-def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], target_num=250, remove_words='', remove_combi='', target_words='', input_type='edogawa', is_used_3d=False, used_category=0, synonym='', selected_category=[]):
+def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], target_num=250, remove_words='', remove_combi='',
+                   target_words='', input_type='edogawa', is_used_3d=False, used_category=0, synonym='', selected_category=[],
+                   co_oc_strength='frequency', strength_max=10000):
     """
     共起ネットワークの作成
 
@@ -176,6 +299,27 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
     target_words: str, default=''
         指定した単語の共起のみ表示する
 
+    input_type: str, default='edogawa'
+        入力データの種類（江戸川乱歩作品: 'edoagwa', csv: 'csv'）
+
+    is_used_3d: bool, default=False
+        3Dの共起ネットワークを表示するか否か
+
+    used_category: int, default=0
+        カテゴリーごとの描画を行う（1）か否（0）か
+
+    synonym: str, default=''
+        同義語設定
+
+    selected_category: list, default=[]
+        カテゴリーごとの描画において描画制限する
+
+    co_oc_strength: str, default='frequency'
+        共起強度に何を用いるか
+
+    strength_max: float, default=10000
+        表示する共起強度の最大値
+
     """
     # カテゴリーごとに表示する際の並び順を取得
     category_list = selected_category
@@ -192,6 +336,10 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
                 category_list = df['カテゴリー'].unique().tolist()
     else:
         df = pd.read_csv(f'tmp/{file_name}')
+    # カラム名を統一
+    df = df.rename(columns={'見出し': '表層形',
+                            '原型': '原形',
+                            '章ラベル': 'カテゴリー'})
     # 除去ワードリスト
     remove_words_list = remove_words.split('\r\n')
 
@@ -199,6 +347,71 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
     if synonym:
         df = modify_df_with_synonym(df, synonym)
         target_hinshi.append('固有名詞')
+
+    if co_oc_strength == 'jaccard':
+        # keywords, sentence_combinations, jaccard_dfの作成
+        keywords_dict = {}
+        sentence_combinations_dict = {}
+        co_oc_df = pd.DataFrame()
+        if used_category == 1 and is_used_3d:
+            for cat in df['カテゴリー'].unique():
+                keywords_dict[cat] = create_keywords(df.query(' カテゴリー==@cat '),
+                                                     remove_words_list,
+                                                     target_hinshi)
+                sentence_combinations_dict[cat] = create_sentence_combinations(keywords_dict[cat],
+                                                                               remove_combi)
+                tmp_df = create_jaccard_coef_df(keywords_dict[cat],
+                                                sentence_combinations_dict[cat],
+                                                category=cat)
+                co_oc_df = pd.concat([co_oc_df, tmp_df]).reset_index(drop=True)
+        else:
+            key_name = 'all'
+            keywords_dict[key_name] = create_keywords(df,
+                                                      remove_words_list,
+                                                      target_hinshi)
+            sentence_combinations_dict[key_name] = create_sentence_combinations(keywords_dict[key_name],
+                                                                                remove_combi)
+            co_oc_df = create_jaccard_coef_df(keywords_dict[key_name],
+                                              sentence_combinations_dict[key_name])
+        # カラム名の変更
+        co_oc_df = co_oc_df.rename(columns={'category': 'カテゴリー',
+                                            'intersection_count': 'firstとsecondの積集合',
+                                            'count1': 'firstの出現頻度',
+                                            'count2': 'secondの出現頻度',
+                                            'union_count': 'firstとsecondの和集合'})
+        # 指定ワードが含まれるレコードのみ抽出
+        if target_words:
+            new_co_oc_df = pd.DataFrame()
+            for tw in target_words.split('\r\n'):
+                new_co_oc_df = pd.concat([new_co_oc_df,
+                                          co_oc_df.query(' @tw in first or @tw in second ')])
+            co_oc_df = new_co_oc_df.sort_values(
+                'jaccard_coef',
+                ascending=False
+            ).drop_duplicates(
+                subset=['first', 'second']
+            ).reset_index(drop=True)
+        # 表示する共起強度を制限
+        co_oc_df = co_oc_df.query(
+            ' jaccard_coef <= @strength_max '
+        ).reset_index(drop=True)
+        # jaccard_coefでソート
+        co_oc_df = co_oc_df.sort_values(
+            'jaccard_coef', ascending=False).reset_index(drop=True)
+        # 所定の構造でCSVファイルに出力
+        file_random_name = create_random_string(32)
+        co_oc_df.to_csv(f'tmp/{file_random_name}.csv',
+                        index=False, encoding='utf_8_sig')
+
+        try:
+            # 2Dの共起ネットワークHTML作成
+            if not is_used_3d:
+                got_net = kyoki_word_network(target_num=target_num,
+                                             file_name=file_random_name)
+                got_net.write_html(f'tmp/{file_random_name}.html')
+            return file_random_name, co_oc_df, category_list
+        except:
+            return '', '', ''
 
     # 形態素解析DFから各列の要素をリストで取得
     try:
@@ -284,6 +497,13 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
                 [new_co_oc_df, co_oc_df.query(' @tw in first or @tw in second ')])
         co_oc_df = new_co_oc_df.sort_values('count', ascending=False).drop_duplicates(
             subset=['first', 'second']).reset_index(drop=True)
+    # 表示する共起強度を制限
+    co_oc_df = co_oc_df.query(
+        ' count <= @strength_max '
+    ).reset_index(drop=True)
+    # countでソート
+    co_oc_df = co_oc_df.sort_values(
+        'count', ascending=False).reset_index(drop=True)
     # 所定の構造でCSVファイルに出力
     file_random_name = create_random_string(32)
     co_oc_df.to_csv(f'tmp/{file_random_name}.csv',

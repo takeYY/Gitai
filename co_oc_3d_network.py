@@ -84,6 +84,9 @@ def create_3d_network_figure(df, target_num, fig, category_list=[], current_ctg_
     # ノードのx, yの幅を広げる係数
     x_y_width = 3.0
 
+    # カラム名変更
+    df = df.rename(columns={'jaccard_coef': 'count'})
+
     # タプル作成
     kyouki_tuple = [(first, second, count) for first, second,
                     count in zip(df['first'], df['second'], df['count'])]

@@ -129,6 +129,8 @@ def result():
     file_name = session.get('input_csv_name')
     used_category = int(session.get('is_used_category'))
     dimension = int(request.form.get('dimension'))
+    co_oc_strength = request.form.get('co_oc_strength')
+    strength_max = float(request.form.get('strength_max'))
     number = int(request.form.get('number'))
     hinshi_eng = request.form.getlist('hinshi')
     hinshi_jpn = [hinshi_dict.get(k) for k in hinshi_eng]
@@ -149,7 +151,7 @@ def result():
     sent_data_dict = dict(input_type=input_type, name=name, dimension=dimension, number=number,
                           hinshi=hinshi_jpn, category=selected_category_list,
                           remove_words=remove_words, remove_combi=remove_combi_dict, target_words=target_words,
-                          is_used_category=used_category, synonym=synonym)
+                          is_used_category=used_category, synonym=synonym, co_oc_strength=co_oc_strength, strength_max=strength_max)
     # 品詞が1つも選択されなかった場合
     if not hinshi_eng:
         flash('品詞が選択されていません。', 'error')
@@ -177,7 +179,8 @@ def result():
                                                                 remove_words=remove_words, remove_combi=remove_combi_dict,
                                                                 target_words=target_words, input_type=input_type,
                                                                 is_used_3d=is_used_3d, used_category=used_category, synonym=synonym,
-                                                                selected_category=selected_category_list)
+                                                                selected_category=selected_category_list, co_oc_strength=co_oc_strength,
+                                                                strength_max=strength_max)
         if is_used_3d:
             html_file_name = create_3d_network(co_oc_df, target_num=number,
                                                used_category=used_category, category_list=category_list)
@@ -206,6 +209,8 @@ def result():
     # 設定データの取得
     options_dict = {'表示形式': '2D' if dimension == 2 else '3D',
                     '共起数上位': number,
+                    '共起強度': '単純共起頻度' if co_oc_strength == 'frequency' else 'Jaccard係数',
+                    '共起強度の最大値': strength_max,
                     '可視化対象の品詞': ', '.join(hinshi_jpn),
                     'カテゴリー選択（3Dのみ）': ', '.join(selected_category_list) if selected_category_list else '',
                     '指定ワード': ', '.join(target_words.split('\r\n')),

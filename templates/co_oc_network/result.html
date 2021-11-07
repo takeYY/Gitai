@@ -90,28 +90,18 @@
         <thead class='thead-dark'>
           <tr>
             <th>NO.</th>
-            <th>first</th>
-            <th>first_type</th>
-            <th>second</th>
-            <th>second_type</th>
-            <th>count</th>
-            {% if 'カテゴリー' in sent_data.get('co_oc_df').columns %}
-            <th>カテゴリー</th>
-            {% endif %}
+            {% for column in sent_data.get('co_oc_df').columns %}
+              <th>{{ column }}</th>
+            {% endfor %}
           </tr>
         </thead>
         {% for index, rows in sent_data.get('co_oc_df')[:sent_data.get('number')].iterrows() %}
-        <tr>
-          <td>{{ index+1 }}</td>
-          <td>{{ rows['first'] }}</td>
-          <td>{{ rows['first_type'] }}</td>
-          <td>{{ rows['second'] }}</td>
-          <td>{{ rows['second_type'] }}</td>
-          <td>{{ rows['count'] }}</td>
-          {% if 'カテゴリー' in sent_data.get('co_oc_df').columns %}
-          <td>{{ rows['カテゴリー'] }}</td>
-          {% endif %}
-        </tr>
+          <tr>
+            <td>{{ index+1 }}</td>
+            {% for column in sent_data.get('co_oc_df').columns %}
+              <td>{{ rows[column] }}</td>
+            {% endfor %}
+          </tr>
         {% endfor %}
         <tr>
           <td colspan={{ 1 + (sent_data.get('co_oc_df').columns | length) }} class='text-center text-danger'>《以下略》</td>
