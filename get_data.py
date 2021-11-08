@@ -8,6 +8,10 @@ def get_hinshi_dict():
     return dict(meishi='名詞', doushi='動詞', keiyoushi='形容詞', fukushi='副詞', kandoushi='感動詞')
 
 
+def get_co_oc_strength_dict():
+    return dict(frequency='共起回数', jaccard='Jaccard係数', dice='Dice係数', simpson='Simpson係数', pmi='相互情報量')
+
+
 def get_edogawa_df():
     return pd.read_csv('csv/edogawa.csv')
 

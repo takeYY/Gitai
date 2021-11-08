@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
-from get_data import get_basic_data, get_novels_tuple, get_hinshi_dict, get_category_list
+from get_data import get_basic_data, get_novels_tuple, get_hinshi_dict, get_category_list, get_co_oc_strength_dict
 from co_oc_network import create_network, get_csv_filename
 from co_oc_3d_network import create_3d_network
 
@@ -174,19 +174,25 @@ def result():
                                category_list=get_category_list(file_name))
     # 共起ネットワーク作成
     is_used_3d = True if dimension == 3 else False
+    # 共起強度の対象を設定
+    target_coef = get_co_oc_strength_dict().get(co_oc_strength, '共起回数')
     try:
         csv_file_name, co_oc_df, category_list = create_network(file_name=file_name, target_hinshi=hinshi_jpn, target_num=number,
                                                                 remove_words=remove_words, remove_combi=remove_combi_dict,
                                                                 target_words=target_words, input_type=input_type,
                                                                 is_used_3d=is_used_3d, used_category=used_category, synonym=synonym,
-                                                                selected_category=selected_category_list, co_oc_strength=co_oc_strength,
+                                                                selected_category=selected_category_list,
+                                                                target_coef=target_coef,
                                                                 strength_max=strength_max)
         if is_used_3d:
             html_file_name = create_3d_network(co_oc_df, target_num=number,
-                                               used_category=used_category, category_list=category_list)
+                                               used_category=used_category, category_list=category_list,
+                                               target_coef=target_coef)
         else:
             html_file_name = csv_file_name
     except:
+        import traceback
+        traceback.print_exc()
         flash('ファイル形式が正しくありません。（入力形式に沿ってください）', 'error')
         sent_data_dict['error'] = dict(
             csv_file_invalid='ファイル形式が正しくありません。（入力形式に沿ってください）')
@@ -209,7 +215,7 @@ def result():
     # 設定データの取得
     options_dict = {'表示形式': '2D' if dimension == 2 else '3D',
                     '共起数上位': number,
-                    '共起強度': '単純共起頻度' if co_oc_strength == 'frequency' else 'Jaccard係数',
+                    '共起強度': target_coef,
                     '共起強度の最大値': strength_max,
                     '可視化対象の品詞': ', '.join(hinshi_jpn),
                     'カテゴリー選択（3Dのみ）': ', '.join(selected_category_list) if selected_category_list else '',

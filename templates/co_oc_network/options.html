@@ -74,11 +74,23 @@
       <div class='px-4'>
         <div class='form-check'>
           <input type='radio' name='co_oc_strength' value='frequency' id='frequency' {{ 'checked' if sent_data and sent_data.get('co_oc_strength')=='frequency' or not sent_data else '' }}>
-          <label class='form-check-label' for='frequency'>単純共起頻度（0〜）</label>
+          <label class='form-check-label' for='frequency'>共起回数（0〜∞）</label>
         </div>
         <div class='form-check'>
           <input type='radio' name='co_oc_strength' value='jaccard' id='jaccard' {{ 'checked' if sent_data and sent_data.get('co_oc_strength')=='jaccard' else '' }}>
           <label class='form-check-label' for='jaccard'>Jaccard係数（0.0〜1.0）</label>
+        </div>
+        <div class='form-check'>
+          <input type='radio' name='co_oc_strength' value='dice' id='dice' {{ 'checked' if sent_data and sent_data.get('co_oc_strength')=='dice' else '' }}>
+          <label class='form-check-label' for='dice'>Dice係数（0.0〜1.0）</label>
+        </div>
+        <div class='form-check'>
+          <input type='radio' name='co_oc_strength' value='simpson' id='simpson' {{ 'checked' if sent_data and sent_data.get('co_oc_strength')=='simpson' else '' }}>
+          <label class='form-check-label' for='simpson'>Simpson係数（0.0〜1.0）</label>
+        </div>
+        <div class='form-check'>
+          <input type='radio' name='co_oc_strength' value='pmi' id='pmi' {{ 'checked' if sent_data and sent_data.get('co_oc_strength')=='pmi' else '' }}>
+          <label class='form-check-label' for='pmi'>相互情報量（-∞〜∞）</label>
         </div>
       </div>
     </div>
