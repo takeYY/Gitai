@@ -37,12 +37,17 @@ def show():
 
     # mrph_resultをcsvとして保存し、df, csv_nameを取得
     result_df, csv_name = dict_in_list2csv(mrph_result, divide_dict)
-    # session登録
-    session['file_name'] = csv_name
-    session['dir_path'] = 'tmp'
-    session['new_name'] = f'{mrph_type}による形態素解析結果'
+    # csvダウンロード設定
+    dl_data = dict(file_name=csv_name,
+                   dl_type='result',
+                   new_name=f'{mrph_type}による形態素解析結果')
     # 形態素解析結果をまとめるデータ群
     mrph_data = dict(words=text, result_df=result_df[:50], csv_name=csv_name,
                      over50=50 < len(result_df), columns_num=len(result_df.columns))
 
-    return render_template('morphological.html', basic_data=basic_data, mrph_type=mrph_type, description=description, mrph_data=mrph_data)
+    return render_template('morphological.html',
+                           basic_data=basic_data,
+                           mrph_type=mrph_type,
+                           description=description,
+                           mrph_data=mrph_data,
+                           dl_data=dl_data)

@@ -381,7 +381,7 @@
     ##### csvダウンロードボタン #####
     #}
     <div class='float-right'>
-      <form action={{ url_for('others.download_csv') }} method='post'>
+      <form action={{ url_for('others.dl_csv', dl_type=dl_data.get('dl_type'), target=dl_data.get('file_name'), new_name=dl_data.get('new_name')) }} method='post'>
         <button type='submit' class='btn btn-primary'>CSVダウンロード</button>
       </form>
     </div>

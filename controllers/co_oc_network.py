@@ -200,10 +200,10 @@ def result():
                                basic_data=basic_data,
                                edogawa_data=edogawa_data,
                                sent_data=sent_data_dict)
-    # sessionの登録
-    session['file_name'] = csv_file_name
-    session['dir_path'] = 'tmp'
-    session['new_name'] = f'{name}_{"-".join(hinshi_jpn)}_{number}'
+    # csvダウンロード設定
+    dl_data = dict(file_name=csv_file_name,
+                   dl_type='result',
+                   new_name=f'{name}_{"-".join(hinshi_jpn)}_{number}')
     # 利用者から送られてきた情報を基に送る情報を格納
     sent_data_dict['file_name'] = csv_file_name
     sent_data_dict['html_file_name'] = html_file_name
@@ -233,6 +233,7 @@ def result():
                                edogawa_data=edogawa_data,
                                sent_data=sent_data_dict,
                                input_data=input_data_dict,
-                               options=options_dict)
+                               options=options_dict,
+                               dl_data=dl_data)
     except:
         return redirect(url_for('network.data_selection'))
