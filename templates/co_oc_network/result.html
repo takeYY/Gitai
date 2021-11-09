@@ -2,9 +2,9 @@
 {% block content %}
 <div class='container pb-4'>
   <h3 class='text-center'>{{ basic_data.get('title') }}</h3>
-  <!--
-  ----- 入力データの情報表示 -----
-  -->
+  {#
+  ##### 入力データの情報表示 #####
+  #}
   {% if input_data %}
   <div class='my-2'>
     <p>データ選択</p>
@@ -27,9 +27,9 @@
   </div>
   {% endif %}
 
-  <!--
-  ----- 設定の情報表示 -----
-  -->
+  {#
+  ##### 設定の情報表示 #####
+  #}
   {% if options %}
   <div class='my-2'>
     <p>設定</p>
@@ -55,36 +55,36 @@
   <hr>
   {% endif %}
 
-  <!--
-  ----- 共起ネットワーク結果 -----
-  -->
+  {#
+  ##### 共起ネットワーク結果 #####
+  #}
   {% if sent_data and sent_data.get('file_name') %}
-  <!--
-  ----- 共起ネットワークのグラフ -----
-  -->
+  {#
+  ##### 共起ネットワークのグラフ #####
+  #}
   <div class='border embed-responsive embed-responsive-16by9'>
     <iframe src={{ url_for('others.show_co_oc_network', file_name=sent_data.get('html_file_name')) }}></iframe>
   </div>
   <hr>
 
-  <!--
-  ----- テーブル情報 -----
-  -->
+  {#
+  ##### テーブル情報 #####
+  #}
   <button class='btn btn-primary' data-toggle='collapse' data-target='#co-oc-table'
   aria-expand='false' aria-controls='co-oc-table'>テーブル表示</button>
   <div id='co-oc-table' class='collapse'>
-    <!--
-    ----- csvダウンロードボタン -----
-    -->
+    {#
+    ##### csvダウンロードボタン #####
+    #}
     <div class='float-right'>
       <form action={{ url_for('others.download_csv') }} method='post'>
         <button type='submit' class='btn btn-primary'>CSVダウンロード</button>
       </form>
     </div>
 
-    <!--
-    ----- テーブルデータ表示 -----
-    -->
+    {#
+    ##### テーブルデータ表示 #####
+    #}
     <div class='my-2'>
       <table class='table table-sm table-striped table-hover'>
         <thead class='thead-dark'>

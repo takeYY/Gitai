@@ -6,13 +6,13 @@
   <p>形態素解析とは、文を単語に分割し、品詞や活用形・基本形などを判別することである。</p>
 
   <form action={{ url_for('morph_analysis.show') }} method='post'>
-    <!--
-    ----- 形態素解析器 -----
-    -->
+    {#
+    ##### 形態素解析器 #####
+    #}
     <div class='form-group'>
       <h5><div class='badge badge-danger'>必須</div> 形態素解析器</h5>
       <small>※（）内は使用する辞書</small>
-      <!-- 形態素解析器の説明 -->
+      {# 形態素解析器の説明 #}
       <div class='p-2'>
         <button class='btn btn-info dropdown-toggle' aria-controls='morphological_description' aria-expanded='false'
           data-target='#morphological_description' data-toggle='collapse' type='button'>詳細説明</button>
@@ -43,9 +43,9 @@
       </div>
     </div>
 
-    <!--
-    ----- 形態素解析用テキスト -----
-    -->
+    {#
+    ##### 形態素解析用テキスト #####
+    #}
     <div class='form-group'>
       <h5><div class='badge badge-danger'>必須</div> 解析テキスト</h5>
       <div class='p-2'>
@@ -72,31 +72,31 @@
       </div>
     </div>
 
-    <!--
-    ----- 解析ボタン -----
-    -->
+    {#
+    ##### 解析ボタン #####
+    #}
     <div class='text-center'>
       <button type='submit' class='btn btn-primary'>解析</button>
     </div>
   </form>
 
 
-  <!--
-  ----- 形態素解析結果 -----
-  -->
+  {#
+  ##### 形態素解析結果 #####
+  #}
   {% if mrph_data and mrph_data.get('csv_name') %}
-    <!--
-    ----- csvダウンロードボタン -----
-    -->
+    {#
+    ##### csvダウンロードボタン #####
+    #}
     <div class='float-right'>
       <form action={{ url_for('others.download_csv') }} method='post'>
         <button type='submit' class='btn btn-primary'>CSVダウンロード</button>
       </form>
     </div>
 
-    <!--
-    ----- テーブルデータ表示 -----
-    -->
+    {#
+    ##### テーブルデータ表示 #####
+    #}
     <div class='my-2'>
       <table class='table table-sm table-striped table-hover'>
         <thead class='thead-dark'>

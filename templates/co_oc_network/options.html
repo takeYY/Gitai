@@ -2,9 +2,9 @@
 {% block content %}
 <div class='container pb-4'>
   <h3 class='text-center'>{{ basic_data.get('title') }}</h3>
-  <!--
-  ----- 入力データの情報表示 -----
-  -->
+  {#
+  ##### 入力データの情報表示 #####
+  #}
   {% if input_data %}
   <div class='my-2'>
     <p>データ選択</p>
@@ -28,13 +28,13 @@
   <hr>
   {% endif %}
 
-  <!--
-  ----- 作品検索フォーム -----
-  -->
+  {#
+  ##### 作品検索フォーム #####
+  #}
   <form action={{ url_for('network.result') }} method=post enctype=multipart/form-data target=_blank>
-    <!--
-    ----- 表示形式 -----
-    -->
+    {#
+    ##### 表示形式 #####
+    #}
     <div class='form-group'>
       <h5><div class='badge badge-danger'>必須</div> 表示形式</h5>
       <div class='px-4'>
@@ -49,9 +49,9 @@
       </div>
     </div>
 
-    <!--
-    ----- 表示する共起数上位 -----
-    -->
+    {#
+    ##### 表示する共起数上位 #####
+    #}
     <div class='form-group w-25'>
       <h5><div class='badge badge-danger'>必須</div> 共起数上位</h5>
       <div class='px-4'>
@@ -65,9 +65,9 @@
       </div>
     </div>
 
-    <!--
-    ----- 共起強度 -----
-    -->
+    {#
+    ##### 共起強度 #####
+    #}
     <div class='form-group'>
       <h5><div class='badge badge-danger'>必須</div> 共起強度</h5>
       <small>※（）内は共起強度の取り得る値の範囲</small>
@@ -95,9 +95,9 @@
       </div>
     </div>
 
-    <!--
-    ----- 表示する共起強度の範囲 -----
-    -->
+    {#
+    ##### 表示する共起強度の範囲 #####
+    #}
     <div class='form-group w-25'>
       <h5><div class='badge badge-danger'>必須</div> 共起強度の最大値</h5>
       <div class='px-4'>
@@ -111,9 +111,9 @@
       </div>
     </div>
 
-    <!--
-    ----- 可視化対象の品詞 -----
-    -->
+    {#
+    ##### 可視化対象の品詞 #####
+    #}
     <div class='form-group'>
       <h5><div class='badge badge-danger'>必須</div> 可視化対象の品詞</h5>
       <div class='px-4'>
@@ -133,9 +133,9 @@
       </div>
     </div>
 
-    <!--
-    ----- カテゴリー選択 -----
-    -->
+    {#
+    ##### カテゴリー選択 #####
+    #}
     {% if category_list and category_list[0] != '< 章なし >' %}
       <div class='form-group'>
         <h5><div class='badge badge-danger'>必須</div> カテゴリー選択（3Dのみ）</h5>
@@ -157,16 +157,16 @@
       </div>
     {% endif %}
 
-    <!--
-    ----- 詳細設定 -----
-    -->
+    {#
+    ##### 詳細設定 #####
+    #}
     <div class='form-group'>
       <button class='btn btn-info dropdown-toggle' aria-controls='detail-options' aria-expanded='false'
         data-target='#detail-options' data-toggle='collapse' type='button'>詳細設定</button>
       <div id='detail-options' class='collapse border border-info rounded px-4 py-2'>
-        <!--
-        ----- 指定ワード -----
-        -->
+        {#
+        ##### 指定ワード #####
+        #}
         <div class='form-group'>
           <h5><div class='badge badge-secondary'>任意</div> 指定ワード</h5>
           <div class='p-4'>
@@ -188,9 +188,9 @@
           </div>
         </div>
 
-        <!--
-        ----- 同義語指定 -----
-        -->
+        {#
+        ##### 同義語指定 #####
+        #}
         <div class='form-group'>
           <h5><div class='badge badge-secondary'>任意</div> 同義語指定</h5>
           <div class='p-4'>
@@ -215,15 +215,15 @@
           </div>
         </div>
 
-        <!--
-        ----- 除去設定 -----
-        -->
+        {#
+        ##### 除去設定 #####
+        #}
         <div class='card border-danger mb-3'>
           <h5 class='card-header'><div class='badge badge-secondary'>任意</div> 除去設定</h5>
           <div class='card-body'>
-            <!--
-            ----- 除去ワード -----
-            -->
+            {#
+            ##### 除去ワード #####
+            #}
             <div class='form-group'>
               <label for='remove-word' class='form-check-label'>除去ワード</label>
               <div class='p-4'>
@@ -245,15 +245,15 @@
               </div>
             </div>
 
-            <!--
-            ----- 除去対象の品詞組み合わせ -----
-            -->
+            {#
+            ##### 除去対象の品詞組み合わせ #####
+            #}
             <div class='form-group'>
               <label class='form-check-label'>除去対象の品詞組み合わせ</label>
               <div class='row px-5'>
-                <!--
-                ----- 名詞 -----
-                -->
+                {#
+                ##### 名詞 #####
+                #}
                 <div class='col-3 card card-body'>
                   <div class='card-title'>名詞 - ?</div>
                   {% for key, value in edogawa_data.get('hinshi_dict').items() %}
@@ -264,9 +264,9 @@
                   </div>
                   {% endfor %}
                 </div>
-                <!--
-                ----- 動詞 -----
-                -->
+                {#
+                ##### 動詞 #####
+                #}
                 <div class='col-3 card card-body'>
                   <div class='card-title'>動詞 - ?</div>
                   {% for key, value in edogawa_data.get('hinshi_dict').items() %}
@@ -277,9 +277,9 @@
                   </div>
                   {% endfor %}
                 </div>
-                <!--
-                ----- 形容詞 -----
-                -->
+                {#
+                ##### 形容詞 #####
+                #}
                 <div class='col-3 card card-body'>
                   <div class='card-title'>形容詞 - ?</div>
                   {% for key, value in edogawa_data.get('hinshi_dict').items() %}
@@ -290,9 +290,9 @@
                   </div>
                   {% endfor %}
                 </div>
-                <!--
-                ----- 副詞 -----
-                -->
+                {#
+                ##### 副詞 #####
+                #}
                 <div class='col-3 card card-body'>
                   <div class='card-title'>副詞 - ?</div>
                   {% for key, value in edogawa_data.get('hinshi_dict').items() %}
@@ -310,9 +310,9 @@
       </div>
     </div>
 
-    <!--
-    ----- 可視化ボタン -----
-    -->
+    {#
+    ##### 可視化ボタン #####
+    #}
     <div class='text-center'>
       <button type='submit' class='btn btn-primary'>新規タブで可視化</button>
     </div>

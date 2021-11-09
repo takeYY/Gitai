@@ -3,13 +3,13 @@
 <div class='container pb-4'>
   <h3 class='text-center'>{{ basic_data.get('title') }}</h3>
 
-  <!--
-  ----- 作品検索フォーム -----
-  -->
+  {#
+  ##### 作品検索フォーム #####
+  #}
   <form action={{ url_for('network.result') }} method='post' enctype=multipart/form-data target='_blank'>
-    <!--
-    ----- 表示形式 -----
-    -->
+    {#
+    ##### 表示形式 #####
+    #}
     <div class='form-group'>
       <h5><div class='badge badge-danger'>必須</div> 表示形式</h5>
       <div class='px-4'>
@@ -24,9 +24,9 @@
       </div>
     </div>
 
-    <!--
-    ----- 入力データ -----
-    -->
+    {#
+    ##### 入力データ #####
+    #}
     <h5><div class='badge badge-danger'>必須</div> 入力データ</h5>
     <div class='accordion mb-3' id='input-accordion'>
       <div class='form-check'>
@@ -39,9 +39,9 @@
           </div>
           <div id='edogawa-collapse' class='collapse {{ "show" if sent_data and sent_data.get("input_type")=="edogawa" or not sent_data else ""}}' aria-labelledby='edogawa-header' data-parent='#input-accordion'>
             <div class='card-body'>
-              <!--
-              ----- 作品名（江戸川乱歩作品で分析） ------
-              -->
+              {#
+              ##### 作品名（江戸川乱歩作品で分析） #####
+              #}
               <div class='form-group w-50'>
                 <label for='name' class='form-check-label'>作品名</label>
                 <div class='px-4'>
@@ -68,9 +68,9 @@
           </div>
         </div>
 
-        <!--
-        ----- 任意のCSVデータで分析 -----
-        -->
+        {#
+        ##### 任意のCSVデータで分析 #####
+        #}
         <div class='card'>
           <div class='card-header px-4' class='csv-header'>
             <input class='form-check-input' type='radio' name='input_type' value='csv' id='input-csv'
@@ -82,9 +82,9 @@
             <div class='card-body'>
               <div class='form-group'>
                 <p><a href={{ url_for('morph_analysis.show') }} target=_blank>形態素解析</a>によって得られたcsvデータが対象（最大16MBまで）</p>
-                <!--
-                ----- 入力形式 -----
-                -->
+                {#
+                ##### 入力形式 #####
+                #}
                 <button class='btn btn-info dropdown-toggle' aria-controls='csv-sample' aria-expanded='false'
                   data-target='#csv-sample' data-toggle='collapse' type='button'>入力形式</button>
                 <div id='csv-sample' class='collapse'>
@@ -105,9 +105,9 @@
                     </p>
                   </div>
                 </div>
-                <!--
-                ----- ファイル選択 -----
-                -->
+                {#
+                ##### ファイル選択 #####
+                #}
                 <div class='form-group'>
                   <div class='input-group'>
                     <div class='custom-file'>
@@ -136,9 +136,9 @@
       </div>
     </div>
 
-    <!--
-    ----- 表示する共起数上位 -----
-    -->
+    {#
+    ##### 表示する共起数上位 #####
+    #}
     <div class='form-group w-25'>
       <h5><div class='badge badge-danger'>必須</div> 共起数上位</h5>
       <div class='px-4'>
@@ -152,9 +152,9 @@
       </div>
     </div>
 
-    <!--
-    ----- 可視化対象の品詞 -----
-    -->
+    {#
+    ##### 可視化対象の品詞 #####
+    #}
     <div class='form-group'>
       <h5><div class='badge badge-danger'>必須</div> 可視化対象の品詞</h5>
       <div class='px-4'>
@@ -174,16 +174,16 @@
       </div>
     </div>
 
-    <!--
-    ----- 詳細設定 -----
-    -->
+    {#
+    ##### 詳細設定 #####
+    #}
     <div class='form-group'>
       <button class='btn btn-info dropdown-toggle' aria-controls='detail-options' aria-expanded='false'
         data-target='#detail-options' data-toggle='collapse' type='button'>詳細設定</button>
       <div id='detail-options' class='collapse border border-info rounded px-4 py-2'>
-        <!--
-        ----- 指定ワード -----
-        -->
+        {#
+        ##### 指定ワード #####
+        #}
         <div class='form-group'>
           <h5><div class='badge badge-secondary'>任意</div> 指定ワード</h5>
           <div class='p-4'>
@@ -205,9 +205,9 @@
           </div>
         </div>
 
-        <!--
-        ----- 同義語指定 -----
-        -->
+        {#
+        ##### 同義語指定 #####
+        #}
         <div class='form-group'>
           <h5><div class='badge badge-secondary'>任意</div> 同義語指定</h5>
           <div class='p-4'>
@@ -232,15 +232,15 @@
           </div>
         </div>
 
-        <!--
-        ----- 除去設定 -----
-        -->
+        {#
+        ##### 除去設定 #####
+        #}
         <div class='card border-danger mb-3'>
           <h5 class='card-header'><div class='badge badge-secondary'>任意</div> 除去設定</h5>
           <div class='card-body'>
-            <!--
-            ----- 除去ワード -----
-            -->
+            {#
+            ##### 除去ワード #####
+            #}
             <div class='form-group'>
               <label for='remove-word' class='form-check-label'>除去ワード</label>
               <div class='p-4'>
@@ -262,15 +262,15 @@
               </div>
             </div>
 
-            <!--
-            ----- 除去対象の品詞組み合わせ -----
-            -->
+            {#
+            ##### 除去対象の品詞組み合わせ #####
+            #}
             <div class='form-group'>
               <label class='form-check-label'>除去対象の品詞組み合わせ</label>
               <div class='row px-5'>
-                <!--
-                ----- 名詞 -----
-                -->
+                {#
+                ##### 名詞 #####
+                #}
                 <div class='col-3 card card-body'>
                   <div class='card-title'>名詞 - ?</div>
                   {% for key, value in edogawa_data.get('hinshi_dict').items() %}
@@ -281,9 +281,9 @@
                   </div>
                   {% endfor %}
                 </div>
-                <!--
-                ----- 動詞 -----
-                -->
+                {#
+                ##### 動詞 #####
+                #}
                 <div class='col-3 card card-body'>
                   <div class='card-title'>動詞 - ?</div>
                   {% for key, value in edogawa_data.get('hinshi_dict').items() %}
@@ -294,9 +294,9 @@
                   </div>
                   {% endfor %}
                 </div>
-                <!--
-                ----- 形容詞 -----
-                -->
+                {#
+                ##### 形容詞 #####
+                #}
                 <div class='col-3 card card-body'>
                   <div class='card-title'>形容詞 - ?</div>
                   {% for key, value in edogawa_data.get('hinshi_dict').items() %}
@@ -307,9 +307,9 @@
                   </div>
                   {% endfor %}
                 </div>
-                <!--
-                ----- 副詞 -----
-                -->
+                {#
+                ##### 副詞 #####
+                #}
                 <div class='col-3 card card-body'>
                   <div class='card-title'>副詞 - ?</div>
                   {% for key, value in edogawa_data.get('hinshi_dict').items() %}
@@ -327,29 +327,29 @@
       </div>
     </div>
 
-    <!--
-    ----- 隠しフィールド -----
-    -->
+    {#
+    ##### 隠しフィールド #####
+    #}
     {% if sent_data and sent_data.get('input_type')=='csv' and sent_data.get('file_name') %}
     <input type='hidden' name='has_previous' value=1>
     {% endif %}
 
-    <!--
-    ----- 可視化ボタン -----
-    -->
+    {#
+    ##### 可視化ボタン #####
+    #}
     <div class='text-center'>
       <button type='submit' class='btn btn-primary'>可視化</button>
     </div>
   </form>
 
 
-  <!--
-  ----- 共起ネットワーク結果 -----
-  -->
+  {#
+  ##### 共起ネットワーク結果 #####
+  #}
   {% if sent_data and sent_data.get('file_name') %}
-  <!--
-  ----- 検索条件の表示 -----
-  -->
+  {#
+  ##### 検索条件の表示 #####
+  #}
   <hr>
   <div class='my-2'>
     <p>入力データ：{{ sent_data.get('name') }}</p>
@@ -363,32 +363,32 @@
     </p>
   </div>
 
-  <!--
-  ----- 共起ネットワークのグラフ -----
-  -->
+  {#
+  ##### 共起ネットワークのグラフ #####
+  #}
   <div class='border embed-responsive embed-responsive-16by9'>
     <iframe src={{ url_for('others.show_co_oc_network', file_name=sent_data.get('html_file_name')) }}></iframe>
   </div>
   <hr>
 
-  <!--
-  ----- テーブル情報 -----
-  -->
+  {#
+  ##### テーブル情報 #####
+  #}
   <button class='btn btn-primary' data-toggle='collapse' data-target='#co-oc-table'
   aria-expand='false' aria-controls='co-oc-table'>テーブル表示</button>
   <div id='co-oc-table' class='collapse'>
-    <!--
-    ----- csvダウンロードボタン -----
-    -->
+    {#
+    ##### csvダウンロードボタン #####
+    #}
     <div class='float-right'>
       <form action={{ url_for('others.download_csv') }} method='post'>
         <button type='submit' class='btn btn-primary'>CSVダウンロード</button>
       </form>
     </div>
 
-    <!--
-    ----- テーブルデータ表示 -----
-    -->
+    {#
+    ##### テーブルデータ表示 #####
+    #}
     <div class='my-2'>
       <table class='table table-sm table-striped table-hover'>
         <thead class='thead-dark'>
