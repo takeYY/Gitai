@@ -291,7 +291,7 @@ def kyoki_word_network(target_num=250, file_name='3742_9_3_11_02', target_coef='
 
 def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], target_num=250, remove_words='', remove_combi='',
                    target_words='', input_type='edogawa', is_used_3d=False, used_category=0, synonym='', selected_category=[],
-                   target_coef='共起回数', strength_max=10000):
+                   target_coef='共起回数', strength_max=10000, mrph_type='juman'):
     """
     共起ネットワークの作成
 
@@ -341,11 +341,19 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
     category_list = selected_category
     if input_type == 'edogawa':
         if used_category == 0 or not is_used_3d:
-            # jumanppにより形態素解析したDF取得
-            df = get_jumanpp_df(file_name)
+            if mrph_type == 'juman':
+                # jumanppにより形態素解析したDF取得
+                df = get_jumanpp_df(file_name)
+            else:
+                # MeCabにより形態素解析されたDF取得
+                df = get_mecab_with_category_df(file_name)
         else:
-            # MeCabにより形態素解析されたDF取得
-            df = get_mecab_with_category_df(file_name)
+            if mrph_type == 'juman':
+                # jumanppにより形態素解析したDF取得
+                df = get_jumanpp_df(file_name)
+            else:
+                # MeCabにより形態素解析されたDF取得
+                df = get_mecab_with_category_df(file_name)
             if selected_category:
                 df = df.query(' カテゴリー in @selected_category ')
             else:
