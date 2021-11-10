@@ -68,6 +68,7 @@ def options():
             input_csv_name = session.get('input_csv_name')
         else:
             input_name, input_csv_name, error_dict = get_csv_filename(request)
+            input_csv_name = input_csv_name.rsplit('.csv', 1)[0]
     else:
         # 利用者から送られてきた情報を基にデータ整理
         input_name, input_csv_name = request.form.get('name').split('-')
@@ -135,6 +136,8 @@ def result():
     # 基本情報
     basic_data = get_basic_data(title='共起ネットワーク：結果画面',
                                 active_url='co_oc_network')
+    # 形態素解析器の説明文
+    description = get_morphological_analysis_description_dict()
     edogawa_data = dict(hinshi_dict=get_hinshi_dict(),
                         name_file=get_novels_tuple(col1='name', col2='file_name'))
 
@@ -146,7 +149,8 @@ def result():
         flash('セッションが切れました。再度データを選択してください。', 'error')
         return render_template('co_oc_network/data_selection.html',
                                basic_data=basic_data,
-                               edogawa_data=edogawa_data)
+                               edogawa_data=edogawa_data,
+                               description=description)
     # 利用者から送られてきた情報の取得
     name = session.get('input_name')
     file_name = session.get('input_csv_name')
@@ -225,7 +229,8 @@ def result():
         return render_template('co_oc_network/data_selection.html',
                                basic_data=basic_data,
                                edogawa_data=edogawa_data,
-                               sent_data=sent_data_dict)
+                               sent_data=sent_data_dict,
+                               description=description)
     # csvダウンロード設定
     dl_data = dict(file_name=csv_file_name,
                    dl_type='result',
