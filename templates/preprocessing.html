@@ -5,13 +5,13 @@
 
   <p>ここでは、テキストを分析するための前処理を施すことができます。</p>
 
-  <!--
-  ----- テキスト前処理設定フォーム -----
-  -->
+  {#
+  ##### テキスト前処理設定フォーム #####
+  #}
   <form action={{ url_for('text_preprocessing.show') }} method='post'>
-    <!--
-    ----- 前処理対象のテキスト -----
-    -->
+    {#
+    ##### 前処理対象のテキスト #####
+    #}
     <div class='form-group'>
       <h5><div class='badge badge-danger'>必須</div> 前処理対象テキスト</h5>
       <div class='px-2'>
@@ -20,12 +20,12 @@
       </div>
     </div>
 
-    <!--
-    ----- 削除対象の文字列 -----
-    -->
+    {#
+    ##### 削除対象の文字列 #####
+    #}
     <div class='form-group'>
       <h5><div class='badge badge-secondary'>任意</div> 削除設定</h5>
-      <!-- 入力例 -->
+      {# 入力例 #}
       <div class='p-2'>
         <p>削除したい文字列を改行区切りで入力してください。</p>
         <button class='btn btn-info dropdown-toggle' aria-controls='remove-word-sample' aria-expanded='false'
@@ -47,12 +47,12 @@
         </div>
     </div>
 
-    <!--
-    ----- 指定の文字列とそれに囲まれた文字の削除 -----
-    -->
+    {#
+    ##### 指定の文字列とそれに囲まれた文字の削除 #####
+    #}
     <div class='form-group'>
       <h5><div class='badge badge-secondary'>任意</div> 指定文字列とその中身の削除設定</h5>
-      <!-- 入力例 -->
+      {# 入力例 #}
       <div class='p-2'>
         <p>「指定文字列（,）指定文字列」という形式でそれぞれ改行区切りで入力してください。</p>
         <button class='btn btn-info dropdown-toggle' aria-controls='remove-word-in-text-sample' aria-expanded='false'
@@ -74,12 +74,12 @@
       </div>
     </div>
 
-    <!--
-    ----- 置換対象の文字列 -----
-    -->
+    {#
+    ##### 置換対象の文字列 #####
+    #}
     <div class='form-group'>
       <h5><div class='badge badge-secondary'>任意</div> 置換設定</h5>
-      <!-- 入力例 -->
+      {# 入力例 #}
       <div class='p-2'>
         <p>「置換対象（半角スペース）置換後」という形式でそれぞれ改行区切りで入力してください。</p>
         <button class='btn btn-info dropdown-toggle' aria-controls='replace-word-sample' aria-expanded='false'
@@ -101,12 +101,12 @@
       </div>
     </div>
 
-    <!--
-    ----- その他設定 -----
-    -->
+    {#
+    ##### その他設定 #####
+    #}
     <div class='form-group'>
       <h5><div class='badge badge-secondary'>任意</div> その他設定</h5>
-      <!-- 設定説明 -->
+      {# 設定説明 #}
       <div class='p-2'>
         <button class='btn btn-info dropdown-toggle' aria-controls='option_description' aria-expanded='false'
           data-target='#option_description' data-toggle='collapse' type='button'>詳細</button>
@@ -135,17 +135,17 @@
       </div>
     </div>
 
-    <!--
-    ----- 前処理ボタン -----
-    -->
+    {#
+    ##### 前処理ボタン #####
+    #}
     <div class='text-center'>
       <button type='submit' class='btn btn-primary'>前処理</button>
     </div>
   </form>
 
-  <!--
-  ----- 前処理結果 -----
-  -->
+  {#
+  ##### 前処理結果 #####
+  #}
   {% if sent_data and sent_data.get('preprocessed_texts')%}
   <hr>
   <div class='form-group'>

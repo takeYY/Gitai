@@ -183,10 +183,10 @@ def result():
                                sent_data=dict(error=error_dict))
     sent_data = dict(name=input_name, file_name=file_name,
                      df=result_df, hinshi=hinshi_jpn)
-    # sessionの登録
-    session['file_name'] = file_name
-    session['dir_path'] = 'tmp'
-    session['new_name'] = file_name
+    # csvダウンロード設定
+    dl_data = dict(file_name=file_name,
+                   dl_type='result',
+                   new_name=f'{input_name}の集計結果')
     # 設定の取得
     options_dict = {'可視化対象の品詞': ', '.join(hinshi_jpn)}
     try:
@@ -196,7 +196,8 @@ def result():
                                description=description,
                                sent_data=sent_data,
                                input_data=input_data_dict,
-                               options=options_dict)
+                               options=options_dict,
+                               dl_data=dl_data)
     except:
         return render_template('aggregation/data_selection.html',
                                basic_data=basic_data,

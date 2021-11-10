@@ -75,7 +75,14 @@ def append_node_dictionary(dictionary, num, x, y, z, frequency, text, info):
     return dictionary
 
 
-def create_3d_network_figure(df, target_num, fig, category_list=[], current_ctg_idx=0):
+def create_word_frequency(words, word_types, counts, word_frequency={}):
+    for word, word_type, count in zip(words, word_types, counts):
+        word_frequency[f'{word}__{word_type}'] = count
+
+    return word_frequency
+
+
+def create_3d_network_figure(df, target_num, fig, category_list=[], current_ctg_idx=0, target_coef='共起回数'):
     # 新規グラフを作成
     G = nx.Graph()
 
@@ -84,9 +91,17 @@ def create_3d_network_figure(df, target_num, fig, category_list=[], current_ctg_
     # ノードのx, yの幅を広げる係数
     x_y_width = 3.0
 
+    # カラム名変更
+    df = df.rename(columns={target_coef: 'count'})
+
     # タプル作成
-    kyouki_tuple = [(first, second, count) for first, second,
-                    count in zip(df['first'], df['second'], df['count'])]
+    kyouki_tuple = [(f'{first}__{first_type}', f'{second}__{second_type}', count)
+                    for first, second, count, first_type, second_type
+                    in zip(df['first'],
+                           df['second'],
+                           df['count'],
+                           df['first_type'],
+                           df['second_type'])]
 
     # ノードとエッジを追加
     list_edge = kyouki_tuple[:target_num]
@@ -97,18 +112,22 @@ def create_3d_network_figure(df, target_num, fig, category_list=[], current_ctg_
                       for t in list(G.nodes())]
 
     # 各単語の頻度を計算
-    word_frequency = {}
-    for node in G.nodes():
-        sum = np.sum(df.query(' @node == first or @node == second ')
-                     ['count'].to_list())
-        word_frequency[node] = sum
+    word_frequency = create_word_frequency(df['first'].tolist(),
+                                           df['first_type'].tolist(),
+                                           df['firstの出現頻度'].tolist())
+    word_frequency = create_word_frequency(df['second'].tolist(),
+                                           df['second_type'].tolist(),
+                                           df['secondの出現頻度'].tolist(),
+                                           word_frequency=word_frequency)
 
     # 各ノード情報を記載
     for idx, text in enumerate(list(G.nodes())):
+        word, word_type = text.split('__')
         G.nodes[text]['node_info'] = {
             '単語ID': idx+1,
             'カテゴリー': category_list[current_ctg_idx] if category_list else 'カテゴリーなし',
-            '単語': text,
+            '単語': word,
+            '品詞': word_type,
             '出現頻度': word_frequency[text],
             '共起': f'<br>{neighbors_list[idx]}',
         }
@@ -124,7 +143,12 @@ def create_3d_network_figure(df, target_num, fig, category_list=[], current_ctg_
         G.nodes[node]["pos"] = pos[node]
 
     # エッジの設定
-    edge_group = [10, 50, 100]
+    if target_coef == '共起回数':
+        edge_group = [10, 50, 100]
+    elif target_coef == '相互情報量':
+        edge_group = [5, 7.5, 10]
+    else:
+        edge_group = [0.1, 0.25, 0.5]
     edges = dict(e0=dict(x=[], y=[], z=[], weight=[]),
                  e1=dict(x=[], y=[], z=[], weight=[]),
                  e2=dict(x=[], y=[], z=[], weight=[]),
@@ -209,7 +233,7 @@ def create_3d_network_figure(df, target_num, fig, category_list=[], current_ctg_
             x, y = x_y_width*x, x_y_width*y
             z = z_width*(len(category_list)-1-current_ctg_idx)
         frequency = word_frequency.get(n)
-        text = n
+        text = n.split('__')[0]
         info = '<br>'.join(
             [f'{k}: {value}' for k, value in G.nodes[n]['node_info'].items()])
         if frequency < node_group[0]:
@@ -267,15 +291,16 @@ def create_3d_network_figure(df, target_num, fig, category_list=[], current_ctg_
     return fig
 
 
-def create_3d_network(df, target_num=50, used_category=0, category_list=[]):
+def create_3d_network(df, target_num=50, used_category=0, category_list=[], target_coef='共起回数'):
     fig = go.Figure()
     if used_category == 0:
-        fig = create_3d_network_figure(df, target_num, fig)
+        fig = create_3d_network_figure(
+            df, target_num, fig, target_coef=target_coef)
     else:
         for idx, category in enumerate(category_list):
             fig = create_3d_network_figure(df.query(' カテゴリー == @category '),
                                            target_num, fig,
-                                           category_list, idx)
+                                           category_list, idx, target_coef)
 
     layout = go.Layout(
         showlegend=True,

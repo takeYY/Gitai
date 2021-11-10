@@ -5,26 +5,16 @@ from get_data import get_basic_data
 others_page = Blueprint('others', __name__)
 
 
-@others_page.route('/rikkyo-edogawa/download/csv', methods=['POST'])
-def download_csv():
+@others_page.route('/rikkyo-edogawa/dl/csv/<dl_type>/<target>/<new_name>', methods=['POST'])
+def download_csv(dl_type, target, new_name):
     """
     csvデータのダウンロード
 
     """
-    dir_path = session.get('dir_path')
-    file_name = session.get('file_name')
-    new_name = session.get('new_name')
-
-    # sessionが切れた場合
-    if not file_name:
-        # 基本情報
-        basic_data = get_basic_data(
-            title='セッション切れ', active_url='session_timeout_error')
-        return render_template('session_timeout.html', basic_data=basic_data)
-
+    dir_path = 'csv/khcoder' if dl_type == 'khcoder' else 'tmp'
     return send_from_directory(
         dir_path,
-        f'{file_name}.csv',
+        f'{target}.csv',
         as_attachment=True,
         attachment_filename=f'{new_name}.csv',
     )
