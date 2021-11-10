@@ -359,7 +359,7 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
             else:
                 category_list = df['カテゴリー'].unique().tolist()
     else:
-        df = pd.read_csv(f'tmp/{file_name}')
+        df = pd.read_csv(f'tmp/{file_name}.csv')
     # カラム名を統一
     df = df.rename(columns={'見出し': '表層形',
                             '原型': '原形',

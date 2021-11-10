@@ -18,8 +18,10 @@
       <tbody>
         {% for key, value in input_data.items() %}
           <tr>
-            <th>{{ key }}</th>
-            <th>{{ value }}</th>
+            {% if value %}
+              <th>{{ key }}</th>
+              <th>{{ value }}</th>
+            {% endif %}
           </tr>
         {% endfor %}
       </tbody>
