@@ -2,6 +2,91 @@
 <html lang="ja">
 {% include "head.html" %}
 <body>
+  <style>
+    .bs-callout {
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid #eee;
+    border-left-width: 5px;
+    border-radius: 3px;
+  }
+  .bs-callout h5 {
+    margin-top: 0;
+    margin-bottom: 5px;
+  }
+  .bs-callout p:last-child {
+    margin-bottom: 0;
+  }
+  .bs-callout code {
+    border-radius: 3px;
+  }
+  .bs-callout + .bs-callout {
+    margin-top: -5px;
+  }
+  .bs-callout-default {
+    border-left-color: #777;
+  }
+  .bs-callout-default h5 {
+    color: #777;
+  }
+  .bs-callout-primary {
+    border-left-color: #428bca;
+  }
+  .bs-callout-primary h5 {
+    color: #428bca;
+  }
+  .bs-callout-success {
+    border-left-color: #5cb85c;
+  }
+  .bs-callout-success h5 {
+    color: #5cb85c;
+  }
+  .bs-callout-danger {
+    border-left-color: #d9534f;
+  }
+  .bs-callout-danger h5 {
+    color: #d9534f;
+  }
+  .bs-callout-warning {
+    border-left-color: #f0ad4e;
+  }
+  .bs-callout-warning h5 {
+    color: #f0ad4e;
+  }
+  .bs-callout-info {
+    border-left-color: #5bc0de;
+  }
+  .bs-callout-info h5 {
+    color: #5bc0de;
+  }
+  </style>
+  <script>
+    $(document).ready(function () {
+    bsCustomFileInput.init()
+    $('#inputFileReset').click(function () {
+      let elem = document.getElementById('inputFile');
+      elem.value = '';
+      elem.dispatchEvent(new Event('change'));
+    });
+    document.getElementById('inputFile').disabled = false;
+    document.getElementById('edogawa-works').disabled = false;
+  });
+
+  function countLength(field, text, max_length) {
+    let text_length = text.length;
+    let target = document.getElementById(field);
+    if (text_length < 1) {
+      target.setAttribute('class', 'text-right text-danger');
+    } else if (0 < text_length && text_length < max_length*0.90) {
+      target.setAttribute('class', 'text-right text-success');
+    } else if (max_length * 0.90 <= text_length && text_length <= max_length) {
+      target.setAttribute('class', 'text-right text-warning');
+    }else {
+      target.setAttribute('class', 'text-right text-danger');
+    }
+    target.innerHTML = `文字数：${Number(text_length).toLocaleString()}/${Number(max_length).toLocaleString()}`;
+  }
+  </script>
   {% include "header.html" %}
   {% include "flash_message.html" %}
   {% block content %}{% endblock %}
