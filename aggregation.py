@@ -122,7 +122,8 @@ def create_aggregation(mrph_type, csv_name, target_hinshi=['名詞']):
 
     html_random_name = create_random_string(32)
     # 集計データの出力
-    agg_df.to_csv(f'tmp/{html_random_name}.csv', index=False)
+    agg_df.to_csv(f'tmp/{html_random_name}.csv',
+                  index=False, encoding='utf_8_sig')
     # 集計グラフのhtml出力
     fig.write_html(f'tmp/{html_random_name}.html', auto_open=False)
 
