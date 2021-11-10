@@ -6,7 +6,7 @@ others_page = Blueprint('others', __name__)
 
 
 @others_page.route('/rikkyo-edogawa/dl/csv/<dl_type>/<target>/<new_name>', methods=['POST'])
-def dl_csv(dl_type, target, new_name):
+def download_csv(dl_type, target, new_name):
     """
     csvデータのダウンロード
 
