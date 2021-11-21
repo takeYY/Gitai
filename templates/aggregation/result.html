@@ -5,121 +5,113 @@
   {#
   ##### 入力データの情報表示 #####
   #}
-  {% if input_data %}
-  <div class='my-2'>
-    <p>データ選択</p>
-    <table class='table table-hover table-striped table-sm'>
-      <thead class='thead-dark'>
-        <tr>
-          <th scope='col'>入力項目</th>
-          <th scope='col'>設定項目</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for key, value in input_data.items() %}
-          {% if value %}
-            <tr>
-              <th>{{ key }}</th>
-              <th>{{ value }}</th>
-            </tr>
-          {% endif %}
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+  {% if input_table %}
+    <div class='my-2'>
+      <p>データ選択</p>
+      <table class='table table-hover table-striped table-sm'>
+        <thead class='thead-dark'>
+          <tr>
+            <th scope='col'>入力項目</th>
+            <th scope='col'>設定項目</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for key, value in input_table.items() %}
+            {% if value %}
+              <tr>
+                <th>{{ key }}</th>
+                <th>{{ value }}</th>
+              </tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   {% endif %}
 
   {#
   ##### 設定の情報表示 #####
   #}
-  {% if options %}
-  <div class='my-2'>
-    <p>設定</p>
-    <table class='table table-hover table-striped table-sm'>
-      <thead class='thead-dark'>
-        <tr>
-          <th scope='col'>入力項目</th>
-          <th scope='col'>設定項目</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for key, value in options.items() %}
-          {% if value %}
-            <tr>
-              <th>{{ key }}</th>
-              <th>{{ value }}</th>
-            </tr>
-          {% endif %}
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-  <hr>
+  {% if option_table %}
+    <div class='my-2'>
+      <p>設定</p>
+      <table class='table table-hover table-striped table-sm'>
+        <thead class='thead-dark'>
+          <tr>
+            <th scope='col'>入力項目</th>
+            <th scope='col'>設定項目</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for key, value in option_table.items() %}
+            {% if value %}
+              <tr>
+                <th>{{ key }}</th>
+                <th>{{ value }}</th>
+              </tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <hr>
   {% endif %}
 
   {#
   ##### 集計結果 #####
   #}
-  {% if sent_data and sent_data.get('file_name')%}
-  {#
-  ##### 検索条件の表示 #####
-  #}
-  <hr>
-  <div class='my-2'>
-    <p>作品名：{{ sent_data.get('name') }}</p>
-  </div>
-
-  {#
-  ##### 集計結果のグラフ #####
-  #}
-  <div class='border embed-responsive embed-responsive-16by9'>
-    <iframe src={{ url_for('others.show_co_oc_network', file_name=sent_data.get('file_name')) }}></iframe>
-  </div>
-  <hr>
-
-  {#
-  ##### テーブル情報 #####
-  #}
-  <button class='btn btn-primary' data-toggle='collapse' data-target='#agg-table'
-  aria-expand='false' aria-controls='agg-table'>テーブル表示</button>
-  <div id='agg-table' class='collapse'>
+  {% if result_data and result_data.get('file_name')%}
     {#
-    ##### csvダウンロードボタン #####
+    ##### 集計結果のグラフ #####
     #}
-    <div class='float-right'>
-      <form action={{ url_for('others.download_csv', dl_type=dl_data.get('dl_type'), target=dl_data.get('file_name'), new_name=dl_data.get('new_name')) }} method='post'>
-        <button type='submit' class='btn btn-primary'>CSVダウンロード</button>
-      </form>
+    <div class='border embed-responsive embed-responsive-16by9'>
+      <iframe src={{ url_for('others.show_co_oc_network', file_name=result_data.get('file_name')) }}></iframe>
     </div>
+    <hr>
 
     {#
-    ##### テーブルデータ表示 #####
+    ##### テーブル情報 #####
     #}
-    <div class='my-2'>
-      <table class='table table-sm table-striped table-hover'>
-        <thead class='thead-dark'>
-          <tr>
-            {% for column in sent_data.get('df').columns %}
-              <th>{{ column }}</th>
-            {% endfor %}
-          </tr>
-        </thead>
-        {% for index, rows in sent_data.get('df')[:50].iterrows() %}
-          <tr>
-            <td>{{ rows['ランキング'] }}</td>
-            <td>{{ rows['単語'] }}</td>
-            <td>{{ rows['品詞'] }}</td>
-            <td>{{ rows['出現頻度'] }}</td>
-          </tr>
-        {% endfor %}
-        {% if 50 < sent_data.get('df')|length %}
-          <tr>
-            <td colspan={{ 1 + (sent_data.get('df').columns|length) }} class='text-center text-danger'>《以下略》</td>
-          </tr>
-        {% endif %}
-      </table>
+    <button class='btn btn-primary' data-toggle='collapse' data-target='#agg-table'
+    aria-expand='false' aria-controls='agg-table'>テーブル表示</button>
+    <div id='agg-table' class='collapse'>
+      {#
+      ##### csvダウンロードボタン #####
+      #}
+      <div class='float-right'>
+        <form action={{ url_for('others.download_csv', dl_type=dl_data.get('dl_type'), target=dl_data.get('file_name'), new_name=dl_data.get('new_name')) }} method='post'>
+          <button type='submit' class='btn btn-primary'>CSVダウンロード</button>
+        </form>
+      </div>
+
+      {#
+      ##### テーブルデータ表示 #####
+      #}
+      <div class='my-2'>
+        <table class='table table-sm table-striped table-hover'>
+          <thead class='thead-dark'>
+            <tr>
+              {% for column in result_data.get('df').columns %}
+                <th>{{ column }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          {% for index, rows in result_data.get('df')[:50].iterrows() %}
+            <tr>
+              <td>{{ rows['ランキング'] }}</td>
+              <td>{{ rows['単語'] }}</td>
+              <td>{{ rows['品詞'] }}</td>
+              <td>{{ rows['出現頻度'] }}</td>
+            </tr>
+          {% endfor %}
+          {% if 50 < result_data.get('df')|length %}
+            <tr>
+              <td colspan={{ 1 + (result_data.get('df').columns|length) }} class='text-center text-danger'>《以下略》</td>
+            </tr>
+          {% endif %}
+        </table>
+      </div>
     </div>
-  </div>
   {% endif %}
 </div>
 {% endblock %}

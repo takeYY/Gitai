@@ -15,12 +15,22 @@
       <div class='form-check'>
         <div class='card'>
           <div class='card-header px-4' class='edogawa-header'>
-            <input class='form-check-input' type='radio' name='input_type' value='edogawa' id='input-edogawa'
-            {{ 'checked' if sent_data and sent_data.get('input_type')=='edogawa' or not sent_data else '' }}
-            data-toggle='collapse' data-target='#edogawa-collapse' aria-expanded='true' aria-controls='edogawa-collapse'>
+            <input class='form-check-input' type='radio' name='data_type' value='edogawa' id='input-edogawa'
+                data-toggle='collapse' data-target='#edogawa-collapse' aria-expanded='true' aria-controls='edogawa-collapse'
+                {% if input_data %}
+                  {{ 'checked' if input_data.get('data_type', 'edogawa')=='edogawa' else '' }}
+                {% else %}
+                  {{ 'checked' }}
+                {% endif %}>
             <label class='form-check-label' for='input-edogawa'>江戸川乱歩作品</label>
           </div>
-          <div id='edogawa-collapse' class='collapse {{ "show" if sent_data and sent_data.get("input_type")=="edogawa" or not sent_data else ""}}' aria-labelledby='edogawa-header' data-parent='#input-accordion'>
+          <div id='edogawa-collapse' aria-labelledby='edogawa-header' data-parent='#input-accordion'
+              class="collapse
+              {% if input_data %}
+                {{ 'show' if input_data.get('data_type', 'edogawa')=='edogawa' else ''}}
+              {% else %}
+                {{ 'show' }}
+              {% endif %}">
             <div class='card-body'>
               {#
               ##### 作品名（江戸川乱歩作品で分析） #####
@@ -30,8 +40,9 @@
                 <div class='px-4'>
                   <select name='name' class='form-control' id='edogawa-works'>
                     {% for name, file in edogawa_data.get('name_file') %}
-                    <option value={{name}}-{{file}} {{'selected' if sent_data and sent_data.get('name')==name else '' }}>{{name}}
-                    </option>
+                      <option value={{name}}-{{file}} {{'selected' if input_data and input_data.get('name')==name else '' }}>
+                        {{name}}
+                      </option>
                     {% endfor %}
                   </select>
                 </div>
@@ -51,9 +62,9 @@
                       {% for key in description.keys() %}
                         <h5>{{ key }}</h5>
                         <div class='px-4 small'>
-                        {% for desc in description[key].split('\n') %}
-                        {{ desc }}<br>
-                        {% endfor %}
+                          {% for desc in description[key].split('\n') %}
+                            {{ desc }}<br>
+                          {% endfor %}
                         </div>
                       {% endfor %}
                     </div>
@@ -62,12 +73,19 @@
 
                 <div class='px-2'>
                   <div class='form-check'>
-                    <input type='radio' name='mrph' value='mecab' id='mecab' class='form-check-input' {{'checked' if
-                    mrph_type == 'mecab' or not mrph_type else '' }}>
+                    <input type='radio' name='mrph_type' value='mecab' id='mecab' class='form-check-input'
+                        {% if input_data %}
+                          {{ 'checked' if input_data.get('mrph_type') == 'mecab' or not input_data.get('mrph_type') else '' }}
+                        {% else %}
+                          {{ 'checked' }}
+                        {% endif %}>
                     <label for='mecab' class='form-check-label'>MeCab（NEologd）</label>
                   </div>
                   <div class='form-check'>
-                    <input type='radio' name='mrph' value='juman' id='juman' class='form-check-input' {{'checked' if mrph_type == 'juman' else '' }}>
+                    <input type='radio' name='mrph_type' value='juman' id='juman' class='form-check-input'
+                        {% if input_data %}
+                          {{ 'checked' if input_data.get('mrph_type') == 'juman' else '' }}
+                        {% endif %}>
                     <label for='juman' class='form-check-label'>Jumanpp</label>
                   </div>
                 </div>
@@ -81,12 +99,18 @@
         #}
         <div class='card'>
           <div class='card-header px-4' class='csv-header'>
-            <input class='form-check-input' type='radio' name='input_type' value='csv' id='input-csv'
-            {{ 'checked' if sent_data and sent_data.get('input_type')=='csv' else '' }}
-            data-toggle='collapse' data-target='#csv-collapse' aria-expanded='true' aria-controls='csv-collapse'>
+            <input class='form-check-input' type='radio' name='data_type' value='csv' id='input-csv'
+                data-toggle='collapse' data-target='#csv-collapse' aria-expanded='true' aria-controls='csv-collapse'
+                {% if input_data %}
+                  {{ 'checked' if input_data.get('data_type')=='csv' else '' }}
+                {% endif %}>
             <label class='form-check-label' for='input-csv'>CSVデータ</label>
           </div>
-          <div id='csv-collapse' class='collapse {{ "show" if sent_data and sent_data.get("input_type")=="csv" else ""}}' aria-labelledby='csv-header' data-parent='#input-accordion'>
+          <div id='csv-collapse' aria-labelledby='csv-header' data-parent='#input-accordion'
+              class="collapse
+              {% if input_data %}
+                {{ 'show' if input_data.get('data_type')=='csv' else ''}}
+              {% endif %}">
             <div class='card-body'>
               <div class='form-group'>
                 <p><a href={{ url_for('morph_analysis.show') }} target=_blank>形態素解析</a>によって得られたcsvデータが対象（最大16MBまで）</p>
@@ -94,7 +118,7 @@
                 ##### 入力形式 #####
                 #}
                 <button class='btn btn-info dropdown-toggle' aria-controls='csv-sample' aria-expanded='false'
-                  data-target='#csv-sample' data-toggle='collapse' type='button'>入力形式</button>
+                    data-target='#csv-sample' data-toggle='collapse' type='button'>入力形式</button>
                 <div id='csv-sample' class='collapse'>
                   <div class='bs-callout bs-callout-info mt-0 py-1'>
                     <p>
@@ -119,21 +143,23 @@
                 <div class='form-group'>
                   <div class='input-group'>
                     <div class='custom-file'>
-                      <input type='file' name='file'
-                        class='custom-file-input {{ "is-invalid" if sent_data and sent_data.get("error", {}).get("csv_file_invalid") else "" }}'
-                        id='inputFile'>
+                      <input type='file' name='file' id='inputFile'
+                          class="custom-file-input
+                          {% if input_data %}
+                            {{ 'is-invalid' if input_data.get('errors', {}).get('csv_file_invalid') else '' }}
+                          {% endif %}">
                       <label class='custom-file-label' for='inputFile' data-browse='参照'>
-                      {{ sent_data.get('name') if sent_data and sent_data.get('input_type')=='csv' and sent_data.get('name')
-                      else 'ファイルを選択...' }}
+                        {{ input_data.get('name') if input_data and input_data.get('data_type')=='csv' and input_data.get('name')
+                            else 'ファイルを選択...' }}
                       </label>
                     </div>
                     <div class='input-group-append'>
                       <button type='button' class='btn btn-outline-secondary input-group-text' id='inputFileReset'>取消</button>
                     </div>
                   </div>
-                  {% if sent_data and sent_data.get('error', {}).get('csv_file_invalid') %}
+                  {% if input_data and input_data.get('errors', {}).get('csv_file_invalid') %}
                     <small class='text-danger'>
-                      {{ sent_data.get('error').get('csv_file_invalid') }}
+                      {{ input_data.get('errors').get('csv_file_invalid') }}
                     </small>
                   {% endif %}
                 </div>
