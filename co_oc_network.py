@@ -19,19 +19,22 @@ def allowed_csv_file(filename):
 
 
 # csvファイルのバリデーション
-def csv_file_invalid(request):
+def get_csv_error_message(request):
     if 'file' not in request.files:
-        flash('ファイルが存在しません。', 'error')
-        return True
+        error_message = 'ファイルが存在しません。'
+        flash(error_message, 'error')
+        return error_message
     file = request.files['file']
     if file.filename == '':
-        flash('ファイルが選択されていません。', 'error')
-        return True
+        error_message = 'ファイルが選択されていません。'
+        flash(error_message, 'error')
+        return error_message
     if not allowed_csv_file(file.filename):
-        flash('ファイル形式がcsvではありません。', 'error')
-        return True
+        error_message = 'ファイル形式がcsvではありません。'
+        flash(error_message, 'error')
+        return error_message
 
-    return False
+    return ''
 
 
 # 選択された品詞である or 除去ワードリストにない単語であるか判定
@@ -71,8 +74,9 @@ def has_not_remove_combinations(word1, word2, remove_dict, hinshi_dict):
 
 
 def get_csv_filename(request):
-    if csv_file_invalid(request):
-        return '', '', dict(csv_file_invalid='csvファイルが適切ではありません。')
+    error_message = get_csv_error_message(request)
+    if error_message:
+        return '', '', dict(csv_file_invalid=error_message)
 
     file = request.files['file']
     input_filename = file.filename
@@ -290,56 +294,52 @@ def kyoki_word_network(target_num=250, file_name='3742_9_3_11_02', target_coef='
 
 
 def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], target_num=250, remove_words='', remove_combi='',
-                   target_words='', input_type='edogawa', is_used_3d=False, used_category=0, synonym='', selected_category=[],
+                   target_words='', data_type='edogawa', is_used_3d=False, used_category=0, synonym='', selected_category=[],
                    target_coef='共起回数', strength_max=10000, mrph_type='juman'):
     """
     共起ネットワークの作成
 
-    params
-    ------
+    Parameters
+    ----------
     file_name: str, default='kaijin_nijumenso'
         作品のファイル名
-
     target_hinshi: list, default=['名詞']
         共起に含めたい品詞
-
     target_num: int, default=250
         表示したい上位共起数
-
     remove_words: str, default=''
         共起に含めたくない除去ワード集
-
     remove_combi: dict, default=''
         除去対象の品詞組み合わせ
-
     target_words: str, default=''
         指定した単語の共起のみ表示する
-
-    input_type: str, default='edogawa'
+    data_type: str, default='edogawa'
         入力データの種類（江戸川乱歩作品: 'edoagwa', csv: 'csv'）
-
     is_used_3d: bool, default=False
         3Dの共起ネットワークを表示するか否か
-
     used_category: int, default=0
         カテゴリーごとの描画を行う（1）か否（0）か
-
     synonym: str, default=''
         同義語設定
-
     selected_category: list, default=[]
         カテゴリーごとの描画において描画制限する
-
     target_coef: str, default='共起回数'
         共起強度に何を用いるか
-
     strength_max: float, default=10000
         表示する共起強度の最大値
+    mrph_type: str, default='juman'
+        入力データが江戸川乱歩作品の場合に使用する形態素解析器
 
+    Returns
+    -------
+    file_random_name: str
+        入力と設定で絞り込んだcsvデータのファイル名
+    co_oc_df: DataFrame
+        入力と設定で絞り込んだcsvデータのDataFrame形式
     """
     # カテゴリーごとに表示する際の並び順を取得
-    category_list = selected_category
-    if input_type == 'edogawa':
+    if data_type == 'edogawa':
+        # カテゴリーごとの分析をしない もしくは 2D表示ならば
         if used_category == 0 or not is_used_3d:
             if mrph_type == 'juman':
                 # jumanppにより形態素解析したDF取得
@@ -347,17 +347,17 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
             else:
                 # MeCabにより形態素解析されたDF取得
                 df = get_mecab_with_category_df(file_name)
+        # カテゴリーごとの分析をする かつ 3D表示ならば
         else:
             if mrph_type == 'juman':
                 # jumanppにより形態素解析したDF取得
-                df = get_jumanpp_df(file_name)
+                df = get_jumanpp_df(file_name).rename(
+                    columns={'章ラベル': 'カテゴリー'})
             else:
                 # MeCabにより形態素解析されたDF取得
                 df = get_mecab_with_category_df(file_name)
             if selected_category:
                 df = df.query(' カテゴリー in @selected_category ')
-            else:
-                category_list = df['カテゴリー'].unique().tolist()
     else:
         df = pd.read_csv(f'tmp/{file_name}.csv')
     # カラム名を統一
@@ -442,6 +442,6 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
                                          file_name=file_random_name,
                                          target_coef=target_coef)
             got_net.write_html(f'tmp/{file_random_name}.html')
-        return file_random_name, co_oc_df, category_list
+        return file_random_name, co_oc_df
     except:
         return '', '', ''
