@@ -5,7 +5,7 @@
   {#
   ##### 入力データの情報表示 #####
   #}
-  {% if input_data %}
+  {% if input_table %}
   <div class='my-2'>
     <p>データ選択</p>
     <table class='table table-hover table-striped table-sm'>
@@ -16,7 +16,7 @@
         </tr>
       </thead>
       <tbody>
-        {% for key, value in input_data.items() %}
+        {% for key, value in input_table.items() %}
           <tr>
             {% if value %}
               <th>{{ key }}</th>
@@ -41,11 +41,19 @@
       <h5><div class='badge badge-danger'>必須</div> 表示形式</h5>
       <div class='px-4'>
         <div class='form-check'>
-          <input type='radio' name='dimension' value=2 id='2d-network' {{ 'checked' if sent_data and sent_data.get('dimension')==2 or not sent_data else '' }}>
+          <input type='radio' name='dimension' value=2 id='2d-network'
+              {% if option %}
+                {{ 'checked' if option.get('dimension', 2) == 2 else '' }}
+              {% else %}
+                {{ 'checked' }}
+              {% endif %}>
           <label class='form-check-label' for='2d-network'>2D</label>
         </div>
         <div class='form-check'>
-          <input type='radio' name='dimension' value=3 id='3d-network' {{ 'checked' if sent_data and sent_data.get('dimension')==3 else '' }}>
+          <input type='radio' name='dimension' value=3 id='3d-network'
+              {% if option %}
+                {{ 'checked' if option.get('dimension')==3 else '' }}
+              {% endif %}>
           <label class='form-check-label' for='3d-network'>3D</label>
         </div>
       </div>
@@ -57,11 +65,14 @@
     <div class='form-group w-25'>
       <h5><div class='badge badge-danger'>必須</div> 共起数上位</h5>
       <div class='px-4'>
-        <input type='number' class='form-control {{ "is-invalid" if sent_data and sent_data.get("error", {}).get("number") else "" }}'
-          name='number' value={{ sent_data.get('number') if sent_data else 10 }}>
-        {% if sent_data and sent_data.get('error', {}).get('number') %}
+        <input type='number' name='number' value="{{ option.get('number') if option else 10 }}"
+            class="form-control
+            {% if option %}
+              {{ 'is-invalid' if option.get('errors', {}).get('number') else '' }}
+            {% endif %}">
+        {% if option and option.get('errors', {}).get('number') %}
           <div class='invalid-feedback'>
-            {{ sent_data.get('error').get('number') }}
+            {{ option.get('errors').get('number') }}
           </div>
         {% endif %}
       </div>
@@ -75,23 +86,40 @@
       <small>※（）内は共起強度の取り得る値の範囲</small>
       <div class='px-4'>
         <div class='form-check'>
-          <input type='radio' name='co_oc_strength' value='frequency' id='frequency' {{ 'checked' if sent_data and sent_data.get('co_oc_strength')=='frequency' or not sent_data else '' }}>
+          <input type='radio' name='co_oc_strength' value='frequency' id='frequency'
+              {% if option %}
+                {{ 'checked' if option.get('co_oc_strength', 'frequency')=='frequency' else '' }}
+              {% else %}
+                {{ 'checked' }}
+              {% endif %}>
           <label class='form-check-label' for='frequency'>共起回数（0〜∞）</label>
         </div>
         <div class='form-check'>
-          <input type='radio' name='co_oc_strength' value='jaccard' id='jaccard' {{ 'checked' if sent_data and sent_data.get('co_oc_strength')=='jaccard' else '' }}>
+          <input type='radio' name='co_oc_strength' value='jaccard' id='jaccard'
+              {% if option %}
+                {{ 'checked' if option.get('co_oc_strength')=='jaccard' else '' }}
+              {% endif %}>
           <label class='form-check-label' for='jaccard'>Jaccard係数（0.0〜1.0）</label>
         </div>
         <div class='form-check'>
-          <input type='radio' name='co_oc_strength' value='dice' id='dice' {{ 'checked' if sent_data and sent_data.get('co_oc_strength')=='dice' else '' }}>
+          <input type='radio' name='co_oc_strength' value='dice' id='dice'
+              {% if option %}
+                {{ 'checked' if option.get('co_oc_strength')=='dice' else '' }}
+              {% endif %}>
           <label class='form-check-label' for='dice'>Dice係数（0.0〜1.0）</label>
         </div>
         <div class='form-check'>
-          <input type='radio' name='co_oc_strength' value='simpson' id='simpson' {{ 'checked' if sent_data and sent_data.get('co_oc_strength')=='simpson' else '' }}>
+          <input type='radio' name='co_oc_strength' value='simpson' id='simpson'
+              {% if option %}
+                {{ 'checked' if option.get('co_oc_strength')=='simpson' else '' }}
+              {% endif %}>
           <label class='form-check-label' for='simpson'>Simpson係数（0.0〜1.0）</label>
         </div>
         <div class='form-check'>
-          <input type='radio' name='co_oc_strength' value='pmi' id='pmi' {{ 'checked' if sent_data and sent_data.get('co_oc_strength')=='pmi' else '' }}>
+          <input type='radio' name='co_oc_strength' value='pmi' id='pmi'
+              {% if option %}
+                {{ 'checked' if option.get('co_oc_strength')=='pmi' else '' }}
+              {% endif %}>
           <label class='form-check-label' for='pmi'>相互情報量（-∞〜∞）</label>
         </div>
       </div>
@@ -103,11 +131,14 @@
     <div class='form-group w-25'>
       <h5><div class='badge badge-danger'>必須</div> 共起強度の最大値</h5>
       <div class='px-4'>
-        <input type='number' class='form-control {{ "is-invalid" if sent_data and sent_data.get("error", {}).get("strength_max") else "" }}'
-          name='strength_max' step='0.01' value={{ sent_data.get('strength_max') if sent_data else 1.0 }}>
-        {% if sent_data and sent_data.get('error', {}).get('strength_max') %}
+        <input type='number' name='strength_max' step='0.01' value="{{ option.get('strength_max') if option else 1000 }}"
+            class="form-control
+            {% if option %}
+              {{ 'is-invalid' if option.get('errors', {}).get('strength_max') else '' }}
+            {% endif %}">
+        {% if option and option.get('errors', {}).get('strength_max') %}
           <div class='invalid-feedback'>
-            {{ sent_data.get('error').get('strength_max') }}
+            {{ option.get('errors').get('strength_max') }}
           </div>
         {% endif %}
       </div>
@@ -123,12 +154,16 @@
         {% for key, value in hinshi_dict.items() %}
         <div class='form-check'>
           <input type='checkbox' name='hinshi' value={{key}} id={{key}}
-            class='form-check-input {{ "is-invalid" if sent_data and sent_data.get("error", {}).get("hinshi") else "" }}'
-            {{'checked' if (sent_data and value in sent_data.get('hinshi', []) or not sent_data) else '' }}>
+              class="form-check-input {{ 'is-invalid' if option and option.get('errors', {}).get('hinshi') else '' }}"
+              {% if option %}
+                {{ 'checked' if value in option.get('hinshi_jpn', []) else '' }}
+              {% else %}
+                {{ 'checked' if loop.index == 1 else '' }}
+              {% endif %}>
           <label for={{key}} class='form-check-label'>{{key}}（{{value}}）</label>
-          {% if loop.index == hinshi_dict|length and sent_data and sent_data.get('error', {}).get('hinshi') %}
+          {% if loop.index == hinshi_dict|length and option and option.get('errors', {}).get('hinshi') %}
             <div class='invalid-feedback'>
-              {{ sent_data.get('error').get('hinshi') }}
+              {{ option.get('errors').get('hinshi') }}
             </div>
           {% endif %}
         </div>
@@ -144,17 +179,24 @@
         <h5><div class='badge badge-danger'>必須</div> カテゴリー選択（3Dのみ）</h5>
         <div class='px-4'>
           {% for category in category_list %}
-          <div class='form-check'>
-            <input type='checkbox' name='category' value={{category}} id={{loop.index}}
-              class='form-check-input {{ "is-invalid" if sent_data and sent_data.get("error", {}).get("category") else "" }}'
-              {{'checked' if (sent_data and category in sent_data.get('category') or not sent_data and loop.index == 1) else '' }}>
-            <label for={{loop.index}} class='form-check-label'>{{category}}</label>
-            {% if loop.index == category_list|length and sent_data and sent_data.get('error', {}).get('category') %}
-              <div class='invalid-feedback'>
-                {{ sent_data.get('error').get('category') }}
-              </div>
-            {% endif %}
-          </div>
+            <div class='form-check'>
+              <input type='checkbox' name='category' value={{category}} id={{loop.index}}
+                  class="form-check-input
+                  {% if option %}
+                    {{ 'is-invalid' if option.get('errors', {}).get('category') else '' }}
+                  {% endif %}"
+                  {% if option %}
+                    {{'checked' if category in option.get('selected_category') else '' }}
+                  {% else %}
+                    {{ 'checked' if loop.index == 1 }}
+                  {% endif %}>
+              <label for={{loop.index}} class='form-check-label'>{{category}}</label>
+              {% if loop.index == category_list|length and option and option.get('errors', {}).get('category') %}
+                <div class='invalid-feedback'>
+                  {{ option.get('errors').get('category') }}
+                </div>
+              {% endif %}
+            </div>
           {% endfor %}
         </div>
       </div>
@@ -165,7 +207,7 @@
     #}
     <div class='form-group'>
       <button class='btn btn-info dropdown-toggle' aria-controls='detail-options' aria-expanded='false'
-        data-target='#detail-options' data-toggle='collapse' type='button'>詳細設定</button>
+          data-target='#detail-options' data-toggle='collapse' type='button'>詳細設定</button>
       <div id='detail-options' class='collapse border border-info rounded px-4 py-2'>
         {#
         ##### 指定ワード #####
@@ -175,7 +217,7 @@
           <div class='p-4'>
             <p>指定した単語の共起のみ表示します。</p>
             <button class='btn btn-info dropdown-toggle' aria-controls='target-word-sample' aria-expanded='false'
-              data-target='#target-word-sample' data-toggle='collapse' type='button'>入力例</button>
+                data-target='#target-word-sample' data-toggle='collapse' type='button'>入力例</button>
             <div id='target-word-sample' class='collapse'>
               <div class='bs-callout bs-callout-info mt-0 py-1'>
                 <p>
@@ -187,7 +229,7 @@
           </div>
           <div class='px-4'>
             <textarea class='form-control' rows=2
-              name='target-words'>{{ sent_data.get('target_words') if sent_data else ''}}</textarea>
+                name='target-words'>{{ option.get('target_words') if option else ''}}</textarea>
           </div>
         </div>
 
@@ -199,7 +241,7 @@
           <div class='p-4'>
             <p>指定した単語群を同一の単語として可視化します。</p>
             <button class='btn btn-info dropdown-toggle' aria-controls='synonym-sample' aria-expanded='false'
-              data-target='#synonym-sample' data-toggle='collapse' type='button'>入力例</button>
+                data-target='#synonym-sample' data-toggle='collapse' type='button'>入力例</button>
             <div id='synonym-sample' class='collapse'>
               <div class='bs-callout bs-callout-info mt-0 py-1'>
                 <p>
@@ -214,7 +256,7 @@
           </div>
           <div class='px-4'>
             <textarea class='form-control' rows=2
-              name='synonym'>{{ sent_data.get('synonym') if sent_data else ''}}</textarea>
+                name='synonym'>{{ option.get('synonym') if option else ''}}</textarea>
           </div>
         </div>
 
@@ -232,7 +274,7 @@
               <div class='p-4'>
                 <p>共起ネットワークに含めない単語を指定可能です。</p>
                 <button class='btn btn-info dropdown-toggle' aria-controls='remove-word-sample' aria-expanded='false'
-                  data-target='#remove-word-sample' data-toggle='collapse' type='button'>入力例</button>
+                    data-target='#remove-word-sample' data-toggle='collapse' type='button'>入力例</button>
                 <div id='remove-word-sample' class='collapse'>
                   <div class='bs-callout bs-callout-info mt-0 py-1'>
                     <p>
@@ -244,7 +286,7 @@
               </div>
               <div class='px-4'>
                 <textarea class='form-control' rows=2
-                  name='remove-words'>{{ sent_data.get('remove_words') if sent_data else ''}}</textarea>
+                    name='remove-words'>{{ option.get('remove_words') if option else ''}}</textarea>
               </div>
             </div>
 
@@ -260,11 +302,13 @@
                 <div class='col-3 card card-body'>
                   <div class='card-title'>名詞 - ?</div>
                   {% for key, value in edogawa_data.get('hinshi_dict').items() %}
-                  <div class='form-check'>
-                    <input type='checkbox' name='remove-combi-meishi' value={{value}} id=meishi-{{key}} class='form-check-input'
-                    {{ 'checked' if ( sent_data and value in sent_data.get('remove_combi', {}).get('meishi', {}) ) else '' }}>
-                    <label for=meishi-{{key}} class='form-check-label'>{{value}}</label>
-                  </div>
+                    <div class='form-check'>
+                      <input type='checkbox' name='remove-combi-meishi' value={{value}} id=meishi-{{key}} class='form-check-input'
+                          {% if option %}
+                            {{ 'checked' if value in option.get('remove_combi', {}).get('meishi', {}) else '' }}
+                          {% endif %}>
+                      <label for=meishi-{{key}} class='form-check-label'>{{value}}</label>
+                    </div>
                   {% endfor %}
                 </div>
                 {#
@@ -273,11 +317,13 @@
                 <div class='col-3 card card-body'>
                   <div class='card-title'>動詞 - ?</div>
                   {% for key, value in edogawa_data.get('hinshi_dict').items() %}
-                  <div class='form-check'>
-                    <input type='checkbox' name='remove-combi-doushi' value={{value}} id=doushi-{{key}} class='form-check-input'
-                    {{ 'checked' if ( sent_data and value in sent_data.get('remove_combi', {}).get('doushi', {}) ) else '' }}>
-                    <label for=doushi-{{key}} class='form-check-label'>{{value}}</label>
-                  </div>
+                    <div class='form-check'>
+                      <input type='checkbox' name='remove-combi-doushi' value={{value}} id=doushi-{{key}} class='form-check-input'
+                          {% if option %}
+                            {{ 'checked' if value in option.get('remove_combi', {}).get('doushi', {}) else '' }}
+                          {% endif %}>
+                      <label for=doushi-{{key}} class='form-check-label'>{{value}}</label>
+                    </div>
                   {% endfor %}
                 </div>
                 {#
@@ -286,11 +332,13 @@
                 <div class='col-3 card card-body'>
                   <div class='card-title'>形容詞 - ?</div>
                   {% for key, value in edogawa_data.get('hinshi_dict').items() %}
-                  <div class='form-check'>
-                    <input type='checkbox' name='remove-combi-keiyoushi' value={{value}} id=keiyoushi-{{key}} class='form-check-input'
-                    {{ 'checked' if ( sent_data and value in sent_data.get('remove_combi', {}).get('keiyoushi', {}) ) else '' }}>
-                    <label for=keiyoushi-{{key}} class='form-check-label'>{{value}}</label>
-                  </div>
+                    <div class='form-check'>
+                      <input type='checkbox' name='remove-combi-keiyoushi' value={{value}} id=keiyoushi-{{key}} class='form-check-input'
+                          {% if option %}
+                            {{ 'checked' if value in option.get('remove_combi', {}).get('keiyoushi', {}) else '' }}
+                          {% endif %}>
+                      <label for=keiyoushi-{{key}} class='form-check-label'>{{value}}</label>
+                    </div>
                   {% endfor %}
                 </div>
                 {#
@@ -299,11 +347,13 @@
                 <div class='col-3 card card-body'>
                   <div class='card-title'>副詞 - ?</div>
                   {% for key, value in edogawa_data.get('hinshi_dict').items() %}
-                  <div class='form-check'>
-                    <input type='checkbox' name='remove-combi-fukushi' value={{value}} id=fukushi-{{key}} class='form-check-input'
-                    {{ 'checked' if ( sent_data and value in sent_data.get('remove_combi', {}).get('fukushi', {}) ) else '' }}>
-                    <label for=fukushi-{{key}} class='form-check-label'>{{value}}</label>
-                  </div>
+                    <div class='form-check'>
+                      <input type='checkbox' name='remove-combi-fukushi' value={{value}} id=fukushi-{{key}} class='form-check-input'
+                          {% if option %}
+                            {{ 'checked' if value in option.get('remove_combi', {}).get('fukushi', {}) else '' }}
+                          {% endif %}>
+                      <label for=fukushi-{{key}} class='form-check-label'>{{value}}</label>
+                    </div>
                   {% endfor %}
                 </div>
               </div>
