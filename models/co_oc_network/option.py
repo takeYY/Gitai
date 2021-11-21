@@ -15,7 +15,7 @@ class OptionCoOcNetwork:
         共起強度の最大値
     number: int
         表示する共起数上位
-    hinshi_jpn: str
+    hinshi_jpn: list of str
         日本語の品詞名
     selected_category: list of str
         選択されたカテゴリーのリスト
@@ -35,26 +35,26 @@ class OptionCoOcNetwork:
         何らかの問題があったときのエラー情報
     """
 
-    def __init__(self, option):
-        options = option.form
-        self.dimension: int = int(options.get('dimension'))
-        self.co_oc_strength: str = options.get('co_oc_strength')
-        self.strength_max: float = float(options.get('strength_max'))
-        self.number: int = int(options.get('number'))
-        self.hinshi_jpn: list = options.getlist('hinshi')
-        self.selected_category: list = options.getlist('category')
-        self.remove_words: str = options.get('remove-words')
-        self.set_remove_combi(options)
-        self.target_words: str = options.get('target-words')
-        self.synonym: str = options.get('synonym')
+    def __init__(self, request):
+        form = request.form
+        self.dimension: int = int(form.get('dimension'))
+        self.co_oc_strength: str = form.get('co_oc_strength')
+        self.strength_max: float = float(form.get('strength_max'))
+        self.number: int = int(form.get('number'))
+        self.hinshi_jpn: list = form.getlist('hinshi')
+        self.selected_category: list = form.getlist('category')
+        self.remove_words: str = form.get('remove-words')
+        self.set_remove_combi(form)
+        self.target_words: str = form.get('target-words')
+        self.synonym: str = form.get('synonym')
         self.set_target_coef()
         self.is_3d: bool = self.set_is_3d()
 
-    def set_remove_combi(self, options):
-        remove_combi_meishi = options.getlist('remove-combi-meishi')
-        remove_combi_doushi = options.getlist('remove-combi-doushi')
-        remove_combi_keiyoushi = options.getlist('remove-combi-keiyoushi')
-        remove_combi_fukushi = options.getlist('remove-combi-fukushi')
+    def set_remove_combi(self, form):
+        remove_combi_meishi = form.getlist('remove-combi-meishi')
+        remove_combi_doushi = form.getlist('remove-combi-doushi')
+        remove_combi_keiyoushi = form.getlist('remove-combi-keiyoushi')
+        remove_combi_fukushi = form.getlist('remove-combi-fukushi')
         self.remove_combi: dict = dict(meishi=remove_combi_meishi, doushi=remove_combi_doushi,
                                        keiyoushi=remove_combi_keiyoushi, fukushi=remove_combi_fukushi)
 

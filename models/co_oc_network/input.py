@@ -27,33 +27,35 @@ class InputCoOcNetwork:
         何らかの問題があったときのエラー情報
     """
 
-    def __init__(self, input, session):
-        self.data_type: str = input.form.get('data_type',
-                                             session.get('data_type'))
-        self.mrph_type: str = input.form.get('mrph',
-                                             session.get('mrph_type'))\
+    def __init__(self, request, session):
+        form = request.form
+        self.data_type: str = form.get('data_type',
+                                       session.get('data_type'))
+        self.mrph_type: str = form.get('mrph',
+                                       session.get('mrph_type'))\
             if self.data_type == 'edogawa'\
             else ''
-        self.set_input_name_csv(input, session)
+        self.set_input_name_csv(request, session)
         # カテゴリごとの表示有無
-        self.is_used_category: int = int(input.form.get('is_used_category',
-                                                        session.get('is_used_category')))
+        self.is_used_category: int = int(form.get('is_used_category',
+                                                  session.get('is_used_category')))
         if not self.__dict__.get('errors'):
             # 品詞の辞書を設定
             self.set_hinshi()
             # カテゴリごとの表示を希望する場合
             self.set_category_list()
 
-    def set_input_name_csv(self, input, session):
+    def set_input_name_csv(self, request, session):
+        form = request.form
         if session.get('input_name'):
             self.name: str = session.get('input_name')
             self.csv_name: str = session.get('input_csv_name')
         elif self.data_type == 'csv':
             (self.name,
              self.csv_name,
-             self.errors) = get_csv_filename(input)
+             self.errors) = get_csv_filename(request)
         else:
-            self.name, self.csv_name = input.form.get('name').split('-')
+            self.name, self.csv_name = form.get('name').split('-')
         self.name = self.name.replace(' ', '')
         self.csv_name = self.csv_name.rsplit('.csv', 1)[0]
 
