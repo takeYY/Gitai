@@ -28,7 +28,7 @@ class OptionCoOcNetwork:
     synonym: str
         同義語（表記ゆれを1つの単語に集約）
     target_coef: str
-        使用する共起強度の日本語名、['共起回数', 'Jaccard係数', 'Dice係数', 'Simpson係数', '相互情報量']
+        使用する共起強度の日本語名、['共起頻度', 'Jaccard係数', 'Dice係数', 'Simpson係数', '相互情報量']
     is_3d: bool
         3D表示を行うか否か
     errors: dict
@@ -65,7 +65,7 @@ class OptionCoOcNetwork:
         self.errors[key] = value
 
     def set_target_coef(self):
-        self.target_coef = get_co_oc_strength_dict().get(self.co_oc_strength, '共起回数')
+        self.target_coef = get_co_oc_strength_dict().get(self.co_oc_strength, '共起頻度')
 
     def set_is_3d(self):
         return True if self.dimension == 3 else False

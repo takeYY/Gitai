@@ -82,7 +82,7 @@ def create_word_frequency(words, word_types, counts, word_frequency={}):
     return word_frequency
 
 
-def create_3d_network_figure(df, target_num, fig, category_list=[], current_ctg_idx=0, target_coef='共起回数'):
+def create_3d_network_figure(df, target_num, fig, category_list=[], current_ctg_idx=0, target_coef='共起頻度'):
     # 新規グラフを作成
     G = nx.Graph()
 
@@ -97,11 +97,11 @@ def create_3d_network_figure(df, target_num, fig, category_list=[], current_ctg_
     # タプル作成
     kyouki_tuple = [(f'{first}__{first_type}', f'{second}__{second_type}', count)
                     for first, second, count, first_type, second_type
-                    in zip(df['first'],
-                           df['second'],
+                    in zip(df['単語a'],
+                           df['単語b'],
                            df['count'],
-                           df['first_type'],
-                           df['second_type'])]
+                           df['単語aの品詞'],
+                           df['単語bの品詞'])]
 
     # ノードとエッジを追加
     list_edge = kyouki_tuple[:target_num]
@@ -112,12 +112,12 @@ def create_3d_network_figure(df, target_num, fig, category_list=[], current_ctg_
                       for t in list(G.nodes())]
 
     # 各単語の頻度を計算
-    word_frequency = create_word_frequency(df['first'].tolist(),
-                                           df['first_type'].tolist(),
-                                           df['firstの出現頻度'].tolist())
-    word_frequency = create_word_frequency(df['second'].tolist(),
-                                           df['second_type'].tolist(),
-                                           df['secondの出現頻度'].tolist(),
+    word_frequency = create_word_frequency(df['単語a'].tolist(),
+                                           df['単語aの品詞'].tolist(),
+                                           df['単語aの出現頻度'].tolist())
+    word_frequency = create_word_frequency(df['単語b'].tolist(),
+                                           df['単語bの品詞'].tolist(),
+                                           df['単語bの出現頻度'].tolist(),
                                            word_frequency=word_frequency)
 
     # 各ノード情報を記載
@@ -143,7 +143,7 @@ def create_3d_network_figure(df, target_num, fig, category_list=[], current_ctg_
         G.nodes[node]["pos"] = pos[node]
 
     # エッジの設定
-    if target_coef == '共起回数':
+    if target_coef == '共起頻度':
         edge_group = [10, 50, 100]
     elif target_coef == '相互情報量':
         edge_group = [5, 7.5, 10]
@@ -291,7 +291,7 @@ def create_3d_network_figure(df, target_num, fig, category_list=[], current_ctg_
     return fig
 
 
-def create_3d_network(df, target_num=50, used_category=0, category_list=[], target_coef='共起回数'):
+def create_3d_network(df, target_num=50, used_category=0, category_list=[], target_coef='共起頻度'):
     fig = go.Figure()
     if used_category == 0:
         fig = create_3d_network_figure(

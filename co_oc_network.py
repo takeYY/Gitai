@@ -172,15 +172,15 @@ def create_co_oc_df(keywords, sentence_combinations, all_data_size, category='')
     combi_count = collections.Counter(sum(sentence_combinations, []))
 
     if not category:
-        columns = ['first', 'first_type', 'second', 'second_type',
+        columns = ['単語a', '単語aの品詞', '単語b', '単語bの品詞',
                    'intersection_count']
-        (on1_list, on2_list) = (['first', 'first_type'],
-                                ['second', 'second_type'])
+        (on1_list, on2_list) = (['単語a', '単語aの品詞'],
+                                ['単語b', '単語bの品詞'])
     else:
-        columns = ['first', 'first_type', 'second', 'second_type',
+        columns = ['単語a', '単語aの品詞', '単語b', '単語bの品詞',
                    'category', 'intersection_count']
-        (on1_list, on2_list) = (['first', 'first_type', 'category'],
-                                ['second', 'second_type', 'category'])
+        (on1_list, on2_list) = (['単語a', '単語aの品詞', 'category'],
+                                ['単語b', '単語bの品詞', 'category'])
 
     word_associates = []
     for key, value in combi_count.items():
@@ -207,15 +207,15 @@ def create_co_oc_df(keywords, sentence_combinations, all_data_size, category='')
 
     word_associates = pd.merge(
         word_associates,
-        word_count.rename(columns={'word': 'first',
-                                   'word_type': 'first_type'}),
+        word_count.rename(columns={'word': '単語a',
+                                   'word_type': '単語aの品詞'}),
         on=on1_list,
         how='left'
     ).rename(
         columns={'count': 'count1'}
     ).merge(
-        word_count.rename(columns={'word': 'second',
-                                   'word_type': 'second_type'}),
+        word_count.rename(columns={'word': '単語b',
+                                   'word_type': '単語bの品詞'}),
         on=on2_list,
         how='left'
     ).rename(
@@ -251,7 +251,7 @@ def create_co_oc_df(keywords, sentence_combinations, all_data_size, category='')
 
 
 # ネットワーク描画のメイン処理定義
-def kyoki_word_network(target_num=250, file_name='3742_9_3_11_02', target_coef='共起回数'):
+def kyoki_word_network(target_num=250, file_name='3742_9_3_11_02', target_coef='共起頻度'):
     from pyvis.network import Network
 
     # got_net = Network(height="1000px", width="95%", bgcolor="#222222", font_color="white", notebook=True)
@@ -267,9 +267,9 @@ def kyoki_word_network(target_num=250, file_name='3742_9_3_11_02', target_coef='
     # カラム名変更
     got_data = got_data.rename(columns={target_coef: 'count'})
 
-    sources = got_data['first']  # count
-    targets = got_data['second']  # first
-    weights = got_data['count']  # second
+    sources = got_data['単語a']  # first
+    targets = got_data['単語b']  # second
+    weights = got_data['count']  # count
 
     edge_data = zip(sources, targets, weights)
 
@@ -295,7 +295,7 @@ def kyoki_word_network(target_num=250, file_name='3742_9_3_11_02', target_coef='
 
 def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], target_num=250, remove_words='', remove_combi='',
                    target_words='', data_type='edogawa', is_used_3d=False, used_category=0, synonym='', selected_category=[],
-                   target_coef='共起回数', strength_max=10000, mrph_type='juman'):
+                   target_coef='共起頻度', strength_max=10000, mrph_type='juman'):
     """
     共起ネットワークの作成
 
@@ -323,7 +323,7 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
         同義語設定
     selected_category: list, default=[]
         カテゴリーごとの描画において描画制限する
-    target_coef: str, default='共起回数'
+    target_coef: str, default='共起頻度'
         共起強度に何を用いるか
     strength_max: float, default=10000
         表示する共起強度の最大値
@@ -402,10 +402,10 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
                                    all_data_size)
     # カラム名の変更
     co_oc_df = co_oc_df.rename(columns={'category': 'カテゴリー',
-                                        'count1': 'firstの出現頻度',
-                                        'count2': 'secondの出現頻度',
-                                        'union_count': 'firstとsecondの和集合',
-                                        'intersection_count': '共起回数',
+                                        'count1': '単語aの出現頻度',
+                                        'count2': '単語bの出現頻度',
+                                        'union_count': '単語aと単語bの和集合',
+                                        'intersection_count': '共起頻度',
                                         'jaccard_coef': 'Jaccard係数',
                                         'dice_coef': 'Dice係数',
                                         'simpson_coef': 'Simpson係数',
@@ -415,12 +415,12 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
         new_co_oc_df = pd.DataFrame()
         for tw in target_words.split('\r\n'):
             new_co_oc_df = pd.concat([new_co_oc_df,
-                                      co_oc_df.query(' @tw in first or @tw in second ')])
+                                      co_oc_df.query(' @tw in 単語a or @tw in 単語b ')])
         co_oc_df = new_co_oc_df.sort_values(
             target_coef,
             ascending=False
         ).drop_duplicates(
-            subset=['first', 'second']
+            subset=['単語a', '単語b']
         ).reset_index(drop=True)
     # 表示する共起強度を制限
     co_oc_df = co_oc_df[co_oc_df[target_coef]
