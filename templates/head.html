@@ -23,6 +23,9 @@
   {#
     <script type="application/javascript" src={{ url_for('static', filename='js/script.js') }}></script>
   #}
+  <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
   {% if basic_data.get('title') %}
   <title>{{ basic_data.get('title') }} - 江戸川乱歩作品可視化システム</title>
   {% else %}
