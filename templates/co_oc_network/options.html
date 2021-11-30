@@ -84,6 +84,21 @@
     <div class='form-group'>
       <h5><div class='badge badge-danger'>必須</div> 共起強度</h5>
       <small>※（）内は共起強度の取り得る値の範囲</small>
+      {#
+      ##### 共起強度の説明
+      #}
+      <div class='p-2'>
+        <button class='btn btn-info dropdown-toggle' aria-controls='co_oc_strength_description' aria-expanded='false'
+            data-target='#co_oc_strength_description' data-toggle='collapse' type='button'>詳細説明</button>
+        <div id='co_oc_strength_description' class='collapse'>
+          <div class='bs-callout bs-callout-info mt-0 py-1'>
+            {% for value in description.get('co_oc_strength').values() %}
+              {{ value|safe }}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
       <div class='px-4'>
         <div class='form-check'>
           <input type='radio' name='co_oc_strength' value='frequency' id='frequency'
@@ -92,7 +107,7 @@
               {% else %}
                 {{ 'checked' }}
               {% endif %}>
-          <label class='form-check-label' for='frequency'>共起回数（0〜∞）</label>
+          <label class='form-check-label' for='frequency'>共起頻度（0〜∞）</label>
         </div>
         <div class='form-check'>
           <input type='radio' name='co_oc_strength' value='jaccard' id='jaccard'

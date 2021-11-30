@@ -3,6 +3,7 @@ from get_data import get_basic_data, get_novels_tuple, get_hinshi_dict
 from co_oc_network import create_network
 from co_oc_3d_network import create_3d_network
 from morphological import get_morphological_analysis_description_dict
+from description import co_oc_strength_description
 from models.co_oc_network.input import InputCoOcNetwork
 from models.co_oc_network.option import OptionCoOcNetwork
 
@@ -11,7 +12,7 @@ network_page = Blueprint(
     'network', __name__, url_prefix='/rikkyo-edogawa/co-oc-network')
 
 
-def render_data_selection(basic_data, edogawa_data, description, input_data=None):
+def render_data_selection(basic_data: dict, edogawa_data: dict, description: dict, input_data: dict = None):
     return render_template('co_oc_network/data_selection.html',
                            basic_data=basic_data,
                            edogawa_data=edogawa_data,
@@ -19,23 +20,24 @@ def render_data_selection(basic_data, edogawa_data, description, input_data=None
                            input_data=input_data)
 
 
-def render_options(basic_data, edogawa_data, input_data, option=None):
+def render_options(basic_data: dict, edogawa_data: dict, description: dict, input_data: dict, option: dict = None):
     return render_template('co_oc_network/options.html',
                            basic_data=basic_data,
                            edogawa_data=edogawa_data,
+                           description=description,
                            category_list=input_data.category_list,
                            input_table=input_data.get_table_dict(),
                            hinshi_dict=input_data.hinshi,
                            option=option)
 
 
-def render_result(basic_data, result_data, dl_data, input_data, option):
+def render_result(basic_data: dict, result_data: dict, dl_data: dict, input_data: dict, option: dict):
     return render_template('co_oc_network/result.html',
                            basic_data=basic_data,
                            result_data=result_data,
                            dl_data=dl_data,
-                           input_table=input_data.get_table_dict(),
-                           option_table=option.get_table_dict())
+                           input_table=input_data,
+                           option_table=option)
 
 
 @network_page.route('/data-selection', methods=['GET'])
@@ -49,7 +51,7 @@ def data_selection():
     basic_data = get_basic_data(title='共起ネットワーク：データ選択',
                                 active_url='co_oc_network')
     # 形態素解析器の説明文
-    description = get_morphological_analysis_description_dict()
+    description = dict(mrph=get_morphological_analysis_description_dict())
     # 江戸川乱歩作品関連の情報
     edogawa_data = dict(name_file=get_novels_tuple(col1='name',
                                                    col2='file_name'))
@@ -69,7 +71,8 @@ def options():
     basic_data = get_basic_data(title='共起ネットワーク：設定画面',
                                 active_url='co_oc_network')
     # 形態素解析器の説明文
-    description = get_morphological_analysis_description_dict()
+    description = dict(mrph=get_morphological_analysis_description_dict(),
+                       co_oc_strength=co_oc_strength_description())
     # 江戸川乱歩作品関連の情報
     edogawa_data = dict(hinshi_dict=get_hinshi_dict(),
                         name_file=get_novels_tuple(col1='name',
@@ -102,7 +105,7 @@ def options():
     session['mrph_type'] = input_data.mrph_type
     session['has_category'] = input_data.has_category_list()
 
-    return render_options(basic_data, edogawa_data, input_data)
+    return render_options(basic_data, edogawa_data, description, input_data)
 
 
 @network_page.route('/result', methods=['POST'])
@@ -143,7 +146,7 @@ def result():
         option.set_errors('category', 'カテゴリが選択されていません。')
     # errorがあれば
     if option.__dict__.get('errors'):
-        return render_options(basic_data, edogawa_data, input_data,
+        return render_options(basic_data, edogawa_data, co_oc_strength_description(), input_data,
                               option=option.__dict__)
     # 共起ネットワーク作成
     try:
@@ -179,6 +182,6 @@ def result():
 
     try:
         return render_result(basic_data, result_data, dl_data,
-                             input_data, option)
+                             input_data.get_table_dict(), option.get_table_dict())
     except:
         return redirect(url_for('network.data_selection'))
