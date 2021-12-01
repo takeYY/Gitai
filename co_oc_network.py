@@ -266,6 +266,8 @@ def kyoki_word_network(target_num=250, file_name='3742_9_3_11_02', target_coef='
 
     # カラム名変更
     got_data = got_data.rename(columns={target_coef: 'count'})
+    # 型変更
+    got_data = got_data.astype({'単語a': str, '単語b': str})
 
     sources = got_data['単語a']  # first
     targets = got_data['単語b']  # second
@@ -444,4 +446,6 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
             got_net.write_html(f'tmp/{file_random_name}.html')
         return file_random_name, co_oc_df
     except:
-        return '', '', ''
+        import traceback
+        traceback.print_exc()
+        return '', ''
