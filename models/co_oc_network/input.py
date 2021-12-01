@@ -38,7 +38,7 @@ class InputCoOcNetwork:
         self.set_input_name_csv(request, session)
         # カテゴリごとの表示有無
         self.is_used_category: int = int(form.get('is_used_category',
-                                                  session.get('is_used_category')))
+                                                  session.get('is_used_category', 0)))
         if not self.__dict__.get('errors'):
             # 品詞の辞書を設定
             self.set_hinshi()
