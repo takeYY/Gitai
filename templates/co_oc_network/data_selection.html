@@ -36,7 +36,7 @@
               ##### 作品名（江戸川乱歩作品で分析） #####
               #}
               <div class='form-group w-50'>
-                <label for='name' class='form-check-label'>作品名</label>
+                <label for='name' class='form-check-label'><div class='badge badge-danger'>必須</div> 作品名</label>
                 <div class='px-4'>
                   <select name='name' class='form-control' id='edogawa-works'>
                     {% for name, file in edogawa_data.get('name_file') %}
@@ -51,7 +51,7 @@
               ##### 形態素解析器 #####
               #}
               <div class='form-group'>
-                <label for='mrph' class='form-check-label'>形態素解析器</label>
+                <label for='mrph' class='form-check-label'><div class='badge badge-danger'>必須</div> 形態素解析器</label>
                 <small>※（）内は使用する辞書</small>
                 {# 形態素解析器の説明 #}
                 <div class='p-2'>
@@ -90,6 +90,7 @@
               ##### カテゴリごとの分割を行うか
               #}
               <div class='form-group'>
+                <div class='badge badge-secondary'>任意</div>
                 <div class='form-check'>
                   <input class='form-check-input' type='checkbox' name='is_used_category' id='categorization' value=1
                       {{ 'checked' if input_data and input_data.get('is_used_category')==1 else '' }}>
