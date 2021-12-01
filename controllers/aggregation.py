@@ -1,9 +1,9 @@
 from os import error
 from flask import Blueprint, render_template, request, session, flash, redirect, url_for
 from aggregation import create_aggregation, valid_agg_columns
+from description import morphological_analysis_description
 from get_data import get_basic_data, get_novels_tuple, get_hinshi_dict
 from models.aggregation.option import OptionAggregation
-from morphological import get_morphological_analysis_description_dict
 from models.aggregation.input import InputAggregation
 
 
@@ -11,7 +11,7 @@ aggregation_page = Blueprint(
     'aggregation', __name__, url_prefix='/rikkyo-edogawa/aggregation')
 
 
-def render_data_selection(basic_data, edogawa_data, description, input_data=None):
+def render_data_selection(basic_data: dict, edogawa_data: dict, description: dict, input_data: dict = None):
     return render_template('aggregation/data_selection.html',
                            basic_data=basic_data,
                            edogawa_data=edogawa_data,
@@ -19,7 +19,7 @@ def render_data_selection(basic_data, edogawa_data, description, input_data=None
                            input_data=input_data)
 
 
-def render_options(basic_data, input_data, option=None):
+def render_options(basic_data: dict, input_data: InputAggregation, option: dict = None):
     return render_template('aggregation/options.html',
                            basic_data=basic_data,
                            input_table=input_data.get_table_dict(),
@@ -27,13 +27,13 @@ def render_options(basic_data, input_data, option=None):
                            option=option)
 
 
-def render_result(basic_data, result_data, dl_data, input_data, option):
+def render_result(basic_data: dict, result_data: dict, dl_data: dict, input_table: dict, option_table: dict):
     return render_template('aggregation/result.html',
                            basic_data=basic_data,
                            result_data=result_data,
                            dl_data=dl_data,
-                           input_table=input_data.get_table_dict(),
-                           option_table=option.get_table_dict())
+                           input_table=input_table,
+                           option_table=option_table)
 
 
 @aggregation_page.route('data-selection', methods=['GET'])
@@ -46,7 +46,7 @@ def data_selection():
     # 基本情報
     basic_data = get_basic_data(title='データの集計', active_url='aggregation')
     # 形態素解析器の説明文
-    description = get_morphological_analysis_description_dict()
+    description = dict(mrph=morphological_analysis_description())
     # 江戸川乱歩作品関連の情報
     edogawa_data = dict(name_file=get_novels_tuple(col1='name',
                                                    col2='file_name'))
@@ -64,7 +64,7 @@ def options():
     # 基本情報
     basic_data = get_basic_data(title='データの集計', active_url='aggregation')
     # 形態素解析器の説明文
-    description = get_morphological_analysis_description_dict()
+    description = dict(mrph=morphological_analysis_description())
     # 江戸川乱歩作品関連の情報
     edogawa_data = dict(hinshi_dict=get_hinshi_dict(),
                         name_file=get_novels_tuple(col1='name',
@@ -113,7 +113,7 @@ def result():
     # 基本情報
     basic_data = get_basic_data(title='データの集計', active_url='aggregation')
     # 形態素解析器の説明文
-    description = get_morphological_analysis_description_dict()
+    description = dict(mrph=morphological_analysis_description())
     # 江戸川乱歩作品関連の情報
     edogawa_data = dict(hinshi_dict=get_hinshi_dict(),
                         name_file=get_novels_tuple(col1='name',
@@ -156,6 +156,6 @@ def result():
                        df=result_df[:51])
     try:
         return render_result(basic_data, result_data, dl_data,
-                             input_data, option)
+                             input_data.get_table_dict(), option.get_table_dict())
     except:
         return redirect(url_for('aggregation.data_selection'))
