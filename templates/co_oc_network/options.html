@@ -39,22 +39,42 @@
     #}
     <div class='form-group'>
       <h5><div class='badge badge-danger'>必須</div> 表示形式</h5>
-      <div class='px-4'>
-        <div class='form-check'>
-          <input type='radio' name='dimension' value=2 id='2d-network'
-              {% if option %}
-                {{ 'checked' if option.get('dimension', 2) == 2 else '' }}
-              {% else %}
-                {{ 'checked' }}
-              {% endif %}>
-          <label class='form-check-label' for='2d-network'>2D</label>
-        </div>
-        <div class='form-check'>
-          <input type='radio' name='dimension' value=3 id='3d-network'
-              {% if option %}
-                {{ 'checked' if option.get('dimension')==3 else '' }}
-              {% endif %}>
-          <label class='form-check-label' for='3d-network'>3D</label>
+      <div class='form-check'>
+        <div class='row'>
+          <div class='col-md-3'>
+            <label class='form-check-label' for='2-dimension'>
+              <div class='card'>
+                <div class='card-header px-4'>
+                  <input class='form-check-input' type='radio' name='dimension' value='2' id='2-dimension'
+                      {% if option %}
+                        {{ 'checked' if option.get('dimension', 2) == 2 else '' }}
+                      {% else %}
+                        {{ 'checked' }}
+                      {% endif %}>
+                      2D
+                </div>
+                <img src='../../static/images/network_2D.png' class='img-thumbnail'/>
+              </div>
+            </label>
+          </div>
+          <div class='col-md-3'>
+            <label class='form-check-label' for='3-dimension'>
+              <div class='card'>
+                <div class='card-header px-4'>
+                  <input class='form-check-input' type='radio' name='dimension' value='3' id='3-dimension'
+                      {% if option %}
+                        {{ 'checked' if option.get('dimension')==3 else '' }}
+                      {% endif %}>
+                      3D
+                </div>
+                {% if input_table.get('章ごとのカテゴリ分割') == 'する' %}
+                  <img src='../../static/images/network_3D_categorization.png' class='img-thumbnail'/>
+                {% else %}
+                  <img src='../../static/images/network_3D.png' class='img-thumbnail'/>
+                {% endif %}
+              </div>
+            </label>
+          </div>
         </div>
       </div>
     </div>
@@ -62,7 +82,7 @@
     {#
     ##### 表示する共起数上位 #####
     #}
-    <div class='form-group w-25'>
+    <div class='form-group w-50'>
       <h5><div class='badge badge-danger'>必須</div> 共起数上位</h5>
       <div class='px-4'>
         <input type='number' name='number' value="{{ option.get('number') if option else 10 }}"
@@ -99,43 +119,54 @@
         </div>
       </div>
 
-      <div class='px-4'>
-        <div class='form-check'>
-          <input type='radio' name='co_oc_strength' value='frequency' id='frequency'
-              {% if option %}
-                {{ 'checked' if option.get('co_oc_strength', 'frequency')=='frequency' else '' }}
-              {% else %}
-                {{ 'checked' }}
-              {% endif %}>
-          <label class='form-check-label' for='frequency'>共起頻度（0〜∞）</label>
+      <div class='row'>
+        <div class='col-md-4'>
+          <div class='form-check'>
+            <input type='radio' name='co_oc_strength' value='jaccard' id='jaccard'
+                {% if option %}
+                  {{ 'checked' if option.get('co_oc_strength', 'jaccard')=='jaccard' else '' }}
+                {% else %}
+                  {{ 'checked' }}
+                {% endif %}>
+            <label class='form-check-label' for='jaccard'>Jaccard係数（0.0〜1.0）</label>
+          </div>
         </div>
-        <div class='form-check'>
-          <input type='radio' name='co_oc_strength' value='jaccard' id='jaccard'
-              {% if option %}
-                {{ 'checked' if option.get('co_oc_strength')=='jaccard' else '' }}
-              {% endif %}>
-          <label class='form-check-label' for='jaccard'>Jaccard係数（0.0〜1.0）</label>
+        <div class='col-md-4'>
+          <div class='form-check'>
+            <input type='radio' name='co_oc_strength' value='dice' id='dice'
+                {% if option %}
+                  {{ 'checked' if option.get('co_oc_strength')=='dice' else '' }}
+                {% endif %}>
+            <label class='form-check-label' for='dice'>Dice係数（0.0〜1.0）</label>
+          </div>
         </div>
-        <div class='form-check'>
-          <input type='radio' name='co_oc_strength' value='dice' id='dice'
-              {% if option %}
-                {{ 'checked' if option.get('co_oc_strength')=='dice' else '' }}
-              {% endif %}>
-          <label class='form-check-label' for='dice'>Dice係数（0.0〜1.0）</label>
+        <div class='col-md-4'>
+          <div class='form-check'>
+            <input type='radio' name='co_oc_strength' value='simpson' id='simpson'
+                {% if option %}
+                  {{ 'checked' if option.get('co_oc_strength')=='simpson' else '' }}
+                {% endif %}>
+            <label class='form-check-label' for='simpson'>Simpson係数（0.0〜1.0）</label>
+          </div>
         </div>
-        <div class='form-check'>
-          <input type='radio' name='co_oc_strength' value='simpson' id='simpson'
-              {% if option %}
-                {{ 'checked' if option.get('co_oc_strength')=='simpson' else '' }}
-              {% endif %}>
-          <label class='form-check-label' for='simpson'>Simpson係数（0.0〜1.0）</label>
+        <div class='w-100'></div>
+        <div class='col-md-4'>
+          <div class='form-check'>
+            <input type='radio' name='co_oc_strength' value='frequency' id='frequency'
+                {% if option %}
+                  {{ 'checked' if option.get('co_oc_strength')=='frequency' else '' }}
+                {% endif %}>
+            <label class='form-check-label' for='frequency'>共起頻度（0〜∞）</label>
+          </div>
         </div>
-        <div class='form-check'>
-          <input type='radio' name='co_oc_strength' value='pmi' id='pmi'
-              {% if option %}
-                {{ 'checked' if option.get('co_oc_strength')=='pmi' else '' }}
-              {% endif %}>
-          <label class='form-check-label' for='pmi'>相互情報量（-∞〜∞）</label>
+        <div class='col-md-4'>
+          <div class='form-check'>
+            <input type='radio' name='co_oc_strength' value='pmi' id='pmi'
+                {% if option %}
+                  {{ 'checked' if option.get('co_oc_strength')=='pmi' else '' }}
+                {% endif %}>
+            <label class='form-check-label' for='pmi'>相互情報量（-∞〜∞）</label>
+          </div>
         </div>
       </div>
     </div>
@@ -143,10 +174,10 @@
     {#
     ##### 表示する共起強度の範囲 #####
     #}
-    <div class='form-group w-25'>
+    <div class='form-group w-50'>
       <h5><div class='badge badge-danger'>必須</div> 共起強度の最大値</h5>
       <div class='px-4'>
-        <input type='number' name='strength_max' step='0.01' value="{{ option.get('strength_max') if option else 1000 }}"
+        <input type='number' name='strength_max' step='0.01' value="{{ option.get('strength_max') if option else 0.99 }}"
             class="form-control
             {% if option %}
               {{ 'is-invalid' if option.get('errors', {}).get('strength_max') else '' }}
@@ -165,23 +196,28 @@
     <div class='form-group'>
       <h5><div class='badge badge-danger'>必須</div> 可視化対象の品詞</h5>
       <small>※（）内は含有数</small>
-      <div class='px-4'>
+      <div class='row'>
         {% for key, value in hinshi_dict.items() %}
-        <div class='form-check'>
-          <input type='checkbox' name='hinshi' value={{key}} id={{key}}
-              class="form-check-input {{ 'is-invalid' if option and option.get('errors', {}).get('hinshi') else '' }}"
-              {% if option %}
-                {{ 'checked' if value in option.get('hinshi_jpn', []) else '' }}
-              {% else %}
-                {{ 'checked' if loop.index == 1 else '' }}
-              {% endif %}>
-          <label for={{key}} class='form-check-label'>{{key}}（{{value}}）</label>
-          {% if loop.index == hinshi_dict|length and option and option.get('errors', {}).get('hinshi') %}
-            <div class='invalid-feedback'>
-              {{ option.get('errors').get('hinshi') }}
+          <div class='col-md-4'>
+            <div class='form-check'>
+              <input type='checkbox' name='hinshi' value={{key}} id={{key}}
+                  class="{{ 'is-invalid' if option and option.get('errors', {}).get('hinshi') else '' }}"
+                  {% if option %}
+                    {{ 'checked' if value in option.get('hinshi_jpn', []) else '' }}
+                  {% else %}
+                    {{ 'checked' if loop.index == 1 else '' }}
+                  {% endif %}>
+              <label for={{key}} class='form-check-label'>{{key}}（{{value}}）</label>
+              {% if loop.index == hinshi_dict|length and option and option.get('errors', {}).get('hinshi') %}
+                <div class='invalid-feedback'>
+                  {{ option.get('errors').get('hinshi') }}
+                </div>
+              {% endif %}
             </div>
+          </div>
+          {% if not loop.index%3 %}
+            <div class='w-100'></div>
           {% endif %}
-        </div>
         {% endfor %}
       </div>
     </div>
@@ -192,26 +228,29 @@
     {% if category_list and category_list[0] != '< 章なし >' %}
       <div class='form-group'>
         <h5><div class='badge badge-danger'>必須</div> カテゴリー選択（3Dのみ）</h5>
-        <div class='px-4'>
+        <small>※（）内はカテゴリの順番</small>
+        <div class='row'>
           {% for category in category_list %}
-            <div class='form-check'>
-              <input type='checkbox' name='category' value={{category}} id={{loop.index}}
-                  class="form-check-input
-                  {% if option %}
-                    {{ 'is-invalid' if option.get('errors', {}).get('category') else '' }}
-                  {% endif %}"
-                  {% if option %}
-                    {{'checked' if category in option.get('selected_category') else '' }}
-                  {% else %}
-                    {{ 'checked' if loop.index == 1 }}
-                  {% endif %}>
-              <label for={{loop.index}} class='form-check-label'>{{category}}</label>
-              {% if loop.index == category_list|length and option and option.get('errors', {}).get('category') %}
-                <div class='invalid-feedback'>
-                  {{ option.get('errors').get('category') }}
-                </div>
-              {% endif %}
+            <div class='col-md-4'>
+              <div class='form-check'>
+                <input type='checkbox' name='category' value={{category}} id={{loop.index}}
+                    class="{{ 'is-invalid' if option and option.get('errors', {}).get('category') else '' }}"
+                    {% if option %}
+                      {{'checked' if category in option.get('selected_category') else '' }}
+                    {% else %}
+                      {{ 'checked' if loop.index == 1 }}
+                    {% endif %}>
+                <label for={{loop.index}} class='form-check-label'>{{category}}（{{loop.index}}）</label>
+                {% if loop.index == category_list|length and option and option.get('errors', {}).get('category') %}
+                  <div class='invalid-feedback'>
+                    {{ option.get('errors').get('category') }}
+                  </div>
+                {% endif %}
+              </div>
             </div>
+            {% if not loop.index%3 %}
+              <div class='w-100'></div>
+            {% endif %}
           {% endfor %}
         </div>
       </div>
