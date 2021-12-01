@@ -3,7 +3,7 @@ from get_data import get_basic_data, get_novels_tuple, get_hinshi_dict
 from co_oc_network import create_network
 from co_oc_3d_network import create_3d_network
 from morphological import get_morphological_analysis_description_dict
-from description import categorization_description, morphological_analysis_description, co_oc_strength_description
+from description import categorization_description, csv_file_description, morphological_analysis_description, co_oc_strength_description
 from models.co_oc_network.input import InputCoOcNetwork
 from models.co_oc_network.option import OptionCoOcNetwork
 
@@ -52,7 +52,8 @@ def data_selection():
                                 active_url='co_oc_network')
     # 形態素解析器の説明文
     description = dict(mrph=morphological_analysis_description(),
-                       categorization=categorization_description())
+                       categorization=categorization_description(),
+                       csv_sample=csv_file_description())
     # 江戸川乱歩作品関連の情報
     edogawa_data = dict(name_file=get_novels_tuple(col1='name',
                                                    col2='file_name'))
@@ -74,7 +75,8 @@ def options():
     # 形態素解析器の説明文
     description = dict(mrph=get_morphological_analysis_description_dict(),
                        categorization=categorization_description(),
-                       co_oc_strength=co_oc_strength_description())
+                       co_oc_strength=co_oc_strength_description(),
+                       csv_sample=csv_file_description())
     # 江戸川乱歩作品関連の情報
     edogawa_data = dict(hinshi_dict=get_hinshi_dict(),
                         name_file=get_novels_tuple(col1='name',
@@ -123,7 +125,8 @@ def result():
     # 形態素解析器の説明文
     description = dict(mrph=get_morphological_analysis_description_dict(),
                        categorization=categorization_description(),
-                       co_oc_strength=co_oc_strength_description())
+                       co_oc_strength=co_oc_strength_description(),
+                       csv_sample=csv_file_description())
     edogawa_data = dict(hinshi_dict=get_hinshi_dict(),
                         name_file=get_novels_tuple(col1='name', col2='file_name'))
 

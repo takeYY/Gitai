@@ -1,7 +1,7 @@
 from os import error
 from flask import Blueprint, render_template, request, session, flash, redirect, url_for
 from aggregation import create_aggregation, valid_agg_columns
-from description import morphological_analysis_description
+from description import csv_file_description, morphological_analysis_description
 from get_data import get_basic_data, get_novels_tuple, get_hinshi_dict
 from models.aggregation.option import OptionAggregation
 from models.aggregation.input import InputAggregation
@@ -46,7 +46,8 @@ def data_selection():
     # 基本情報
     basic_data = get_basic_data(title='データの集計', active_url='aggregation')
     # 形態素解析器の説明文
-    description = dict(mrph=morphological_analysis_description())
+    description = dict(mrph=morphological_analysis_description(),
+                       csv_sample=csv_file_description())
     # 江戸川乱歩作品関連の情報
     edogawa_data = dict(name_file=get_novels_tuple(col1='name',
                                                    col2='file_name'))
@@ -64,7 +65,8 @@ def options():
     # 基本情報
     basic_data = get_basic_data(title='データの集計', active_url='aggregation')
     # 形態素解析器の説明文
-    description = dict(mrph=morphological_analysis_description())
+    description = dict(mrph=morphological_analysis_description(),
+                       csv_sample=csv_file_description())
     # 江戸川乱歩作品関連の情報
     edogawa_data = dict(hinshi_dict=get_hinshi_dict(),
                         name_file=get_novels_tuple(col1='name',
@@ -113,7 +115,8 @@ def result():
     # 基本情報
     basic_data = get_basic_data(title='データの集計', active_url='aggregation')
     # 形態素解析器の説明文
-    description = dict(mrph=morphological_analysis_description())
+    description = dict(mrph=morphological_analysis_description(),
+                       csv_sample=csv_file_description())
     # 江戸川乱歩作品関連の情報
     edogawa_data = dict(hinshi_dict=get_hinshi_dict(),
                         name_file=get_novels_tuple(col1='name',

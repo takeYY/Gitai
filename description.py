@@ -81,6 +81,15 @@ def detail_image_description(title: str = None, description: str = None, images:
     return html_text
 
 
+def csv_file_description():
+    return dict(sample1=detail_table_description('サンプルデータ1（MeCab）',
+                                                 '',
+                                                 pd.read_csv('csv/samples/input_csv_sample1.csv')),
+                sample2=detail_table_description('サンプルデータ2（Jumanpp）',
+                                                 '',
+                                                 pd.read_csv('csv/samples/input_csv_sample2.csv')))
+
+
 def morphological_analysis_description():
     return dict(mecab=detail_description('MeCab',
                                          mecab_description()),
