@@ -20,7 +20,7 @@ def render_data_selection(basic_data: dict, edogawa_data: dict, description: dic
                            input_data=input_data)
 
 
-def render_options(basic_data: dict, edogawa_data: dict, description: dict, input_data: dict, option: dict = None):
+def render_options(basic_data: dict, edogawa_data: dict, description: dict, input_data: InputCoOcNetwork, option: dict = None):
     return render_template('co_oc_network/options.html',
                            basic_data=basic_data,
                            edogawa_data=edogawa_data,
