@@ -3,7 +3,7 @@ from get_data import get_basic_data, get_novels_tuple, get_hinshi_dict
 from co_oc_network import create_network
 from co_oc_3d_network import create_3d_network
 from morphological import get_morphological_analysis_description_dict
-from description import co_oc_strength_description
+from description import categorization_description, morphological_analysis_description, co_oc_strength_description
 from models.co_oc_network.input import InputCoOcNetwork
 from models.co_oc_network.option import OptionCoOcNetwork
 
@@ -51,7 +51,8 @@ def data_selection():
     basic_data = get_basic_data(title='共起ネットワーク：データ選択',
                                 active_url='co_oc_network')
     # 形態素解析器の説明文
-    description = dict(mrph=get_morphological_analysis_description_dict())
+    description = dict(mrph=morphological_analysis_description(),
+                       categorization=categorization_description())
     # 江戸川乱歩作品関連の情報
     edogawa_data = dict(name_file=get_novels_tuple(col1='name',
                                                    col2='file_name'))
@@ -72,6 +73,7 @@ def options():
                                 active_url='co_oc_network')
     # 形態素解析器の説明文
     description = dict(mrph=get_morphological_analysis_description_dict(),
+                       categorization=categorization_description(),
                        co_oc_strength=co_oc_strength_description())
     # 江戸川乱歩作品関連の情報
     edogawa_data = dict(hinshi_dict=get_hinshi_dict(),
@@ -119,7 +121,9 @@ def result():
     basic_data = get_basic_data(title='共起ネットワーク：結果画面',
                                 active_url='co_oc_network')
     # 形態素解析器の説明文
-    description = get_morphological_analysis_description_dict()
+    description = dict(mrph=get_morphological_analysis_description_dict(),
+                       categorization=categorization_description(),
+                       co_oc_strength=co_oc_strength_description())
     edogawa_data = dict(hinshi_dict=get_hinshi_dict(),
                         name_file=get_novels_tuple(col1='name', col2='file_name'))
 
