@@ -47,19 +47,6 @@
                   </select>
                 </div>
               </div>
-              <div class='form-group'>
-                <label for='is_used_category' class='form-check-label'>章ごとのカテゴリ分割</label>
-                <div class='form-check'>
-                  <input type='radio' name='is_used_category' value=0 id='not-used-category'
-                      {{ 'checked' if input_data and input_data.get('is_used_category')==0 or not input_data else '' }}>
-                  <label class='form-check-label' for='not-used-category'>しない</label>
-                </div>
-                <div class='form-check'>
-                  <input type='radio' name='is_used_category' value=1 id='used-category'
-                      {{ 'checked' if input_data and input_data.get('is_used_category')==1 else '' }}>
-                  <label class='form-check-label' for='used-category'>する</label>
-                </div>
-              </div>
               {#
               ##### 形態素解析器 #####
               #}
@@ -72,18 +59,13 @@
                       data-target='#morphological_description' data-toggle='collapse' type='button'>詳細説明</button>
                   <div id='morphological_description' class='collapse'>
                     <div class='bs-callout bs-callout-info mt-0 py-1'>
-                      {% for key in description.get('mrph').keys() %}
-                        <h5>{{ key }}</h5>
-                        <div class='px-4 small'>
-                          {% for desc in description.get('mrph').get(key).split('\n') %}
-                            {{ desc }}<br>
-                          {% endfor %}
-                        </div>
+                      {% for value in description.get('mrph').values() %}
+                        {{ value|safe }}
                       {% endfor %}
                     </div>
                   </div>
                 </div>
-
+                {# 入力欄 #}
                 <div class='px-2'>
                   <div class='form-check'>
                     <input type='radio' name='mrph' value='mecab' id='mecab' class='form-check-input'
@@ -100,6 +82,27 @@
                           {{'checked' if input_data.get('mrph_type') == 'juman' else '' }}
                         {% endif %}>
                     <label for='juman' class='form-check-label'>Jumanpp</label>
+                  </div>
+                </div>
+              </div>
+
+              {#
+              ##### カテゴリごとの分割を行うか
+              #}
+              <div class='form-group'>
+                <div class='form-check'>
+                  <input class='form-check-input' type='checkbox' name='is_used_category' id='categorization' value=1
+                      {{ 'checked' if input_data and input_data.get('is_used_category')==1 else '' }}>
+                  <label for='categorization' class='form-check-label'>章ごとのカテゴリ分割（3Dのみ）を行う</label>
+                </div>
+                {# 形態素解析器の説明 #}
+                <div class='p-2'>
+                  <button class='btn btn-info dropdown-toggle' aria-controls='categorization_description' aria-expanded='false'
+                      data-target='#categorization_description' data-toggle='collapse' type='button'>詳細説明</button>
+                  <div id='categorization_description' class='collapse'>
+                    <div class='bs-callout bs-callout-info mt-0 py-1'>
+                      {{ description.get('categorization')|safe }}
+                    </div>
                   </div>
                 </div>
               </div>
