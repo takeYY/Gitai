@@ -68,7 +68,7 @@
                 {# 入力欄 #}
                 <div class='px-2'>
                   <div class='form-check'>
-                    <input type='radio' name='mrph' value='mecab' id='mecab' class='form-check-input'
+                    <input type='radio' name='mrph_type' value='mecab' id='mecab' class='form-check-input'
                         {% if input_data %}
                           {{'checked' if input_data.get('mrph_type') == 'mecab' or not input_data.get('mrph_type') else '' }}
                         {% else %}
@@ -77,7 +77,7 @@
                     <label for='mecab' class='form-check-label'>MeCab（NEologd）</label>
                   </div>
                   <div class='form-check'>
-                    <input type='radio' name='mrph' value='juman' id='juman' class='form-check-input'
+                    <input type='radio' name='mrph_type' value='juman' id='juman' class='form-check-input'
                         {% if input_data %}
                           {{'checked' if input_data.get('mrph_type') == 'juman' else '' }}
                         {% endif %}>

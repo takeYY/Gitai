@@ -31,7 +31,7 @@ class InputCoOcNetwork:
         form = request.form
         self.data_type: str = form.get('data_type',
                                        session.get('data_type'))
-        self.mrph_type: str = form.get('mrph',
+        self.mrph_type: str = form.get('mrph_type',
                                        session.get('mrph_type'))\
             if self.data_type == 'edogawa'\
             else ''
