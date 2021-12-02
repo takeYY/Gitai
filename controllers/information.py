@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template
-from get_data import get_basic_data, get_edogawa_merge_df
+from src.get_data import get_basic_data, get_edogawa_merge_df
 
 information_page = Blueprint(
     'information', __name__, url_prefix='/rikkyo-edogawa/information')

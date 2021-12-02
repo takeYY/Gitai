@@ -5,7 +5,7 @@ import numpy as np
 import itertools
 import collections
 from werkzeug.utils import secure_filename
-from get_data import get_jumanpp_df, get_mecab_with_category_df, get_datetime_now, get_hinshi_dict, create_random_string
+from src.get_data import get_jumanpp_df, get_mecab_with_category_df, get_datetime_now, get_hinshi_dict, create_random_string
 import os
 
 ALLOWED_EXTENSIONS = os.environ.get('ALLOWED_EXTENSIONS')

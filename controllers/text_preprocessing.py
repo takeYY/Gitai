@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, flash
-from get_data import get_basic_data
-from preprocessing import texts_preprocessing, get_other_option_dict, get_other_option_description_dict
+from src.get_data import get_basic_data
+from src.preprocessing import texts_preprocessing, get_other_option_dict, get_other_option_description_dict
 
 preprocessing_page = Blueprint(
     'text_preprocessing', __name__, url_prefix='/rikkyo-edogawa/text-preprocessing')

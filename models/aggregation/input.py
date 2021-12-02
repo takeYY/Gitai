@@ -1,5 +1,5 @@
-from aggregation import get_unique_hinshi_dict
-from co_oc_network import get_csv_filename
+from src.aggregation import get_unique_hinshi_dict
+from src.co_oc_network import get_csv_filename
 
 
 class InputAggregation:

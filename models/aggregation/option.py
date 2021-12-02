@@ -1,4 +1,4 @@
-from get_data import get_co_oc_strength_dict
+from src.get_data import get_co_oc_strength_dict
 
 
 class OptionAggregation:

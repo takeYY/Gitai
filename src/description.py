@@ -1,5 +1,5 @@
 import pandas as pd
-from mathematical_formula import get_count_formula, get_jaccard_formula, get_dice_formula, get_simpson_formula, get_pmi_formula, get_co_oc_formula_description
+from src.mathematical_formula import get_count_formula, get_jaccard_formula, get_dice_formula, get_simpson_formula, get_pmi_formula, get_co_oc_formula_description
 
 
 def list2str_with_br(description: list):

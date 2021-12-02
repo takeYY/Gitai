@@ -1,7 +1,7 @@
 import MeCab
 import timeout_decorator
 from pyknp import Juman
-from get_data import mecab_divide_dict, juman_divide_dict
+from src.get_data import mecab_divide_dict, juman_divide_dict
 
 
 def get_morphological_analysis_dict():

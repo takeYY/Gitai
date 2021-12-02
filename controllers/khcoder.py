@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, session
-from get_data import get_basic_data, get_novels_tuple, get_khcoder_df
+from src.get_data import get_basic_data, get_novels_tuple, get_khcoder_df
 
 khcoder_page = Blueprint(
     'khcoder', __name__, url_prefix='/rikkyo-edogawa/khcoder')

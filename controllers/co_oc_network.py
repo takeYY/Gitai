@@ -1,9 +1,9 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
-from get_data import get_basic_data, get_novels_tuple, get_hinshi_dict
-from co_oc_network import create_network
-from co_oc_3d_network import create_3d_network
-from morphological import get_morphological_analysis_description_dict
-from description import categorization_description, csv_file_description, morphological_analysis_description, co_oc_strength_description
+from src.get_data import get_basic_data, get_novels_tuple, get_hinshi_dict
+from src.co_oc_network import create_network
+from src.co_oc_3d_network import create_3d_network
+from src.morphological import get_morphological_analysis_description_dict
+from src.description import categorization_description, csv_file_description, morphological_analysis_description, co_oc_strength_description
 from models.co_oc_network.input import InputCoOcNetwork
 from models.co_oc_network.option import OptionCoOcNetwork
 

@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template
-from get_data import get_basic_data
+from src.get_data import get_basic_data
 
 index_page = Blueprint('index', __name__, url_prefix='/rikkyo-edogawa/home')
 
