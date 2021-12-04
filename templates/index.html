@@ -51,6 +51,21 @@
         </div>
       </div>
       {#
+      ##### データの集計 #####
+      #}
+      <div class='p-2 col-md-6'>
+        <div class='card h-100'>
+          <div class='card-body'>
+            <h5 class='card-title'>データの集計</h5>
+            <p class='card-text'>入力されたデータを品詞ごとに出現頻度で集計します。横軸に各単語、縦軸に出現頻度を取ったグラフを表示して、どの単語が
+            どれくらいの頻度で出現しているのかを確認することができます。</p>
+          </div>
+          <div class='card-footer'>
+            <a href={{ url_for('aggregation.data_selection') }} class='card-link'>データの集計</a>
+          </div>
+        </div>
+      </div>
+      {#
       ##### 共起ネットワーク #####
       #}
       <div class='p-2 col-md-6'>
@@ -67,9 +82,9 @@
         </div>
       </div>
       {#
-      ##### KE Coder #####
+      ##### KH Coder #####
       #}
-      <div class='p-2 col-md-12'>
+      <div class='p-2 col-md-6'>
         <div class='card h-100'>
           <div class='card-body'>
             <h5 class='card-title'>KH Coder</h5>
