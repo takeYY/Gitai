@@ -297,7 +297,7 @@ def kyoki_word_network(target_num=250, file_name='3742_9_3_11_02', target_coef='
 
 def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], target_num=250, remove_words='', remove_combi='',
                    target_words='', data_type='edogawa', is_used_3d=False, used_category=0, synonym='', selected_category=[],
-                   target_coef='共起頻度', strength_max=10000, mrph_type='juman'):
+                   target_coef='共起頻度', strength_max=10000, mrph_type='juman', co_oc_freq_min=2):
     """
     共起ネットワークの作成
 
@@ -331,6 +331,8 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
         表示する共起強度の最大値
     mrph_type: str, default='juman'
         入力データが江戸川乱歩作品の場合に使用する形態素解析器
+    co_oc_freq_min: int, default=2
+        共起頻度の最小値
 
     Returns
     -------
@@ -412,6 +414,9 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
                                         'dice_coef': 'Dice係数',
                                         'simpson_coef': 'Simpson係数',
                                         'pmi_coef': '相互情報量'})
+    # 共起頻度の最小値以上に制限
+    co_oc_df = co_oc_df.query(
+        ' @co_oc_freq_min <= 共起頻度 ').reset_index(drop=True)
     # 指定ワードが含まれるレコードのみ抽出
     if target_words:
         new_co_oc_df = pd.DataFrame()

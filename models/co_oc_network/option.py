@@ -15,6 +15,8 @@ class OptionCoOcNetwork:
         共起強度の最大値
     number: int
         表示する共起数上位
+    co_oc_freq_min: int
+        共起頻度の最小値
     hinshi_jpn: list of str
         日本語の品詞名
     selected_category: list of str
@@ -41,6 +43,7 @@ class OptionCoOcNetwork:
         self.co_oc_strength: str = form.get('co_oc_strength')
         self.strength_max: float = float(form.get('strength_max'))
         self.number: int = int(form.get('number'))
+        self.co_oc_freq_min: int = int(form.get('co_oc_freq_min'))
         self.hinshi_jpn: list = form.getlist('hinshi')
         self.selected_category: list = form.getlist('category')
         self.remove_words: str = form.get('remove-words')
@@ -73,6 +76,7 @@ class OptionCoOcNetwork:
     def get_table_dict(self):
         return {'表示形式': '2D' if self.dimension == 2 else '3D',
                 '共起数上位': self.number,
+                '共起頻度の最小値': self.co_oc_freq_min,
                 '共起強度': self.target_coef,
                 '共起強度の最大値': self.strength_max,
                 '可視化対象の品詞': ', '.join(self.hinshi_jpn),
