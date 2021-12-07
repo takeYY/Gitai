@@ -18,13 +18,8 @@
           data-target='#morphological_description' data-toggle='collapse' type='button'>詳細説明</button>
         <div id='morphological_description' class='collapse'>
           <div class='bs-callout bs-callout-info mt-0 py-1'>
-            {% for key in description.keys() %}
-              <h5>{{ key }}</h5>
-              <div class='px-4 small'>
-              {% for desc in description[key].split('\n') %}
-              {{ desc }}<br>
-              {% endfor %}
-              </div>
+            {% for value in description.get('mrph').values() %}
+              {{ value|safe }}
             {% endfor %}
           </div>
         </div>
