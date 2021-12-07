@@ -98,8 +98,6 @@ def options():
                               '品詞がありません。入力データの形式を確認してください。')
         return render_data_selection(basic_data, edogawa_data, description,
                                      input_data=input_data.__dict__)
-    # 品詞の含有数でソート
-    input_data.hinshi_sort()
     # sessionの登録
     session['data_type'] = input_data.data_type
     session['input_name'] = input_data.name
@@ -140,19 +138,23 @@ def result():
     option = OptionCoOcNetwork(request)
     # 品詞が1つも選択されなかった場合
     if not option.hinshi_jpn:
-        flash('品詞が選択されていません。', 'error')
+        flash('「可視化対象の品詞」が1つも選択されていません。', 'error')
         option.set_errors('hinshi', '品詞が選択されていません。')
     # 共起数が0以下だった場合
     if option.number < 1:
-        flash('共起数が少なすぎます。', 'error')
-        option.set_errors('number', '共起数が少なすぎます。')
+        flash('「共起数上位」は1以上で設定してください。', 'error')
+        option.set_errors('number', '1以上で設定してください。')
+    # 共起頻度の最小値が0以下だった場合
+    if option.co_oc_freq_min < 1:
+        flash('「共起頻度の最小値」は1以上で設定してください。', 'error')
+        option.set_errors('co_oc_freq_min', '1以上で設定してください。')
     # edogawa選択、カテゴリごとの表示選択、章がある作品において、チェックが一つもなかった場合
     if input_data.data_type == 'edogawa' and input_data.is_used_category and int(session.get('has_category')) and not option.selected_category:
-        flash('カテゴリが選択されていません。', 'error')
-        option.set_errors('category', 'カテゴリが選択されていません。')
+        flash('「カテゴリー選択（3Dのみ）」が1つも選択されていません。', 'error')
+        option.set_errors('category', 'カテゴリーが選択されていません。')
     # errorがあれば
     if option.__dict__.get('errors'):
-        return render_options(basic_data, edogawa_data, co_oc_strength_description(), input_data,
+        return render_options(basic_data, edogawa_data, description, input_data,
                               option=option.__dict__)
     # 共起ネットワーク作成
     try:
@@ -162,7 +164,8 @@ def result():
                                                  is_used_3d=option.is_3d, used_category=input_data.is_used_category, synonym=option.synonym,
                                                  selected_category=option.selected_category,
                                                  target_coef=option.target_coef,
-                                                 strength_max=option.strength_max, mrph_type=input_data.mrph_type)
+                                                 strength_max=option.strength_max, mrph_type=input_data.mrph_type,
+                                                 co_oc_freq_min=option.co_oc_freq_min)
         if option.is_3d:
             html_file_name = create_3d_network(co_oc_df, target_num=option.number,
                                                used_category=input_data.is_used_category, category_list=option.selected_category,

@@ -79,22 +79,50 @@
       </div>
     </div>
 
-    {#
-    ##### 表示する共起数上位 #####
-    #}
-    <div class='form-group w-50'>
-      <h5><div class='badge badge-danger'>必須</div> 共起数上位</h5>
-      <div class='px-4'>
-        <input type='number' name='number' value="{{ option.get('number') if option else 10 }}"
-            class="form-control
-            {% if option %}
-              {{ 'is-invalid' if option.get('errors', {}).get('number') else '' }}
-            {% endif %}">
-        {% if option and option.get('errors', {}).get('number') %}
-          <div class='invalid-feedback'>
-            {{ option.get('errors').get('number') }}
+    <div class='row'>
+      {#
+      ##### 表示する共起数上位 #####
+      #}
+      <div class='col-md-6'>
+        <div class='form-group w-50 h-100'>
+          <h5><div class='badge badge-danger'>必須</div> 共起数上位</h5>
+          <div class='px-4'>
+            <input type='number' name='number' value="{{ option.get('number') if option else 10 }}"
+                class="form-control
+                {% if option %}
+                  {{ 'is-invalid' if option.get('errors', {}).get('number') else '' }}
+                {% endif %}"
+                required
+                placeholder='例）10'>
+            {% if option and option.get('errors', {}).get('number') %}
+              <div class='invalid-feedback'>
+                {{ option.get('errors').get('number') }}
+              </div>
+            {% endif %}
           </div>
-        {% endif %}
+        </div>
+      </div>
+      {#
+      ##### 共起頻度の最小値 #####
+      #}
+      <div class='col-md-6'>
+        <div class='form-group w-50 h-100'>
+          <h5><div class='badge badge-danger'>必須</div> 共起頻度の最小値</h5>
+          <div class='px-4'>
+            <input type='number' name='co_oc_freq_min' value="{{ option.get('co_oc_freq_min') if option else 2 }}"
+                class="form-control
+                {% if option %}
+                  {{ 'is-invalid' if option.get('errors', {}).get('co_oc_freq_min') else '' }}
+                {% endif %}"
+                required
+                placeholder='例）2'>
+            {% if option and option.get('errors', {}).get('co_oc_freq_min') %}
+              <div class='invalid-feedback'>
+                {{ option.get('errors').get('co_oc_freq_min') }}
+              </div>
+            {% endif %}
+          </div>
+        </div>
       </div>
     </div>
 
@@ -181,7 +209,9 @@
             class="form-control
             {% if option %}
               {{ 'is-invalid' if option.get('errors', {}).get('strength_max') else '' }}
-            {% endif %}">
+            {% endif %}"
+            required
+            placeholder='例）0.99'>
         {% if option and option.get('errors', {}).get('strength_max') %}
           <div class='invalid-feedback'>
             {{ option.get('errors').get('strength_max') }}
@@ -199,27 +229,24 @@
       <div class='row'>
         {% for key, value in hinshi_dict.items() %}
           <div class='col-md-4'>
-            <div class='form-check'>
+            <div class='form-check h-100'>
               <input type='checkbox' name='hinshi' value={{key}} id={{key}}
-                  class="{{ 'is-invalid' if option and option.get('errors', {}).get('hinshi') else '' }}"
+                  class="form-check-input {{ 'is-invalid' if option and option.get('errors', {}).get('hinshi') else '' }}"
                   {% if option %}
                     {{ 'checked' if value in option.get('hinshi_jpn', []) else '' }}
                   {% else %}
                     {{ 'checked' if loop.index == 1 else '' }}
                   {% endif %}>
               <label for={{key}} class='form-check-label'>{{key}}（{{value}}）</label>
-              {% if loop.index == hinshi_dict|length and option and option.get('errors', {}).get('hinshi') %}
-                <div class='invalid-feedback'>
-                  {{ option.get('errors').get('hinshi') }}
-                </div>
-              {% endif %}
             </div>
           </div>
-          {% if not loop.index%3 %}
-            <div class='w-100'></div>
-          {% endif %}
         {% endfor %}
       </div>
+      {% if option and option.get('errors', {}).get('hinshi') %}
+        <div class='small text-danger'>
+          {{ option.get('errors').get('hinshi') }}
+        </div>
+      {% endif %}
     </div>
 
     {#
@@ -232,27 +259,24 @@
         <div class='row'>
           {% for category in category_list %}
             <div class='col-md-4'>
-              <div class='form-check'>
+              <div class='form-check h-100'>
                 <input type='checkbox' name='category' value={{category}} id={{loop.index}}
-                    class="{{ 'is-invalid' if option and option.get('errors', {}).get('category') else '' }}"
+                    class="form-check-input {{ 'is-invalid' if option and option.get('errors', {}).get('category') else '' }}"
                     {% if option %}
                       {{'checked' if category in option.get('selected_category') else '' }}
                     {% else %}
                       {{ 'checked' if loop.index == 1 }}
                     {% endif %}>
                 <label for={{loop.index}} class='form-check-label'>{{category}}（{{loop.index}}）</label>
-                {% if loop.index == category_list|length and option and option.get('errors', {}).get('category') %}
-                  <div class='invalid-feedback'>
-                    {{ option.get('errors').get('category') }}
-                  </div>
-                {% endif %}
               </div>
             </div>
-            {% if not loop.index%3 %}
-              <div class='w-100'></div>
-            {% endif %}
           {% endfor %}
         </div>
+        {% if option and option.get('errors', {}).get('category') %}
+          <div class='small text-danger'>
+            {{ option.get('errors').get('category') }}
+          </div>
+        {% endif %}
       </div>
     {% endif %}
 

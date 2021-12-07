@@ -42,6 +42,9 @@ class InputCoOcNetwork:
         if not self.__dict__.get('errors'):
             # 品詞の辞書を設定
             self.set_hinshi()
+            # 品詞がある場合のみソート
+            if self.hinshi:
+                self.hinshi_sort()
             # カテゴリごとの表示を希望する場合
             self.set_category_list()
 
