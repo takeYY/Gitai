@@ -2,7 +2,6 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from src.get_data import get_basic_data, get_novels_tuple, get_hinshi_dict
 from src.co_oc_network import create_network
 from src.co_oc_3d_network import create_3d_network
-from src.morphological import get_morphological_analysis_description_dict
 from src.description import categorization_description, csv_file_description, morphological_analysis_description, co_oc_strength_description
 from models.co_oc_network.input import InputCoOcNetwork
 from models.co_oc_network.option import OptionCoOcNetwork
@@ -73,7 +72,7 @@ def options():
     basic_data = get_basic_data(title='共起ネットワーク：設定画面',
                                 active_url='co_oc_network')
     # 形態素解析器の説明文
-    description = dict(mrph=get_morphological_analysis_description_dict(),
+    description = dict(mrph=morphological_analysis_description(),
                        categorization=categorization_description(),
                        co_oc_strength=co_oc_strength_description(),
                        csv_sample=csv_file_description())
@@ -123,7 +122,7 @@ def result():
     basic_data = get_basic_data(title='共起ネットワーク：結果画面',
                                 active_url='co_oc_network')
     # 形態素解析器の説明文
-    description = dict(mrph=get_morphological_analysis_description_dict(),
+    description = dict(mrph=morphological_analysis_description(),
                        categorization=categorization_description(),
                        co_oc_strength=co_oc_strength_description(),
                        csv_sample=csv_file_description())
