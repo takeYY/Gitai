@@ -21,7 +21,7 @@ def show():
     # 詳細説明追加
     description = dict(other_options=preprocessing_other_options_description())
     if request.method == 'GET':
-        return render_template('preprocessing.html',
+        return render_template('text_preprocessing/index.html',
                                basic_data=basic_data,
                                other_option=other_option,
                                description=description)
@@ -31,7 +31,7 @@ def show():
     # textsがない場合
     if not texts:
         flash('テキストが入力されていません。', 'error')
-        return render_template('preprocessing.html',
+        return render_template('text_preprocessing/index.html',
                                basic_data=basic_data,
                                ther_option=other_option,
                                description=description)
@@ -55,14 +55,14 @@ def show():
     if errors:
         for error in errors:
             flash(error, 'error')
-        return render_template('preprocessing.html',
+        return render_template('text_preprocessing/index.html',
                                basic_data=basic_data,
                                sent_data=sent_data_dict,
                                other_option=other_option,
                                description=description)
     # 送るデータをまとめる
     sent_data_dict['preprocessed_texts'] = preprocessed_text
-    return render_template('preprocessing.html',
+    return render_template('text_preprocessing/index.html',
                            basic_data=basic_data,
                            sent_data=sent_data_dict,
                            other_option=other_option,

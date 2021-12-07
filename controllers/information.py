@@ -16,6 +16,6 @@ def show():
     # 江戸川乱歩作品関連の情報
     edogawa_merge_df = get_edogawa_merge_df(drop_duplicates=True)
 
-    return render_template('information.html',
+    return render_template('information/index.html',
                            basic_data=basic_data,
                            edogawa_merge_df=edogawa_merge_df)
