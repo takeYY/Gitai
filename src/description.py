@@ -20,21 +20,25 @@ def detail_description(title: str = None, description: str = None, formula: str 
 
 
 # 詳細説明を文章と表で行う場合のHTMLタグ構成
-def detail_table_description(title: str = None, description: str = None, table: pd.DataFrame = None) -> str:
+def detail_table_description(title: str = None, description: str = None, table: pd.DataFrame = None, has_index: bool = False) -> str:
     html_text = ''
     if title:
         html_text += fr"""<h5>{title}</h5>"""
     if description:
         html_text += fr"""<p class='px-2 small'>{description}</p>"""
     if table is not None:
-        html_text += fr"""<div class='p-2 small'><table class='table table-hover table-striped table-sm'>
+        html_text += fr"""<div class='p-2 small table-responsive'><table class='table table-hover table-striped table-sm'>
                             <thead class='thead-dark'>
                               <tr>"""
+        if has_index:
+            html_text += fr"""<th></th>"""
         for column in table.columns:
             html_text += fr"""<th scope='col'>{column}</th>"""
         html_text += fr"""</tr></thead><tbody>"""
         for idx, rows in table.iterrows():
             html_text += fr"""<tr>"""
+            if has_index:
+                html_text += fr"""<th>{idx}</th>"""
             for column in table.columns:
                 html_text += fr"""<th>{rows[column]}</th>"""
             html_text += fr"""</tr>"""
@@ -142,6 +146,25 @@ def co_oc_strength_description():
                 sample=detail_table_description('例',
                                                 co_oc_strength_sample_description(),
                                                 pd.read_csv('csv/samples/co_oc_strength_result_sample.csv')))
+
+
+def preprocessing_other_options_description():
+    return dict(all2half=detail_table_description('全角を半角へ変換',
+                                                  '',
+                                                  pd.read_csv(
+                                                      'csv/samples/all2half_description.csv').T,
+                                                  has_index=True),
+                big2small=detail_table_description('英語大文字を小文字へ変換',
+                                                   '例文',
+                                                   pd.read_csv('csv/samples/big2small.csv')),
+                remove_symbols=detail_table_description('記号を削除',
+                                                        '',
+                                                        pd.read_csv(
+                                                            'csv/samples/remove_symbols_description.csv').T,
+                                                        has_index=True),
+                replace_numbers2zero=detail_table_description('数字を全て0に変換',
+                                                              '例文',
+                                                              pd.read_csv('csv/samples/replace_numbers2zero.csv')))
 
 
 def is_used_category_description():

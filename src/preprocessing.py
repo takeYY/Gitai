@@ -6,16 +6,6 @@ def get_other_option_dict():
     return dict(all2half='全角を半角へ変換', big2small='英語大文字を小文字へ変換', remove_symbols='記号を削除', replace_numbers2zero='数字を全て0に変換')
 
 
-def get_other_option_description_dict():
-    description = ["""変換対象：！＂＃＄％＆＇（）＊＋，－．／０１２３４５６７８９：；＜＝＞？＠ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ［＼］＾＿｀ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ｛｜｝～
-  変換後：!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~""",
-                   """Hi, can you hear me? ==> hi, can you hear me?
-  Ｈｅｌｌｏ ==> ｈｅｌｌｏ""",
-                   """削除対象：!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~""",
-                   """明治27年10月21日 ==> 明治0年0月0日"""]
-    return {value: description[idx] for idx, value in enumerate(get_other_option_dict().values())}
-
-
 def texts_preprocessing(texts, remove_words, remove_word_in_texts, replace_words, other_options):
     # テキストを前処理
     preprocessed_text = []
