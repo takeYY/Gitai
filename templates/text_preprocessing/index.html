@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "layout/layout.html" %}
 {% block content %}
 <div class='container pb-4'>
   <h3 class='text-center'>{{ basic_data.get('title') }}</h3>
@@ -112,13 +112,8 @@
           data-target='#option_description' data-toggle='collapse' type='button'>詳細</button>
         <div id='option_description' class='collapse'>
           <div class='bs-callout bs-callout-info mt-0 py-1'>
-            {% for key in description.keys() %}
-              <h5>{{ key }}</h5>
-              <p class='px-4 small'>
-              {% for desc in description[key].split('\n') %}
-              {{ desc }}<br>
-              {% endfor %}
-              </p>
+            {% for value in description.get('other_options').values() %}
+              {{ value|safe }}
             {% endfor %}
           </div>
         </div>

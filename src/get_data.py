@@ -24,12 +24,15 @@ def get_original_text_df():
     return pd.read_csv('csv/original_text.csv')
 
 
-def get_edogawa_merge_df():
+def get_edogawa_merge_df(drop_duplicates=False):
     edogawa = get_edogawa_df()
     edogawa_detail = get_edogawa_detail_df()
     original_text = get_original_text_df()
     edogawa_merge = pd.merge(edogawa, edogawa_detail, on='reader_id')
     edogawa_merge = pd.merge(edogawa_merge, original_text, on='reader_id')
+    if drop_duplicates:
+        edogawa_merge = edogawa_merge.drop_duplicates(subset='name')
+
     return edogawa_merge
 
 

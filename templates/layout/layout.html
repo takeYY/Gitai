@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
-{% include "head.html" %}
+{% include "layout/head/head.html" %}
 <body>
   <style>
     .bs-callout {
@@ -87,8 +87,8 @@
     target.innerHTML = `文字数：${Number(text_length).toLocaleString()}/${Number(max_length).toLocaleString()}`;
   }
   </script>
-  {% include "header.html" %}
-  {% include "flash_message.html" %}
+  {% include "layout/header.html" %}
+  {% include "layout/flash_message.html" %}
   {% block content %}{% endblock %}
 </body>
 

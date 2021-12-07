@@ -1,6 +1,6 @@
-from aggregation import get_unique_hinshi_dict
-from co_oc_network import get_csv_filename
-from get_data import get_category_list
+from src.aggregation import get_unique_hinshi_dict
+from src.co_oc_network import get_csv_filename
+from src.get_data import get_category_list
 
 
 class InputCoOcNetwork:
@@ -31,14 +31,14 @@ class InputCoOcNetwork:
         form = request.form
         self.data_type: str = form.get('data_type',
                                        session.get('data_type'))
-        self.mrph_type: str = form.get('mrph',
+        self.mrph_type: str = form.get('mrph_type',
                                        session.get('mrph_type'))\
             if self.data_type == 'edogawa'\
             else ''
         self.set_input_name_csv(request, session)
         # カテゴリごとの表示有無
         self.is_used_category: int = int(form.get('is_used_category',
-                                                  session.get('is_used_category')))
+                                                  session.get('is_used_category', 0)))
         if not self.__dict__.get('errors'):
             # 品詞の辞書を設定
             self.set_hinshi()

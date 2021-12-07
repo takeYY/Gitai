@@ -1,20 +1,21 @@
-{% extends "layout.html" %}
+{% extends "layout/layout.html" %}
 {% block content %}
 <div class='container pb-4'>
   <h3 class='text-center'>{{basic_data.get('title')}}</h3>
 
-  <p>江戸川乱歩作品の可視化システムです。</p>
+  <p class='px-2'>江戸川乱歩作品の可視化システムです。</p>
 
   <div class='container-fluid'>
     <div class='row'>
       {#
       ##### 作品情報 #####
       #}
-      <div class='p-2 col-sm-6'>
+      <div class='p-2 col-md-6'>
         <div class='card h-100'>
           <div class='card-body'>
             <h5 class='card-title'>作品情報</h5>
-            <p class='card-text'>江戸川乱歩作品の初出、底本、出版社などの情報がまとめられている。</p>
+            <p class='card-text'>江戸川乱歩作品の初出、底本、出版社などの情報がまとめられています。
+            また、えあ草紙で各作品を読むこともできます。</p>
           </div>
           <div class='card-footer'>
             <a href={{ url_for('information.show') }} class='card-link'>作品情報</a>
@@ -24,11 +25,12 @@
       {#
       ##### テキストの前処理 #####
       #}
-      <div class='p-2 col-sm-6'>
+      <div class='p-2 col-md-6'>
         <div class='card h-100'>
           <div class='card-body'>
             <h5 class='card-title'>テキストの前処理</h5>
-            <p class='card-text'>テキストを分析するための前処理を施すことができます。</p>
+            <p class='card-text'>テキストを分析するための前処理を施すことができます。
+            分析したいテキストに含まれる単語の削除・置換、記号の削除などができます。</p>
           </div>
           <div class='card-footer'>
             <a href={{ url_for('text_preprocessing.show') }} class='card-link'>テキストの前処理</a>
@@ -38,12 +40,12 @@
       {#
       ##### 形態素解析 #####
       #}
-      <div class='p-2 col-sm-6'>
+      <div class='p-2 col-md-6'>
         <div class='card h-100'>
           <div class='card-body'>
             <h5 class='card-title'>形態素解析</h5>
-            <p class='card-text'>形態素解析とは、文法的な情報の注記の無い自然言語のテキストデータから、対象言語の文法や、辞書と呼ばれる単語の品詞等の情報にもとづき、
-            形態素の列に分割し、それぞれの形態素の品詞等を判別する作業である。</p>
+            <p class='card-text'>形態素解析とは、文法的な情報の注記の無い自然言語のテキストデータから、対象言語の文法や、
+            辞書と呼ばれる単語の品詞等の情報にもとづき、形態素の列に分割し、それぞれの形態素の品詞等を判別する作業です。</p>
           </div>
           <div class='card-footer'>
             <a href={{ url_for('morph_analysis.show') }} class='card-link'>形態素解析</a>
@@ -51,15 +53,30 @@
         </div>
       </div>
       {#
+      ##### データの集計 #####
+      #}
+      <div class='p-2 col-md-6'>
+        <div class='card h-100'>
+          <div class='card-body'>
+            <h5 class='card-title'>データの集計</h5>
+            <p class='card-text'>入力されたデータを品詞ごとに出現頻度で集計します。横軸に各単語、縦軸に出現頻度を取ったグラフを表示して、どの単語が
+            どれくらいの頻度で出現しているのかを確認することができます。</p>
+          </div>
+          <div class='card-footer'>
+            <a href={{ url_for('aggregation.data_selection') }} class='card-link'>データの集計</a>
+          </div>
+        </div>
+      </div>
+      {#
       ##### 共起ネットワーク #####
       #}
-      <div class='p-2 col-sm-6'>
+      <div class='p-2 col-md-6'>
         <div class='card h-100'>
           <div class='card-body'>
             <h5 class='card-title'>共起ネットワーク</h5>
-            <p class='card-text'>共起ネットワークは、単語が共通に出現する関係（共起関係）を円と線で表示した図である。
-            どんな単語が同じコメント内に出現しやすいかが感覚的に把握できて、
-            一つ一つの文書を読んでいく方法とは一味違った解釈やひらめきを呼び込む。</p>
+            <p class='card-text'>共起ネットワークは、単語が共通に出現する関係（共起関係）を円と線で表示した図です。
+            どんな単語が同じ文内に出現しやすいかが感覚的に把握、
+            一つ一つの文書を読んでいく方法とは一味違った解釈やひらめきを呼び込むことができます。</p>
           </div>
           <div class='card-footer'>
             <a href={{ url_for('network.data_selection') }} class='card-link'>共起ネットワーク</a>
@@ -67,9 +84,9 @@
         </div>
       </div>
       {#
-      ##### KE Coder #####
+      ##### KH Coder #####
       #}
-      <div class='p-2 col-sm-12'>
+      <div class='p-2 col-md-6'>
         <div class='card h-100'>
           <div class='card-body'>
             <h5 class='card-title'>KH Coder</h5>

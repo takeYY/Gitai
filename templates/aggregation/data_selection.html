@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "layout/layout.html" %}
 {% block content %}
 <div class='container pb-4'>
   <h3 class='text-center'>{{ basic_data.get('title') }}</h3>
@@ -59,13 +59,8 @@
                     data-target='#morphological_description' data-toggle='collapse' type='button'>詳細説明</button>
                   <div id='morphological_description' class='collapse'>
                     <div class='bs-callout bs-callout-info mt-0 py-1'>
-                      {% for key in description.keys() %}
-                        <h5>{{ key }}</h5>
-                        <div class='px-4 small'>
-                          {% for desc in description[key].split('\n') %}
-                            {{ desc }}<br>
-                          {% endfor %}
-                        </div>
+                      {% for value in description.get('mrph').values() %}
+                        {{ value|safe }}
                       {% endfor %}
                     </div>
                   </div>
@@ -115,26 +110,15 @@
               <div class='form-group'>
                 <p><a href={{ url_for('morph_analysis.show') }} target=_blank>形態素解析</a>によって得られたcsvデータが対象（最大16MBまで）</p>
                 {#
-                ##### 入力形式 #####
+                ##### ファイル形式 #####
                 #}
                 <button class='btn btn-info dropdown-toggle' aria-controls='csv-sample' aria-expanded='false'
-                    data-target='#csv-sample' data-toggle='collapse' type='button'>入力形式</button>
+                    data-target='#csv-sample' data-toggle='collapse' type='button'>ファイル形式</button>
                 <div id='csv-sample' class='collapse'>
                   <div class='bs-callout bs-callout-info mt-0 py-1'>
-                    <p>
-                    例1）<br>
-                    表層形,品詞,原形<br>
-                    すもも,名詞,すもも<br>
-                    も,助詞,も<br>
-                    もも,名詞,もも<br>
-                    も,助詞,も<br>
-                    もも,名詞,もも<br><br>
-                    例2）<br>
-                    見出し,品詞,原形<br>
-                    くるま,名詞,くるま<br>
-                    で,助詞,で<br>
-                    まつ,動詞,まつ
-                    </p>
+                    {% for value in description.get('csv_sample').values() %}
+                      {{ value|safe }}
+                    {% endfor %}
                   </div>
                 </div>
                 {#
