@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, flash, session
+from src.description import morphological_analysis_description
 from src.get_data import get_basic_data, dict_in_list2csv
-from src.morphological import mrph_analysis, get_morphological_analysis_description_dict
+from src.morphological import mrph_analysis
 
 morph_analysis_page = Blueprint(
     'morph_analysis', __name__, url_prefix='/rikkyo-edogawa/morphological-analysis')
@@ -15,7 +16,7 @@ def show():
     # 基本情報
     basic_data = get_basic_data(title='形態素解析', active_url='morph_analysis')
     # 形態素解析器の説明文
-    description = get_morphological_analysis_description_dict()
+    description = dict(mrph=morphological_analysis_description())
     # リクエストがGETならば
     if request.method == 'GET':
         session.clear()
