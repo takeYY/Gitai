@@ -1,45 +1,12 @@
 import MeCab
 import timeout_decorator
 from pyknp import Juman
-from get_data import mecab_divide_dict, juman_divide_dict
+from src.get_data import mecab_divide_dict, juman_divide_dict
 
 
 def get_morphological_analysis_dict():
     return dict(MeCab='MeCab', NEologd='NEologd', Jumanpp='Jumanpp',
                 output_sample_mecab='MeCab（NEologd）の出力例', output_sample_jumanpp='Jumanppの出力例')
-
-
-def get_morphological_analysis_description_dict():
-    description = ["""高速に解析ができ、日本語テキストの中では最もよく使われています。
-                        とりあえず解析したい場合は、MeCabを選択すると良いでしょう。""",
-                   """MeCabの解析時に使用する辞書のことで、辞書の更新を頻繁に行っています。
-                        そのため、新語・固有名詞の解析が得意で語彙数も多いです。""",
-                   """MeCabよりも高精度で単語の分割、品詞の判別が可能です。
-                        ただし、欠点として解析に時間がかかり、単語の分割が細かいことが挙げられます。""",
-                   """インスタ映え ==>
-                        　表層形, 品詞, 品詞細分類(1)
-                        　インスタ映え, 名詞, 固有名詞
-
-                        バナナオレが飲みたい ==>
-                        　表層形, 品詞, 品詞細分類(1)
-                        　バナナオレ, 名詞, 一般
-                        　が, 助詞, 格助詞
-                        　飲み, 動詞, 自立
-                        　たい, 助動詞, *
-                        """,
-                   """インスタ映え ==>
-                        　見出し, 品詞, 品詞細分類
-                        　インスタ, 名詞, 普通名詞
-                        　映え, 名詞, 普通名詞
-
-                        バナナオレが飲みたい ==>
-                        　見出し, 品詞, 品詞細分類
-                        　バナナ, 名詞, 普通名詞
-                        　オレ, 名詞, 普通名詞
-                        　が, 助詞, 格助詞
-                        　飲む, 動詞, *
-                        　たい, 接尾辞, 形容詞性述語接尾辞"""]
-    return {value: description[idx] for idx, value in enumerate(get_morphological_analysis_dict().values())}
 
 
 @timeout_decorator.timeout(29, use_signals=False)

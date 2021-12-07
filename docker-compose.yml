@@ -9,12 +9,13 @@ services:
       - .:/code
     tty: true
     command: >
+      bash -c 'rm -f tmp/*.csv tmp/*.html &&
       waitress-serve --listen "*:${PORT:-8080}"
       --url-scheme=https
-      --trusted-proxy '*'
-      --trusted-proxy-headers 'x-forwarded-for x-forwarded-proto x-forwarded-port'
+      --trusted-proxy "*"
+      --trusted-proxy-headers "x-forwarded-for x-forwarded-proto x-forwarded-port"
       --log-untrusted-proxy-headers
       --clear-untrusted-proxy-headers
       --threads ${WEB_CONCURRENCY:-4}
-      app:app
+      app:app'
     env_file: ./app.env

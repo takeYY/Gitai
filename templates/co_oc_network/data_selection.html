@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "layout/layout.html" %}
 {% block content %}
 <div class='container pb-4'>
   <h3 class='text-center'>{{ basic_data.get('title') }}</h3>
@@ -36,7 +36,7 @@
               ##### 作品名（江戸川乱歩作品で分析） #####
               #}
               <div class='form-group w-50'>
-                <label for='name' class='form-check-label'>作品名</label>
+                <label for='name' class='form-check-label'><div class='badge badge-danger'>必須</div> 作品名</label>
                 <div class='px-4'>
                   <select name='name' class='form-control' id='edogawa-works'>
                     {% for name, file in edogawa_data.get('name_file') %}
@@ -47,24 +47,11 @@
                   </select>
                 </div>
               </div>
-              <div class='form-group'>
-                <label for='is_used_category' class='form-check-label'>章ごとのカテゴリ分割</label>
-                <div class='form-check'>
-                  <input type='radio' name='is_used_category' value=0 id='not-used-category'
-                      {{ 'checked' if input_data and input_data.get('is_used_category')==0 or not input_data else '' }}>
-                  <label class='form-check-label' for='not-used-category'>しない</label>
-                </div>
-                <div class='form-check'>
-                  <input type='radio' name='is_used_category' value=1 id='used-category'
-                      {{ 'checked' if input_data and input_data.get('is_used_category')==1 else '' }}>
-                  <label class='form-check-label' for='used-category'>する</label>
-                </div>
-              </div>
               {#
               ##### 形態素解析器 #####
               #}
               <div class='form-group'>
-                <label for='mrph' class='form-check-label'>形態素解析器</label>
+                <label for='mrph' class='form-check-label'><div class='badge badge-danger'>必須</div> 形態素解析器</label>
                 <small>※（）内は使用する辞書</small>
                 {# 形態素解析器の説明 #}
                 <div class='p-2'>
@@ -72,21 +59,16 @@
                       data-target='#morphological_description' data-toggle='collapse' type='button'>詳細説明</button>
                   <div id='morphological_description' class='collapse'>
                     <div class='bs-callout bs-callout-info mt-0 py-1'>
-                      {% for key in description.get('mrph').keys() %}
-                        <h5>{{ key }}</h5>
-                        <div class='px-4 small'>
-                          {% for desc in description.get('mrph').get(key).split('\n') %}
-                            {{ desc }}<br>
-                          {% endfor %}
-                        </div>
+                      {% for value in description.get('mrph').values() %}
+                        {{ value|safe }}
                       {% endfor %}
                     </div>
                   </div>
                 </div>
-
+                {# 入力欄 #}
                 <div class='px-2'>
                   <div class='form-check'>
-                    <input type='radio' name='mrph' value='mecab' id='mecab' class='form-check-input'
+                    <input type='radio' name='mrph_type' value='mecab' id='mecab' class='form-check-input'
                         {% if input_data %}
                           {{'checked' if input_data.get('mrph_type') == 'mecab' or not input_data.get('mrph_type') else '' }}
                         {% else %}
@@ -95,11 +77,33 @@
                     <label for='mecab' class='form-check-label'>MeCab（NEologd）</label>
                   </div>
                   <div class='form-check'>
-                    <input type='radio' name='mrph' value='juman' id='juman' class='form-check-input'
+                    <input type='radio' name='mrph_type' value='juman' id='juman' class='form-check-input'
                         {% if input_data %}
                           {{'checked' if input_data.get('mrph_type') == 'juman' else '' }}
                         {% endif %}>
                     <label for='juman' class='form-check-label'>Jumanpp</label>
+                  </div>
+                </div>
+              </div>
+
+              {#
+              ##### カテゴリごとの分割を行うか
+              #}
+              <div class='form-group'>
+                <div class='badge badge-secondary'>任意</div>
+                <div class='form-check'>
+                  <input class='form-check-input' type='checkbox' name='is_used_category' id='categorization' value=1
+                      {{ 'checked' if input_data and input_data.get('is_used_category')==1 else '' }}>
+                  <label for='categorization' class='form-check-label'>章ごとのカテゴリ分割（3Dのみ）を行う</label>
+                </div>
+                {# 形態素解析器の説明 #}
+                <div class='p-2'>
+                  <button class='btn btn-info dropdown-toggle' aria-controls='categorization_description' aria-expanded='false'
+                      data-target='#categorization_description' data-toggle='collapse' type='button'>詳細説明</button>
+                  <div id='categorization_description' class='collapse'>
+                    <div class='bs-callout bs-callout-info mt-0 py-1'>
+                      {{ description.get('categorization')|safe }}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -123,26 +127,15 @@
               <div class='form-group'>
                 <p><a href={{ url_for('morph_analysis.show') }} target=_blank>形態素解析</a>によって得られたcsvデータが対象（最大16MBまで）</p>
                 {#
-                ##### 入力形式 #####
+                ##### ファイル形式 #####
                 #}
                 <button class='btn btn-info dropdown-toggle' aria-controls='csv-sample' aria-expanded='false'
-                    data-target='#csv-sample' data-toggle='collapse' type='button'>入力形式</button>
+                    data-target='#csv-sample' data-toggle='collapse' type='button'>ファイル形式</button>
                 <div id='csv-sample' class='collapse'>
                   <div class='bs-callout bs-callout-info mt-0 py-1'>
-                    <p>
-                    例1）<br>
-                    表層形,品詞,原形<br>
-                    すもも,名詞,すもも<br>
-                    も,助詞,も<br>
-                    もも,名詞,もも<br>
-                    も,助詞,も<br>
-                    もも,名詞,もも<br><br>
-                    例2）<br>
-                    見出し,品詞,原形<br>
-                    くるま,名詞,くるま<br>
-                    で,助詞,で<br>
-                    まつ,動詞,まつ
-                    </p>
+                    {% for value in description.get('csv_sample').values() %}
+                      {{ value|safe }}
+                    {% endfor %}
                   </div>
                 </div>
                 {#

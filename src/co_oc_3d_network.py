@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 import plotly
-from get_data import create_random_string
+from src.get_data import create_random_string
 
 
 def apply_js(fig, filename):

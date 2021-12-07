@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 import plotly
-from get_data import create_random_string, get_plotly_symbols, get_plotly_text_positions
+from src.get_data import create_random_string, get_plotly_symbols, get_plotly_text_positions
 
 
 def get_df_from_csv_filename(mrph_type, csv_filename):

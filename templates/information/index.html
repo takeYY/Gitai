@@ -1,0 +1,41 @@
+{% extends "layout/layout.html" %}
+{% block content %}
+<div class='container pb-4'>
+  <h3 class='text-center'>{{basic_data.get('title')}}</h3>
+
+  <table class='table table-sm table-striped table-hover'>
+    <thead class='thead-dark'>
+      <tr>
+        <th>No.</th>
+        <th>作品名</th>
+        <th>初出</th>
+        <th>底本</th>
+        <th>出版社</th>
+        <th>初版発行日</th>
+        <th></th>
+      </tr>
+    </thead>
+    {% for index, rows in edogawa_merge_df.iterrows() %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>
+          {% if rows.name == '随筆銭形平次' %}
+            {% set aozora_uri = 'https://www.aozora.gr.jp/cards/001670/card' %}
+          {% else %}
+            {% set aozora_uri = 'https://www.aozora.gr.jp/cards/001779/card' %}
+          {% endif %}
+          <a href="{{aozora_uri}}{{rows.reader_id}}.html" target="_blank">{{ rows['name'] }}</a>
+        </td>
+        <td>{{ rows.first_appearance }}</td>
+        <td>{{ rows.original_text }}</td>
+        <td>{{ rows.publisher }}</td>
+        <td>{{ rows.published_date }}</td>
+        <td>
+          <a class="btn btn-sm btn-info"
+            href="https://www.satokazzz.com/airzoshi/reader.php?action=aozora&id={{rows.reader_id}}" target="_blank">読む</a>
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}
