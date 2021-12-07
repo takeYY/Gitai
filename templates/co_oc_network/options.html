@@ -91,7 +91,9 @@
                 class="form-control
                 {% if option %}
                   {{ 'is-invalid' if option.get('errors', {}).get('number') else '' }}
-                {% endif %}">
+                {% endif %}"
+                required
+                placeholder='例）10'>
             {% if option and option.get('errors', {}).get('number') %}
               <div class='invalid-feedback'>
                 {{ option.get('errors').get('number') }}
@@ -111,7 +113,9 @@
                 class="form-control
                 {% if option %}
                   {{ 'is-invalid' if option.get('errors', {}).get('co_oc_freq_min') else '' }}
-                {% endif %}">
+                {% endif %}"
+                required
+                placeholder='例）2'>
             {% if option and option.get('errors', {}).get('co_oc_freq_min') %}
               <div class='invalid-feedback'>
                 {{ option.get('errors').get('co_oc_freq_min') }}
@@ -205,7 +209,9 @@
             class="form-control
             {% if option %}
               {{ 'is-invalid' if option.get('errors', {}).get('strength_max') else '' }}
-            {% endif %}">
+            {% endif %}"
+            required
+            placeholder='例）0.99'>
         {% if option and option.get('errors', {}).get('strength_max') %}
           <div class='invalid-feedback'>
             {{ option.get('errors').get('strength_max') }}
