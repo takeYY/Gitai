@@ -81,7 +81,10 @@ def get_csv_filename(request):
     file = request.files['file']
     input_filename = file.filename
     csv_filename = get_datetime_now() + '_input_' + secure_filename(input_filename)
-    file.save(os.path.join(UPLOAD_FOLDER, csv_filename))
+    try:
+        file.save(os.path.join(UPLOAD_FOLDER, csv_filename))
+    except:
+        file.save(os.path.join('/code/tmp', csv_filename))
 
     return input_filename, csv_filename, dict()
 
