@@ -117,8 +117,8 @@ def morphological_analysis_description():
 
 def categorization_description():
     image_options = dict(comparison=True,
-                         images=['../../static/images/network_3D.png',
-                                 '../../static/images/network_3D_categorization.png'])
+                         images=['https://raw.githubusercontent.com/takeYY/Rampo_Edogawa_Visualization/main/static/images/network_3D.png',
+                                 'https://raw.githubusercontent.com/takeYY/Rampo_Edogawa_Visualization/main/static/images/network_3D_categorization.png'])
     return detail_image_description('章ごとのカテゴリ分割',
                                     is_used_category_description(),
                                     image_options)
