@@ -34,271 +34,290 @@
   ##### 作品検索フォーム #####
   #}
   <form action={{ url_for('network.result') }} method=post enctype=multipart/form-data target=_blank>
-    {#
-    ##### 表示形式 #####
-    #}
-    <div class='form-group'>
-      <h5><div class='badge badge-danger'>必須</div> 表示形式</h5>
-      <div class='form-check'>
-        <div class='row'>
-          <div class='col-md-3'>
-            <label class='form-check-label' for='2-dimension'>
-              <div class='card'>
-                <div class='card-header px-4'>
-                  <input class='form-check-input' type='radio' name='dimension' value='2' id='2-dimension'
-                      {% if option %}
-                        {{ 'checked' if option.get('dimension', 2) == 2 else '' }}
-                      {% else %}
-                        {{ 'checked' }}
-                      {% endif %}>
-                      2D
-                </div>
-                <img src='https://raw.githubusercontent.com/takeYY/Rampo_Edogawa_Visualization/main/static/images/network_2D.png' class='img-thumbnail'/>
+    {# 設定の必須と任意でタブ作成 #}
+    <ul class='nav nav-tabs' id='options' role='tablist'>
+      <li class='nav-item'>
+        <a class='nav-link active' id='required-tab' data-toggle='tab' href='#required' role='tab' aria-controls='required' aria-selected='true'>必須設定</a>
+      </li>
+      <li class='nav-item'>
+        <a class='nav-link' id='optional-tab' data-toggle='tab' href='#optional' role='tab' aria-controls='optional' aria-selected='false'>詳細設定</a>
+      </li>
+    </ul>
+    {# タブの中身 #}
+    <div class='tab-content py-2'>
+      {#
+      # 必須設定項目 #
+      #}
+      <div class='tab-pane fade show active' id='required' role='tabpanel' aria-labelledby='required-tab'>
+        {#
+        ##### 表示形式 #####
+        #}
+        <div class='form-group'>
+          <h5><div class='badge badge-danger'>必須</div> 表示形式</h5>
+          <div class='form-check'>
+            <div class='row'>
+              <div class='col-md-3'>
+                <label class='form-check-label' for='2-dimension'>
+                  <div class='card'>
+                    <div class='card-header px-4'>
+                      <input class='form-check-input' type='radio' name='dimension' value='2' id='2-dimension'
+                          {% if option %}
+                            {{ 'checked' if option.get('dimension', 2) == 2 else '' }}
+                          {% else %}
+                            {{ 'checked' }}
+                          {% endif %}>
+                          2D
+                    </div>
+                    <img src='https://raw.githubusercontent.com/takeYY/Rampo_Edogawa_Visualization/main/static/images/network_2D.png' class='img-thumbnail'/>
+                  </div>
+                </label>
               </div>
-            </label>
+              <div class='col-md-3'>
+                <label class='form-check-label' for='3-dimension'>
+                  <div class='card'>
+                    <div class='card-header px-4'>
+                      <input class='form-check-input' type='radio' name='dimension' value='3' id='3-dimension'
+                          {% if option %}
+                            {{ 'checked' if option.get('dimension')==3 else '' }}
+                          {% endif %}>
+                          3D
+                    </div>
+                    {% if input_table.get('章ごとのカテゴリ分割') == 'する' %}
+                      <img src='https://raw.githubusercontent.com/takeYY/Rampo_Edogawa_Visualization/main/static/images/network_3D_categorization.png' class='img-thumbnail'/>
+                    {% else %}
+                      <img src='https://raw.githubusercontent.com/takeYY/Rampo_Edogawa_Visualization/main/static/images/network_3D.png' class='img-thumbnail'/>
+                    {% endif %}
+                  </div>
+                </label>
+              </div>
+            </div>
           </div>
-          <div class='col-md-3'>
-            <label class='form-check-label' for='3-dimension'>
-              <div class='card'>
-                <div class='card-header px-4'>
-                  <input class='form-check-input' type='radio' name='dimension' value='3' id='3-dimension'
-                      {% if option %}
-                        {{ 'checked' if option.get('dimension')==3 else '' }}
-                      {% endif %}>
-                      3D
-                </div>
-                {% if input_table.get('章ごとのカテゴリ分割') == 'する' %}
-                  <img src='https://raw.githubusercontent.com/takeYY/Rampo_Edogawa_Visualization/main/static/images/network_3D_categorization.png' class='img-thumbnail'/>
-                {% else %}
-                  <img src='https://raw.githubusercontent.com/takeYY/Rampo_Edogawa_Visualization/main/static/images/network_3D.png' class='img-thumbnail'/>
+        </div>
+
+        {# 共起数上位と共起頻度の最小値の設定 #}
+        <div class='row'>
+          {#
+          ##### 表示する共起数上位 #####
+          #}
+          <div class='col-md-6'>
+            <div class='form-group w-50 h-100'>
+              <h5><div class='badge badge-danger'>必須</div> 共起数上位</h5>
+              <div class='px-4'>
+                <input type='number' name='number' value="{{ option.get('number') if option else 10 }}"
+                    class="form-control
+                    {% if option %}
+                      {{ 'is-invalid' if option.get('errors', {}).get('number') else '' }}
+                    {% endif %}"
+                    required
+                    placeholder='例）10'>
+                {% if option and option.get('errors', {}).get('number') %}
+                  <div class='invalid-feedback'>
+                    {{ option.get('errors').get('number') }}
+                  </div>
                 {% endif %}
               </div>
-            </label>
+            </div>
+          </div>
+          {#
+          ##### 共起頻度の最小値 #####
+          #}
+          <div class='col-md-6'>
+            <div class='form-group w-50 h-100'>
+              <h5><div class='badge badge-danger'>必須</div> 共起頻度の最小値</h5>
+              <div class='px-4'>
+                <input type='number' name='co_oc_freq_min' value="{{ option.get('co_oc_freq_min') if option else 2 }}"
+                    class="form-control
+                    {% if option %}
+                      {{ 'is-invalid' if option.get('errors', {}).get('co_oc_freq_min') else '' }}
+                    {% endif %}"
+                    required
+                    placeholder='例）2'>
+                {% if option and option.get('errors', {}).get('co_oc_freq_min') %}
+                  <div class='invalid-feedback'>
+                    {{ option.get('errors').get('co_oc_freq_min') }}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <div class='row'>
-      {#
-      ##### 表示する共起数上位 #####
-      #}
-      <div class='col-md-6'>
-        <div class='form-group w-50 h-100'>
-          <h5><div class='badge badge-danger'>必須</div> 共起数上位</h5>
+        {#
+        ##### 共起強度 #####
+        #}
+        <div class='form-group'>
+          <h5><div class='badge badge-danger'>必須</div> 共起強度</h5>
+          <small>※（）内は共起強度の取り得る値の範囲</small>
+          {#
+          ##### 共起強度の説明
+          #}
+          <div class='p-2'>
+            <button class='btn btn-info dropdown-toggle' aria-controls='co_oc_strength_description' aria-expanded='false'
+                data-target='#co_oc_strength_description' data-toggle='collapse' type='button'>詳細説明</button>
+            <div id='co_oc_strength_description' class='collapse'>
+              <div class='bs-callout bs-callout-info mt-0 py-1'>
+                {% for value in description.get('co_oc_strength').values() %}
+                  {{ value|safe }}
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+
+          <div class='row'>
+            <div class='col-md-4'>
+              <div class='form-check'>
+                <input type='radio' name='co_oc_strength' value='jaccard' id='jaccard'
+                    {% if option %}
+                      {{ 'checked' if option.get('co_oc_strength', 'jaccard')=='jaccard' else '' }}
+                    {% else %}
+                      {{ 'checked' }}
+                    {% endif %}>
+                <label class='form-check-label' for='jaccard'>Jaccard係数（0.0〜1.0）</label>
+              </div>
+            </div>
+            <div class='col-md-4'>
+              <div class='form-check'>
+                <input type='radio' name='co_oc_strength' value='dice' id='dice'
+                    {% if option %}
+                      {{ 'checked' if option.get('co_oc_strength')=='dice' else '' }}
+                    {% endif %}>
+                <label class='form-check-label' for='dice'>Dice係数（0.0〜1.0）</label>
+              </div>
+            </div>
+            <div class='col-md-4'>
+              <div class='form-check'>
+                <input type='radio' name='co_oc_strength' value='simpson' id='simpson'
+                    {% if option %}
+                      {{ 'checked' if option.get('co_oc_strength')=='simpson' else '' }}
+                    {% endif %}>
+                <label class='form-check-label' for='simpson'>Simpson係数（0.0〜1.0）</label>
+              </div>
+            </div>
+            <div class='w-100'></div>
+            <div class='col-md-4'>
+              <div class='form-check'>
+                <input type='radio' name='co_oc_strength' value='frequency' id='frequency'
+                    {% if option %}
+                      {{ 'checked' if option.get('co_oc_strength')=='frequency' else '' }}
+                    {% endif %}>
+                <label class='form-check-label' for='frequency'>共起頻度（0〜∞）</label>
+              </div>
+            </div>
+            <div class='col-md-4'>
+              <div class='form-check'>
+                <input type='radio' name='co_oc_strength' value='pmi' id='pmi'
+                    {% if option %}
+                      {{ 'checked' if option.get('co_oc_strength')=='pmi' else '' }}
+                    {% endif %}>
+                <label class='form-check-label' for='pmi'>相互情報量（-∞〜∞）</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {#
+        ##### 表示する共起強度の範囲 #####
+        #}
+        <div class='form-group w-50'>
+          <h5><div class='badge badge-danger'>必須</div> 共起強度の最大値</h5>
           <div class='px-4'>
-            <input type='number' name='number' value="{{ option.get('number') if option else 10 }}"
+            <input type='number' name='strength_max' step='0.01' value="{{ option.get('strength_max') if option else 0.99 }}"
                 class="form-control
                 {% if option %}
-                  {{ 'is-invalid' if option.get('errors', {}).get('number') else '' }}
+                  {{ 'is-invalid' if option.get('errors', {}).get('strength_max') else '' }}
                 {% endif %}"
                 required
-                placeholder='例）10'>
-            {% if option and option.get('errors', {}).get('number') %}
+                placeholder='例）0.99'>
+            {% if option and option.get('errors', {}).get('strength_max') %}
               <div class='invalid-feedback'>
-                {{ option.get('errors').get('number') }}
+                {{ option.get('errors').get('strength_max') }}
               </div>
             {% endif %}
           </div>
         </div>
-      </div>
-      {#
-      ##### 共起頻度の最小値 #####
-      #}
-      <div class='col-md-6'>
-        <div class='form-group w-50 h-100'>
-          <h5><div class='badge badge-danger'>必須</div> 共起頻度の最小値</h5>
-          <div class='px-4'>
-            <input type='number' name='co_oc_freq_min' value="{{ option.get('co_oc_freq_min') if option else 2 }}"
-                class="form-control
-                {% if option %}
-                  {{ 'is-invalid' if option.get('errors', {}).get('co_oc_freq_min') else '' }}
-                {% endif %}"
-                required
-                placeholder='例）2'>
-            {% if option and option.get('errors', {}).get('co_oc_freq_min') %}
-              <div class='invalid-feedback'>
-                {{ option.get('errors').get('co_oc_freq_min') }}
-              </div>
-            {% endif %}
-          </div>
-        </div>
-      </div>
-    </div>
 
-    {#
-    ##### 共起強度 #####
-    #}
-    <div class='form-group'>
-      <h5><div class='badge badge-danger'>必須</div> 共起強度</h5>
-      <small>※（）内は共起強度の取り得る値の範囲</small>
-      {#
-      ##### 共起強度の説明
-      #}
-      <div class='p-2'>
-        <button class='btn btn-info dropdown-toggle' aria-controls='co_oc_strength_description' aria-expanded='false'
-            data-target='#co_oc_strength_description' data-toggle='collapse' type='button'>詳細説明</button>
-        <div id='co_oc_strength_description' class='collapse'>
-          <div class='bs-callout bs-callout-info mt-0 py-1'>
-            {% for value in description.get('co_oc_strength').values() %}
-              {{ value|safe }}
+        {#
+        ##### 可視化対象の品詞 #####
+        #}
+        <div class='form-group'>
+          <h5><div class='badge badge-danger'>必須</div> 可視化対象の品詞</h5>
+          <div class='row'>
+            <small class='col-auto mr-auto'>※（）内は含有数</small>
+            <div class='col-auto'>
+              <input type='button' class='btn btn-sm btn-outline-primary' value='全選択' onClick='checkAllContents("hinshi")'>
+              <input type='button' class='btn btn-sm btn-outline-danger' value='全解除' onClick='clearAllContents("hinshi")'>
+            </div>
+          </div>
+          <div class='row'>
+            {% for key, value in hinshi_dict.items() %}
+              <div class='col-md-4'>
+                <div class='form-check h-100'>
+                  <input type='checkbox' name='hinshi' value={{key}} id={{key}}
+                      class="form-check-input {{ 'is-invalid' if option and option.get('errors', {}).get('hinshi') else '' }}"
+                      {% if option %}
+                        {{ 'checked' if value in option.get('hinshi_jpn', []) else '' }}
+                      {% else %}
+                        {{ 'checked' if loop.index == 1 else '' }}
+                      {% endif %}>
+                  <label for={{key}} class='form-check-label'>{{key}}（{{value}}）</label>
+                </div>
+              </div>
             {% endfor %}
           </div>
-        </div>
-      </div>
-
-      <div class='row'>
-        <div class='col-md-4'>
-          <div class='form-check'>
-            <input type='radio' name='co_oc_strength' value='jaccard' id='jaccard'
-                {% if option %}
-                  {{ 'checked' if option.get('co_oc_strength', 'jaccard')=='jaccard' else '' }}
-                {% else %}
-                  {{ 'checked' }}
-                {% endif %}>
-            <label class='form-check-label' for='jaccard'>Jaccard係数（0.0〜1.0）</label>
-          </div>
-        </div>
-        <div class='col-md-4'>
-          <div class='form-check'>
-            <input type='radio' name='co_oc_strength' value='dice' id='dice'
-                {% if option %}
-                  {{ 'checked' if option.get('co_oc_strength')=='dice' else '' }}
-                {% endif %}>
-            <label class='form-check-label' for='dice'>Dice係数（0.0〜1.0）</label>
-          </div>
-        </div>
-        <div class='col-md-4'>
-          <div class='form-check'>
-            <input type='radio' name='co_oc_strength' value='simpson' id='simpson'
-                {% if option %}
-                  {{ 'checked' if option.get('co_oc_strength')=='simpson' else '' }}
-                {% endif %}>
-            <label class='form-check-label' for='simpson'>Simpson係数（0.0〜1.0）</label>
-          </div>
-        </div>
-        <div class='w-100'></div>
-        <div class='col-md-4'>
-          <div class='form-check'>
-            <input type='radio' name='co_oc_strength' value='frequency' id='frequency'
-                {% if option %}
-                  {{ 'checked' if option.get('co_oc_strength')=='frequency' else '' }}
-                {% endif %}>
-            <label class='form-check-label' for='frequency'>共起頻度（0〜∞）</label>
-          </div>
-        </div>
-        <div class='col-md-4'>
-          <div class='form-check'>
-            <input type='radio' name='co_oc_strength' value='pmi' id='pmi'
-                {% if option %}
-                  {{ 'checked' if option.get('co_oc_strength')=='pmi' else '' }}
-                {% endif %}>
-            <label class='form-check-label' for='pmi'>相互情報量（-∞〜∞）</label>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    {#
-    ##### 表示する共起強度の範囲 #####
-    #}
-    <div class='form-group w-50'>
-      <h5><div class='badge badge-danger'>必須</div> 共起強度の最大値</h5>
-      <div class='px-4'>
-        <input type='number' name='strength_max' step='0.01' value="{{ option.get('strength_max') if option else 0.99 }}"
-            class="form-control
-            {% if option %}
-              {{ 'is-invalid' if option.get('errors', {}).get('strength_max') else '' }}
-            {% endif %}"
-            required
-            placeholder='例）0.99'>
-        {% if option and option.get('errors', {}).get('strength_max') %}
-          <div class='invalid-feedback'>
-            {{ option.get('errors').get('strength_max') }}
-          </div>
-        {% endif %}
-      </div>
-    </div>
-
-    {#
-    ##### 可視化対象の品詞 #####
-    #}
-    <div class='form-group'>
-      <h5><div class='badge badge-danger'>必須</div> 可視化対象の品詞</h5>
-      <div class='row'>
-        <small class='col-auto mr-auto'>※（）内は含有数</small>
-        <div class='col-auto'>
-          <input type='button' class='btn btn-sm btn-outline-primary' value='全選択' onClick='checkAllContents("hinshi")'>
-          <input type='button' class='btn btn-sm btn-outline-danger' value='全解除' onClick='clearAllContents("hinshi")'>
-        </div>
-      </div>
-      <div class='row'>
-        {% for key, value in hinshi_dict.items() %}
-          <div class='col-md-4'>
-            <div class='form-check h-100'>
-              <input type='checkbox' name='hinshi' value={{key}} id={{key}}
-                  class="form-check-input {{ 'is-invalid' if option and option.get('errors', {}).get('hinshi') else '' }}"
-                  {% if option %}
-                    {{ 'checked' if value in option.get('hinshi_jpn', []) else '' }}
-                  {% else %}
-                    {{ 'checked' if loop.index == 1 else '' }}
-                  {% endif %}>
-              <label for={{key}} class='form-check-label'>{{key}}（{{value}}）</label>
+          {% if option and option.get('errors', {}).get('hinshi') %}
+            <div class='small text-danger'>
+              {{ option.get('errors').get('hinshi') }}
             </div>
-          </div>
-        {% endfor %}
-      </div>
-      {% if option and option.get('errors', {}).get('hinshi') %}
-        <div class='small text-danger'>
-          {{ option.get('errors').get('hinshi') }}
+          {% endif %}
         </div>
-      {% endif %}
-    </div>
 
-    {#
-    ##### カテゴリー選択 #####
-    #}
-    {% if category_list and category_list[0] != '< 章なし >' %}
-      <div class='form-group'>
-        <h5><div class='badge badge-danger'>必須</div> カテゴリー選択（3Dのみ）</h5>
-        <div class='row'>
-          <small class='col-auto mr-auto'>※（）内はカテゴリの順番</small>
-          <div class='col-auto'>
-            <input type='button' class='btn btn-sm btn-outline-primary' value='全選択' onClick='checkAllContents("category")'>
-            <input type='button' class='btn btn-sm btn-outline-danger' value='全解除' onClick='clearAllContents("category")'>
-          </div>
-        </div>
-        <div class='row'>
-          {% for category in category_list %}
-            <div class='col-md-4'>
-              <div class='form-check h-100'>
-                <input type='checkbox' name='category' value={{category}} id={{loop.index}}
-                    class="form-check-input {{ 'is-invalid' if option and option.get('errors', {}).get('category') else '' }}"
-                    {% if option %}
-                      {{'checked' if category in option.get('selected_category') else '' }}
-                    {% else %}
-                      {{ 'checked' if loop.index == 1 }}
-                    {% endif %}>
-                <label for={{loop.index}} class='form-check-label'>{{category}}（{{loop.index}}）</label>
+        {#
+        ##### カテゴリー選択 #####
+        #}
+        {% if category_list and category_list[0] != '< 章なし >' %}
+          <div class='form-group'>
+            <h5><div class='badge badge-danger'>必須</div> カテゴリー選択（3Dのみ）</h5>
+            <div class='row'>
+              <small class='col-auto mr-auto'>※（）内はカテゴリの順番</small>
+              <div class='col-auto'>
+                <input type='button' class='btn btn-sm btn-outline-primary' value='全選択' onClick='checkAllContents("category")'>
+                <input type='button' class='btn btn-sm btn-outline-danger' value='全解除' onClick='clearAllContents("category")'>
               </div>
             </div>
-          {% endfor %}
-        </div>
-        {% if option and option.get('errors', {}).get('category') %}
-          <div class='small text-danger'>
-            {{ option.get('errors').get('category') }}
+            <div class='row'>
+              {% for category in category_list %}
+                <div class='col-md-4'>
+                  <div class='form-check h-100'>
+                    <input type='checkbox' name='category' value={{category}} id={{loop.index}}
+                        class="form-check-input {{ 'is-invalid' if option and option.get('errors', {}).get('category') else '' }}"
+                        {% if option %}
+                          {{'checked' if category in option.get('selected_category') else '' }}
+                        {% else %}
+                          {{ 'checked' if loop.index == 1 }}
+                        {% endif %}>
+                    <label for={{loop.index}} class='form-check-label'>{{category}}（{{loop.index}}）</label>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+            {% if option and option.get('errors', {}).get('category') %}
+              <div class='small text-danger'>
+                {{ option.get('errors').get('category') }}
+              </div>
+            {% endif %}
           </div>
         {% endif %}
+        {# 必須設定項目ここまで #}
       </div>
-    {% endif %}
 
-    {#
-    ##### 詳細設定 #####
-    #}
-    <div class='form-group'>
-      <button class='btn btn-info dropdown-toggle' aria-controls='detail-options' aria-expanded='false'
-          data-target='#detail-options' data-toggle='collapse' type='button'>詳細設定</button>
-      <div id='detail-options' class='collapse border border-info rounded px-4 py-2'>
+
+
+
+
+      {#
+      # 詳細設定項目 #
+      #}
+      <div class='tab-pane fade' id='optional' role='tabpanel' aria-labelledby='optional-tab'>
         {#
         ##### 指定ワード #####
         #}
@@ -450,9 +469,9 @@
             </div>
           </div>
         </div>
+        {# 詳細設定ここまで #}
       </div>
     </div>
-
     {#
     ##### 可視化ボタン #####
     #}
