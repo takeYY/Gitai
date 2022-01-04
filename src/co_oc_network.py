@@ -117,6 +117,29 @@ def modify_df_with_synonym(df, synonym):
 
 
 def create_keywords(df, remove_words_list, target_words, target_hinshi):
+    """
+    共起に使用する(単語, 品詞)を文ごとにリスト化する
+
+    Parameters
+    ----------
+    df: pd.DataFrame
+        共起ネットワークを構築する対象のデータ
+    remove_words_list: list of str
+        ストップワードのリスト
+    target_words: list of str
+        指定ワードのリスト
+    target_hinshi: list of str
+        可視化対象の品詞のリスト
+
+    Returns
+    -------
+    keywords: list of tuple
+        ex) [
+                [('少年', '名詞'), ('探偵', '名詞')],
+                [('先生', '名詞'), ('明智', '名詞')],
+                [('受話器', '名詞'), ('小林', '名詞'), ('横', '名詞'), ('先生', '名詞'), ('明智', '名詞')]
+            ]
+    """
     # 形態素解析DFから各列の要素をリストで取得
     midashi = list(df['表層形'])
     genkei = list(df['原形'])
@@ -143,10 +166,42 @@ def create_keywords(df, remove_words_list, target_words, target_hinshi):
         # and not (除去対象の品詞組み合わせである)
         if can_add_genkei2words(sentence, target_hinshi, remove_words_list, target_words):
             words.add((sentence[1], sentence[2]))
+
     return keywords
 
 
 def create_sentence_combinations(keywords, remove_combi):
+    """
+    単語の組み合わせを作成
+
+    Parameters
+    ----------
+    keywords: list of tuple
+        共起に使用する(単語, 品詞)を文ごとにリスト化したもの
+    remove_combi: dict
+        削除する品詞の組み合わせ辞書
+
+    Returns
+    -------
+    sentence_combinations: list of tuple
+        共起の組み合わせ
+        ex) [
+                [(('少年', '名詞'), ('探偵', '名詞'))],
+                [(('先生', '名詞'), ('明智', '名詞'))],
+                [
+                    (('横', '名詞'), ('先生', '名詞')),
+                    (('横', '名詞'), ('小林', '名詞')),
+                    (('受話器', '名詞'), ('よこ', '名詞')),
+                    (('横', '名詞'), ('明智', '名詞')),
+                    (('先生', '名詞'), ('小林', '名詞')),
+                    (('受話器', '名詞'), ('先生', '名詞')),
+                    (('先生', '名詞'), ('明智', '名詞')),
+                    (('受話器', '名詞'), ('小林', '名詞')),
+                    (('小林', '名詞'), ('明智', '名詞')),
+                    (('受話器', '名詞'), ('明智', '名詞'))
+                ]
+            ]
+    """
     # keywordsを基に単語ごとの組み合わせを計算
     sentence_combinations = [list(itertools.combinations(
         set(sentence), 2)) for sentence in keywords]
