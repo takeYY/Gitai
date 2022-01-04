@@ -38,11 +38,14 @@ def get_csv_error_message(request):
 
 
 # 選択された品詞である or 除去ワードリストにない単語であるか判定
-def can_add_genkei2words(sentence, target_hinshi, remove_words_list):
+def can_add_genkei2words(sentence, target_hinshi, remove_words_list, target_words: list):
     midashi = sentence[0]
     genkei = sentence[1]
     hinshi = sentence[2]
 
+    # 指定ワードであればどんな条件に関係なく追加
+    if midashi in target_words or genkei in target_words:
+        return True
     # 品詞が可視化対象の品詞に含まれていない場合
     if not hinshi in target_hinshi:
         return False
@@ -113,7 +116,7 @@ def modify_df_with_synonym(df, synonym):
     return df
 
 
-def create_keywords(df, remove_words_list, target_hinshi):
+def create_keywords(df, remove_words_list, target_words, target_hinshi):
     # 形態素解析DFから各列の要素をリストで取得
     midashi = list(df['表層形'])
     genkei = list(df['原形'])
@@ -135,9 +138,10 @@ def create_keywords(df, remove_words_list, target_hinshi):
             words = set()
             continue
 
-        # 品詞がtarget_hinshiに含まれている and not (見出しが除去ワードリストに入っている or 原型が除去ワードリストに入っている)
+        # 見出しか原型が指定ワードに含まれている or 品詞がtarget_hinshiに含まれている
+        # and not (見出しが除去ワードリストに入っている or 原型が除去ワードリストに入っている)
         # and not (除去対象の品詞組み合わせである)
-        if can_add_genkei2words(sentence, target_hinshi, remove_words_list):
+        if can_add_genkei2words(sentence, target_hinshi, remove_words_list, target_words.split('\r\n')):
             words.add((sentence[1], sentence[2]))
     return keywords
 
@@ -387,6 +391,7 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
         for cat in df['カテゴリー'].unique():
             keywords_dict[cat] = create_keywords(df.query(' カテゴリー==@cat '),
                                                  remove_words_list,
+                                                 target_words,
                                                  target_hinshi)
             sentence_combinations_dict[cat] = create_sentence_combinations(keywords_dict[cat],
                                                                            remove_combi)
@@ -400,6 +405,7 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
         key_name = 'all'
         keywords_dict[key_name] = create_keywords(df,
                                                   remove_words_list,
+                                                  target_words,
                                                   target_hinshi)
         sentence_combinations_dict[key_name] = create_sentence_combinations(keywords_dict[key_name],
                                                                             remove_combi)
