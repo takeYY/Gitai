@@ -338,7 +338,7 @@
           </div>
           <div class='px-4'>
             <textarea class='form-control' rows=2
-                name='target-words'>{{ option.get('target_words') if option else ''}}</textarea>
+                name='target-words'>{{ option.get('target_words', [])|join('\r\n') if option else ''}}</textarea>
           </div>
         </div>
 
