@@ -225,7 +225,13 @@
     #}
     <div class='form-group'>
       <h5><div class='badge badge-danger'>必須</div> 可視化対象の品詞</h5>
-      <small>※（）内は含有数</small>
+      <div class='row'>
+        <small class='col-auto mr-auto'>※（）内は含有数</small>
+        <div class='col-auto'>
+          <input type='button' class='btn btn-sm btn-outline-primary' value='全選択' onClick='checkAllContents("hinshi")'>
+          <input type='button' class='btn btn-sm btn-outline-danger' value='全解除' onClick='clearAllContents("hinshi")'>
+        </div>
+      </div>
       <div class='row'>
         {% for key, value in hinshi_dict.items() %}
           <div class='col-md-4'>
@@ -255,7 +261,13 @@
     {% if category_list and category_list[0] != '< 章なし >' %}
       <div class='form-group'>
         <h5><div class='badge badge-danger'>必須</div> カテゴリー選択（3Dのみ）</h5>
-        <small>※（）内はカテゴリの順番</small>
+        <div class='row'>
+          <small class='col-auto mr-auto'>※（）内はカテゴリの順番</small>
+          <div class='col-auto'>
+            <input type='button' class='btn btn-sm btn-outline-primary' value='全選択' onClick='checkAllContents("category")'>
+            <input type='button' class='btn btn-sm btn-outline-danger' value='全解除' onClick='clearAllContents("category")'>
+          </div>
+        </div>
         <div class='row'>
           {% for category in category_list %}
             <div class='col-md-4'>
