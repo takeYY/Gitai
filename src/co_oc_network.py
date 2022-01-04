@@ -44,7 +44,7 @@ def can_add_genkei2words(sentence, target_hinshi, remove_words_list, target_word
     hinshi = sentence[2]
 
     # 指定ワードであればどんな条件に関係なく追加
-    if midashi in target_words or genkei in target_words:
+    if target_words and midashi in target_words or genkei in target_words:
         return True
     # 品詞が可視化対象の品詞に含まれていない場合
     if not hinshi in target_hinshi:
@@ -141,7 +141,7 @@ def create_keywords(df, remove_words_list, target_words, target_hinshi):
         # 見出しか原型が指定ワードに含まれている or 品詞がtarget_hinshiに含まれている
         # and not (見出しが除去ワードリストに入っている or 原型が除去ワードリストに入っている)
         # and not (除去対象の品詞組み合わせである)
-        if can_add_genkei2words(sentence, target_hinshi, remove_words_list, target_words.split('\r\n')):
+        if can_add_genkei2words(sentence, target_hinshi, remove_words_list, target_words):
             words.add((sentence[1], sentence[2]))
     return keywords
 
@@ -303,7 +303,7 @@ def kyoki_word_network(target_num=250, file_name='3742_9_3_11_02', target_coef='
 
 
 def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], target_num=250, remove_words='', remove_combi='',
-                   target_words='', data_type='edogawa', is_used_3d=False, used_category=0, synonym='', selected_category=[],
+                   target_words=[], data_type='edogawa', is_used_3d=False, used_category=0, synonym='', selected_category=[],
                    target_coef='共起頻度', strength_max=10000, mrph_type='juman', co_oc_freq_min=2):
     """
     共起ネットワークの作成
@@ -320,7 +320,7 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
         共起に含めたくない除去ワード集
     remove_combi: dict, default=''
         除去対象の品詞組み合わせ
-    target_words: str, default=''
+    target_words: list, default=[]
         指定した単語の共起のみ表示する
     data_type: str, default='edogawa'
         入力データの種類（江戸川乱歩作品: 'edoagwa', csv: 'csv'）
@@ -429,7 +429,7 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
     # 指定ワードが含まれるレコードのみ抽出
     if target_words:
         new_co_oc_df = pd.DataFrame()
-        for tw in target_words.split('\r\n'):
+        for tw in target_words:
             new_co_oc_df = pd.concat([new_co_oc_df,
                                       co_oc_df.query(' @tw in 単語a or @tw in 単語b ')])
         co_oc_df = new_co_oc_df.sort_values(

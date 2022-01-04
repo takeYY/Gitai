@@ -25,8 +25,8 @@ class OptionCoOcNetwork:
         ストップワード（表示しない単語）
     remove_combi: dict
         表示しない品詞の組み合わせ、1番目の品詞名: str -> 2番目の品詞名: dict
-    target_words: str
-        強制的に表示する単語
+    target_words: list of str
+        強制的に表示する単語群
     synonym: str
         同義語（表記ゆれを1つの単語に集約）
     target_coef: str
@@ -48,7 +48,9 @@ class OptionCoOcNetwork:
         self.selected_category: list = form.getlist('category')
         self.remove_words: str = form.get('remove-words')
         self.set_remove_combi(form)
-        self.target_words: str = form.get('target-words')
+        self.target_words: list = form.get('target-words').split('\r\n')\
+            if form.get('target-words')\
+            else []
         self.synonym: str = form.get('synonym')
         self.set_target_coef()
         self.is_3d: bool = self.set_is_3d()
@@ -81,7 +83,7 @@ class OptionCoOcNetwork:
                 '共起強度の最大値': self.strength_max,
                 '可視化対象の品詞': ', '.join(self.hinshi_jpn),
                 'カテゴリー選択（3Dのみ）': ', '.join(self.selected_category) if self.selected_category else '',
-                '指定ワード': ', '.join(self.target_words.split('\r\n')),
+                '指定ワード': ', '.join(self.target_words),
                 '同義語指定': self.synonym,
                 '除去ワード': ', '.join(self.remove_words),
                 '除去対象の品詞組み合わせ（名詞）': ', '.join(self.remove_combi.get('meishi')),
