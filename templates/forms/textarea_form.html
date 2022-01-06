@@ -1,0 +1,41 @@
+{#
+  option_type: str
+    入力要件, value: ['必須', '任意']
+  form_label: str
+    ラベル名
+  form_help: str
+    説明文
+  form_name: str
+    name属性
+  form_sample: str
+    入力例文
+  form_y: int
+    テキストエリアの行数
+  option: dict
+    エラー時の入力項目やエラー文などを格納したデータ
+#}
+<div class='form-group'>
+  <h5><div class="badge badge-{{ 'danger' if option_type=='必須' else 'secondary' }}">{{ option_type }}</div> {{ form_label }}</h5>
+  <div class='px-4'>
+    {% if form_help %}
+      <div class='small'>
+        {{ form_help|safe }}
+      </div>
+    {% endif %}
+    {% if form_sample %}
+      <button class='btn btn-sm btn-outline-info dropdown-toggle' aria-controls='{{form_name}}-sample' aria-expanded='false'
+          data-target='#{{form_name}}-sample' data-toggle='collapse' type='button'>入力例</button>
+      <div id='{{form_name}}-sample' class='collapse'>
+        <div class='bs-callout bs-callout-info mt-0 py-1'>
+          <p class='small'>
+            {{ form_sample|safe }}
+          </p>
+        </div>
+      </div>
+    {% endif %}
+    <textarea class='form-control' rows={{ form_y if form_y else 2 }}
+        name={{form_name}}>{{ option.get(form_name, [])|join('\r\n')
+        if option and (form_name=='target_words' or form_name=='remove_words')
+        else option.get(form_name) if option else '' }}</textarea>
+  </div>
+</div>
