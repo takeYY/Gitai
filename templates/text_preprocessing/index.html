@@ -12,94 +12,40 @@
     {#
     ##### 前処理対象のテキスト #####
     #}
-    <div class='form-group'>
-      <h5><div class='badge badge-danger'>必須</div> 前処理対象テキスト</h5>
-      <div class='px-2'>
-        <textarea class='form-control' rows=5
-          name='texts'>{{ sent_data.get('texts') if sent_data else ''}}</textarea>
-      </div>
-    </div>
+    {% with option_type='必須', form_label='前処理対象テキスト', form_name='texts',
+            form_y=5, option=input_data %}
+      {% include 'forms/textarea_form.html' %}
+    {% endwith %}
 
     {#
     ##### 削除対象の文字列 #####
     #}
-    <div class='form-group'>
-      <h5><div class='badge badge-secondary'>任意</div> 削除設定</h5>
-      {# 入力例 #}
-      <div class='p-2'>
-        <p>削除したい文字列を改行区切りで入力してください。</p>
-        <button class='btn btn-info dropdown-toggle' aria-controls='remove-word-sample' aria-expanded='false'
-          data-target='#remove-word-sample' data-toggle='collapse' type='button'>入力例</button>
-        <div id='remove-word-sample' class='collapse'>
-          <div class='bs-callout bs-callout-info mt-0 py-1'>
-            <p>
-            「<br>
-            怪人<br>
-            」
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class='px-2'>
-        <textarea class='form-control' rows=3
-          name='remove-texts'>{{ sent_data.get('remove_texts') if sent_data else ''}}</textarea>
-        </div>
-    </div>
-
-    {#
-    ##### 指定の文字列とそれに囲まれた文字の削除 #####
-    #}
-    <div class='form-group'>
-      <h5><div class='badge badge-secondary'>任意</div> 指定文字列とその中身の削除設定</h5>
-      {# 入力例 #}
-      <div class='p-2'>
-        <p>「指定文字列（,）指定文字列」という形式でそれぞれ改行区切りで入力してください。</p>
-        <button class='btn btn-info dropdown-toggle' aria-controls='remove-word-in-text-sample' aria-expanded='false'
-          data-target='#remove-word-in-text-sample' data-toggle='collapse' type='button'>入力例</button>
-        <div id='remove-word-in-text-sample' class='collapse'>
-          <div class='bs-callout bs-callout-info mt-0 py-1'>
-            <p>
-            《,》<br>
-            「,」<br>
-            （,）
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class='px-2'>
-        <textarea class='form-control' rows=3
-          name='remove-text-in-texts'>{{ sent_data.get('remove_text_in_texts') if sent_data else ''}}</textarea>
-      </div>
-    </div>
+    {% with option_type='任意', form_label='削除設定', form_name='remove_texts',
+            form_help='削除したい文字列を改行区切りで入力してください。',
+            form_sample='「<br>怪人<br>」',
+            form_y=3, option=option %}
+      {% include 'forms/textarea_form.html' %}
+    {% endwith %}
 
     {#
     ##### 置換対象の文字列 #####
     #}
-    <div class='form-group'>
-      <h5><div class='badge badge-secondary'>任意</div> 置換設定</h5>
-      {# 入力例 #}
-      <div class='p-2'>
-        <p>「置換対象（半角スペース）置換後」という形式でそれぞれ改行区切りで入力してください。</p>
-        <button class='btn btn-info dropdown-toggle' aria-controls='replace-word-sample' aria-expanded='false'
-          data-target='#replace-word-sample' data-toggle='collapse' type='button'>入力例</button>
-        <div id='replace-word-sample' class='collapse'>
-          <div class='bs-callout bs-callout-info mt-0 py-1'>
-            <p>
-            ! 。<br>
-            ? 。<br>
-            かいじん 怪人
-            </p>
-          </div>
-        </div>
-      </div>
+    {% with option_type='任意', form_label='置換設定', form_name='replace_texts',
+            form_help='「置換対象（半角スペース）置換後」という形式でそれぞれ改行区切りで入力してください。',
+            form_sample='! 。<br>? 。<br>かいじん 怪人',
+            form_y=3, option=option %}
+      {% include 'forms/textarea_form.html' %}
+    {% endwith %}
 
-      <div class='px-2'>
-        <textarea class='form-control' rows=3
-          name='replace-texts'>{{ sent_data.get('replace_texts') if sent_data else ''}}</textarea>
-      </div>
-    </div>
+    {#
+    ##### 指定の文字列とそれに囲まれた文字の削除 #####
+    #}
+    {% with option_type='任意', form_label='指定文字列とその中身の削除設定', form_name='remove_text_in_texts',
+            form_help='「指定文字列（,）指定文字列」という形式でそれぞれ改行区切りで入力してください。<br>入力形式は入力例をご覧ください。',
+            form_sample='《,》<br>「,」<br>（,）',
+            form_y=3, option=option %}
+      {% include 'forms/textarea_form.html' %}
+    {% endwith %}
 
     {#
     ##### その他設定 #####
@@ -107,8 +53,8 @@
     <div class='form-group'>
       <h5><div class='badge badge-secondary'>任意</div> その他設定</h5>
       {# 設定説明 #}
-      <div class='p-2'>
-        <button class='btn btn-info dropdown-toggle' aria-controls='option_description' aria-expanded='false'
+      <div class='px-4'>
+        <button class='btn btn-sm btn-outline-info dropdown-toggle' aria-controls='option_description' aria-expanded='false'
           data-target='#option_description' data-toggle='collapse' type='button'>詳細</button>
         <div id='option_description' class='collapse'>
           <div class='bs-callout bs-callout-info mt-0 py-1'>
@@ -117,19 +63,15 @@
             {% endfor %}
           </div>
         </div>
-      </div>
-
-      <div class='px-2'>
         {% for key, value in other_option.items() %}
         <div class='form-check'>
-          <input type='checkbox' name='other-option' value={{key}} id={{key}} class='form-check-input' {{'checked' if 
-          (sent_data and value in sent_data.get('other_option') or not sent_data and key not in ['replace_numbers2zero', 'big2small']) else '' }}>
+          <input type='checkbox' name='other_option' value={{key}} id={{key}} class='form-check-input' {{'checked' if 
+          (option and value in option.get('other_option') or not option and key not in ['replace_numbers2zero', 'big2small']) else '' }}>
           <label for={{key}} class='form-check-label'>{{value}}</label>
         </div>
         {% endfor %}
       </div>
     </div>
-
     {#
     ##### 前処理ボタン #####
     #}
@@ -141,10 +83,13 @@
   {#
   ##### 前処理結果 #####
   #}
-  {% if sent_data and sent_data.get('preprocessed_texts')%}
+  {% if result and result.get('preprocessed_texts')%}
   <hr>
   <div class='form-group'>
-    <textarea class='form-control' rows={{ sent_data.get('preprocessed_texts')|length }}>{{ '\r\n'.join(sent_data.get('preprocessed_texts'))}}</textarea>
+    <textarea class='form-control'
+        rows={{ result.get('preprocessed_texts')|length//60
+                if 5 < result.get('preprocessed_texts')|length//60
+                else 5 }}>{{ result.get('preprocessed_texts') }}</textarea>
   </div>
   {% endif %}
 </div>

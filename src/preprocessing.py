@@ -6,11 +6,34 @@ def get_other_option_dict():
     return dict(all2half='全角を半角へ変換', big2small='英語大文字を小文字へ変換', remove_symbols='記号を削除', replace_numbers2zero='数字を全て0に変換')
 
 
-def texts_preprocessing(texts, remove_words, remove_word_in_texts, replace_words, other_options):
+def texts_preprocessing(texts: str, remove_words, remove_word_in_texts, replace_words, other_options):
+    """
+    テキストの前処理
+
+    Parameters
+    ----------
+    texts: str
+        入力テキスト
+    remove_words: str
+        削除設定の文字列
+    remove_word_in_texts: str
+        指定文字列とその中身の削除設定の文字列
+    replace_words: str
+        置換設定の文字列
+    other_options: list of str
+        その他設定
+
+    Returns
+    -------
+    result: str
+        前処理された文字列
+    errors: dict
+        前処理でエラーとなった情報
+    """
     # テキストを前処理
     preprocessed_text = []
     # エラーの有無
-    errors = []
+    errors = {}
     for text in texts.split('\r\n'):
         if errors:
             break
@@ -24,7 +47,7 @@ def texts_preprocessing(texts, remove_words, remove_word_in_texts, replace_words
                     alpha, omega = rwit.split(',')
                     text = re.sub(f'\{alpha}.*?\{omega}', '', text)
                 except:
-                    errors.append('「指定文字列とその中身の削除設定」の入力形式が違います。')
+                    errors['remove_text_in_texts'] = '「指定文字列とその中身の削除設定」の入力形式が違います。'
                     break
         if replace_words:
             for rw in replace_words.split('\r\n'):
@@ -32,7 +55,7 @@ def texts_preprocessing(texts, remove_words, remove_word_in_texts, replace_words
                     target, replace = rw.split(' ')
                     text = text.replace(target, replace)
                 except:
-                    errors.append('「置換設定」の入力形式が違います。')
+                    errors['replace_texts'] = '「置換設定」の入力形式が違います。'
                     break
         # エラーがある場合、処理終了
         if errors:
@@ -54,4 +77,6 @@ def texts_preprocessing(texts, remove_words, remove_word_in_texts, replace_words
             text = re.sub('[0-9]+', '0', text)
         preprocessed_text.append(text)
 
-    return preprocessed_text, errors
+    result = '\r\n'.join(preprocessed_text)
+
+    return result, errors
