@@ -1,0 +1,70 @@
+{#
+  option_type: str
+    入力要件, value: ['必須', '任意']
+  form_label: str
+    ラベル名
+  form_remarks: str
+    備考
+  form_help: str
+    説明文
+  form_name: str
+    name属性
+  option: dict
+    エラー時の入力項目やエラー文などを格納したデータ
+  form_hinshi: dict
+    品詞関係のデータ
+  form_list: list
+    チェックボックスで表示したいデータのリスト
+#}
+<div class='form-group'>
+  <h5><div class="badge badge-{{ 'danger' if option_type=='必須' else 'secondary' }}">{{ option_type }}</div> {{ form_label }}</h5>
+  <div class='row px-4'>
+    {% if form_remarks %}
+      <small class='col-auto mr-auto'>{{ form_remarks }}</small>
+    {% endif %}
+    <div class='col-auto'>
+      <input type='button' class='btn btn-sm btn-outline-primary' value='全選択' onClick="checkAllContents('{{ form_name }}')">
+      <input type='button' class='btn btn-sm btn-outline-danger' value='全解除' onClick="clearAllContents('{{ form_name }}')">
+    </div>
+  </div>
+  <div class='row px-4'>
+    {% if form_hinshi %}
+      {# 品詞関係のチェックボックス #}
+      {% for key, value in form_hinshi.items() %}
+        <div class='col-md-4'>
+          <div class='form-check h-100'>
+            <input type='checkbox' name={{form_name}} value={{key}} id={{key}}
+                class="form-check-input {{ 'is-invalid' if option and option.get('errors', {}).get(form_name) else '' }}"
+                {% if option %}
+                  {{ 'checked' if value in option.get(form_name, []) else '' }}
+                {% else %}
+                  {{ 'checked' if loop.index == 1 else '' }}
+                {% endif %}>
+            <label for={{key}} class='form-check-label'>{{key}}（{{value}}）</label>
+          </div>
+        </div>
+      {% endfor %}
+    {% elif form_list %}
+      {# 上記以外のチェックボックス #}
+      {% for content in form_list %}
+        <div class='col-md-4'>
+          <div class='form-check h-100'>
+            <input type='checkbox' name='{{ form_name }}' value={{content}} id={{form_name}}-{{loop.index}}
+                class="form-check-input {{ 'is-invalid' if option and option.get('errors', {}).get(form_name) else '' }}"
+                {% if option %}
+                  {{'checked' if content in option.get(form_name) else '' }}
+                {% else %}
+                  {{ 'checked' if loop.index == 1 }}
+                {% endif %}>
+            <label for={{form_name}}-{{loop.index}} class='form-check-label'>{{content}}（{{loop.index}}）</label>
+          </div>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+  {% if option and option.get('errors', {}).get(form_name) %}
+    <div class='small text-danger'>
+      {{ option.get('errors').get(form_name) }}
+    </div>
+  {% endif %}
+</div>
