@@ -9,7 +9,8 @@ def get_hinshi_dict():
 
 
 def get_co_oc_strength_dict():
-    return dict(frequency='共起頻度', jaccard='Jaccard係数', dice='Dice係数', simpson='Simpson係数', pmi='相互情報量')
+    return dict(jaccard='Jaccard係数（0.0〜1.0）', dice='Dice係数（0.0〜1.0）', simpson='Simpson係数（0.0〜1.0）',
+                frequency='共起頻度（0〜∞）', pmi='相互情報量（-∞〜∞）')
 
 
 def get_edogawa_df():

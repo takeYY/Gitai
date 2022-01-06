@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
-from src.get_data import get_basic_data, get_novels_tuple, get_hinshi_dict
+from src.get_data import get_basic_data, get_co_oc_strength_dict, get_novels_tuple, get_hinshi_dict
 from src.co_oc_network import create_network
 from src.co_oc_3d_network import create_3d_network
 from src.description import categorization_description, csv_file_description, morphological_analysis_description, co_oc_strength_description
@@ -19,7 +19,8 @@ def render_data_selection(basic_data: dict, edogawa_data: dict, description: dic
                            input_data=input_data)
 
 
-def render_options(basic_data: dict, edogawa_data: dict, description: dict, input_data: InputCoOcNetwork, option: dict = None):
+def render_options(basic_data: dict, edogawa_data: dict, description: dict, input_data: InputCoOcNetwork,
+                   option: dict = None, co_oc_strength_dict: dict = get_co_oc_strength_dict()):
     return render_template('co_oc_network/options.html',
                            basic_data=basic_data,
                            edogawa_data=edogawa_data,
@@ -27,7 +28,8 @@ def render_options(basic_data: dict, edogawa_data: dict, description: dict, inpu
                            category_list=input_data.category_list,
                            input_table=input_data.get_table_dict(),
                            hinshi_dict=input_data.hinshi,
-                           option=option)
+                           option=option,
+                           co_oc_strength_dict=co_oc_strength_dict)
 
 
 def render_result(basic_data: dict, result_data: dict, dl_data: dict, input_data: dict, option: dict):
@@ -137,19 +139,19 @@ def result():
     # 利用者から送られてきた情報の取得
     option = OptionCoOcNetwork(request)
     # 品詞が1つも選択されなかった場合
-    if not option.hinshi_jpn:
+    if not option.hinshi:
         flash('「可視化対象の品詞」が1つも選択されていません。', 'error')
         option.set_errors('hinshi', '品詞が選択されていません。')
     # 共起数が0以下だった場合
     if option.number < 1:
-        flash('「共起数上位」は1以上で設定してください。', 'error')
+        flash('「共起関係上位」は1以上で設定してください。', 'error')
         option.set_errors('number', '1以上で設定してください。')
     # 共起頻度の最小値が0以下だった場合
     if option.co_oc_freq_min < 1:
         flash('「共起頻度の最小値」は1以上で設定してください。', 'error')
         option.set_errors('co_oc_freq_min', '1以上で設定してください。')
     # edogawa選択、カテゴリごとの表示選択、章がある作品において、チェックが一つもなかった場合
-    if input_data.data_type == 'edogawa' and input_data.is_used_category and int(session.get('has_category')) and not option.selected_category:
+    if input_data.data_type == 'edogawa' and input_data.is_used_category and int(session.get('has_category')) and not option.category:
         flash('「カテゴリー選択（3Dのみ）」が1つも選択されていません。', 'error')
         option.set_errors('category', 'カテゴリーが選択されていません。')
     # errorがあれば
@@ -158,17 +160,17 @@ def result():
                               option=option.__dict__)
     # 共起ネットワーク作成
     try:
-        csv_file_name, co_oc_df = create_network(file_name=input_data.csv_name, target_hinshi=option.hinshi_jpn, target_num=option.number,
+        csv_file_name, co_oc_df = create_network(file_name=input_data.csv_name, target_hinshi=option.hinshi, target_num=option.number,
                                                  remove_words=option.remove_words, remove_combi=option.remove_combi,
                                                  target_words=option.target_words, data_type=input_data.data_type,
                                                  is_used_3d=option.is_3d, used_category=input_data.is_used_category, synonym=option.synonym,
-                                                 selected_category=option.selected_category,
+                                                 selected_category=option.category,
                                                  target_coef=option.target_coef,
                                                  strength_max=option.strength_max, mrph_type=input_data.mrph_type,
                                                  co_oc_freq_min=option.co_oc_freq_min)
         if option.is_3d:
             html_file_name = create_3d_network(co_oc_df, target_num=option.number,
-                                               used_category=input_data.is_used_category, category_list=option.selected_category,
+                                               used_category=input_data.is_used_category, category_list=option.category,
                                                target_coef=option.target_coef)
         else:
             html_file_name = csv_file_name
@@ -183,7 +185,7 @@ def result():
     # csvダウンロード設定
     dl_data = dict(file_name=csv_file_name,
                    dl_type='result',
-                   new_name=f'{input_data.name}_{"-".join(option.hinshi_jpn)}_{option.number}')
+                   new_name=f'{input_data.name}_{"-".join(option.hinshi)}_{option.number}')
     # 結果情報を格納
     result_data = dict(file_name=csv_file_name,
                        html_file_name=html_file_name,
