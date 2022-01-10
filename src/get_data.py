@@ -116,18 +116,7 @@ def create_random_string(n):
     return ''.join(rand_str_list)
 
 
-def dict_in_list2csv(dict_in_list, divide_dict):
-    # 分類される要素をキーとし、空のリストを初期値に設定
-    df_cols = {}
-    for div_key in divide_dict.keys():
-        df_cols[div_key] = []
-    # 辞書の各valueに分類結果追加
-    for dic in dict_in_list:
-        for div_key in divide_dict.keys():
-            df_cols[div_key].append(dic.get(div_key, '*'))
-    # DataFrame作成
-    df = pd.DataFrame(df_cols).rename(columns=divide_dict)
-    # DataFrameをcsvとしてtmpに保存
+def save_df(df):
     csv_name = f'{get_datetime_now()}_mrph'
     df.to_csv(f'tmp/{csv_name}.csv', index=False, encoding='utf_8_sig')
-    return df, csv_name
+    return csv_name

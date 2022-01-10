@@ -11,11 +11,13 @@
     #}
     <div class='form-group'>
       <h5><div class='badge badge-danger'>必須</div> 形態素解析器</h5>
-      <small>※（）内は使用する辞書</small>
       {# 形態素解析器の説明 #}
-      <div class='p-2'>
-        <button class='btn btn-info dropdown-toggle' aria-controls='morphological_description' aria-expanded='false'
-          data-target='#morphological_description' data-toggle='collapse' type='button'>詳細説明</button>
+      <div class='px-4'>
+        <div class='small'>
+          ※（）内は使用する辞書
+        </div>
+        <button class='btn btn-sm btn-outline-info dropdown-toggle' aria-controls='morphological_description' aria-expanded='false'
+            data-target='#morphological_description' data-toggle='collapse' type='button'>詳細説明</button>
         <div id='morphological_description' class='collapse'>
           <div class='bs-callout bs-callout-info mt-0 py-1'>
             {% for value in description.get('mrph').values() %}
@@ -23,16 +25,21 @@
             {% endfor %}
           </div>
         </div>
-      </div>
-
-      <div class='px-2'>
+        {# 入力欄 #}
         <div class='form-check'>
-          <input type='radio' name='mrph' value='mecab' id='mecab' class='form-check-input' {{'checked' if
-          mrph_type == 'mecab' or mrph_type == 'None' else '' }}>
+          <input type='radio' name='mrph_type' value='mecab' id='mecab' class='form-check-input'
+              {% if option %}
+                {{'checked' if option.get('mrph_type') == 'mecab' or not option.get('mrph_type') else '' }}
+              {% else %}
+                {{ 'checked' }}
+              {% endif %}>
           <label for='mecab' class='form-check-label'>MeCab（NEologd）</label>
         </div>
         <div class='form-check'>
-          <input type='radio' name='mrph' value='juman' id='juman' class='form-check-input' {{'checked' if mrph_type == 'juman' else '' }}>
+          <input type='radio' name='mrph_type' value='juman' id='juman' class='form-check-input'
+              {% if option %}
+                {{'checked' if option.get('mrph_type') == 'juman' else '' }}
+              {% endif %}>
           <label for='juman' class='form-check-label'>Jumanpp</label>
         </div>
       </div>
@@ -43,27 +50,24 @@
     #}
     <div class='form-group'>
       <h5><div class='badge badge-danger'>必須</div> 解析テキスト</h5>
-      <div class='p-2'>
-        <p>
+      <div class='px-4'>
+        <p class='small'>
           形態素解析したいテキストを入力してください。<br>
           ※ Jumanppを選択する場合、21,000字以内が推奨です。
         </p>
-        <button class='btn btn-info dropdown-toggle' aria-controls='mrph-word-sample' aria-expanded='false'
+        <button class='btn btn-sm btn-outline-info dropdown-toggle' aria-controls='mrph-word-sample' aria-expanded='false'
           data-target='#mrph-word-sample' data-toggle='collapse' type='button'>入力例</button>
         <div id='mrph-word-sample' class='collapse'>
           <div class='bs-callout bs-callout-info mt-0 py-1'>
-            <p>
+            <p class='small'>
             すもももももももものうち<br>
             くるまでまつ
             </p>
           </div>
         </div>
-      </div>
-
-      <div class='px-2'>
-        <div id='limited-words' class='text-right'>文字数：{{ '{:,}'.format(mrph_data.get('words').replace('\n', '')|length) if mrph_data else 0 }}/21,000</div>
+        <div id='limited-words' class='text-right'>文字数：{{ '{:,}'.format(option.get('text').replace('\n', '')|length) if option else 0 }}/21,000</div>
         <textarea class='form-control' rows=14 name='words'
-          onKeyUp="countLength('limited-words', value, 21000);">{{ mrph_data.get('words') if mrph_data else ''}}</textarea>
+          onKeyUp="countLength('limited-words', value, 21000);" required>{{ option.get('text') if option else ''}}</textarea>
       </div>
     </div>
 
@@ -79,12 +83,12 @@
   {#
   ##### 形態素解析結果 #####
   #}
-  {% if mrph_data and mrph_data.get('csv_name') %}
+  {% if result %}
     {#
     ##### csvダウンロードボタン #####
     #}
     <div class='float-right'>
-      <form action={{ url_for('others.download_csv', dl_type=dl_data.get('dl_type'), target=dl_data.get('file_name'), new_name=dl_data.get('new_name')) }} method='post'>
+      <form action={{ url_for('others.download_csv', dl_type=result.get('dl_type'), target=result.get('file_name'), new_name=result.get('new_name')) }} method='post'>
         <button type='submit' class='btn btn-primary'>CSVダウンロード</button>
       </form>
     </div>
@@ -96,21 +100,21 @@
       <table class='table table-sm table-striped table-hover'>
         <thead class='thead-dark'>
           <tr>
-            {% for column in mrph_data.get('result_df').columns %}
+            {% for column in result.get('df').columns %}
               <th>{{ column }}</th>
             {% endfor %}
           </tr>
         </thead>
-        {% for index, mrph in mrph_data.get('result_df').iterrows() %}
-          <tr>
-            {% for key in mrph_data.get('result_df').columns %}
+        {% for index, mrph in result.get('df')[:50].iterrows() %}
+          <tr class='small'>
+            {% for key in result.get('df').columns %}
               <td>{{ mrph.get(key, '*') }}</td>
             {% endfor %}
           </tr>
         {% endfor %}
-        {% if mrph_data.get('over50') %}
+        {% if 50 <= result.get('df')|length %}
           <tr>
-            <td colspan={{ mrph_data.get('columns_num') }} class='text-center text-danger'>《以下略》</td>
+            <td colspan={{ 1 + (result.get('df').columns | length) }} class='text-center text-danger'>《以下略》</td>
           </tr>
         {% endif %}
       </table>
