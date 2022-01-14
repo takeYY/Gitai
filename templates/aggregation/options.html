@@ -6,27 +6,9 @@
   ##### 入力データの情報表示 #####
   #}
   {% if input_table %}
-    <div class='my-2'>
-      <p>データ選択</p>
-      <table class='table table-hover table-striped table-sm'>
-        <thead class='thead-dark'>
-          <tr>
-            <th scope='col'>入力項目</th>
-            <th scope='col'>設定項目</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for key, value in input_table.items() %}
-            {% if value %}
-              <tr>
-                <th>{{ key }}</th>
-                <th>{{ value }}</th>
-              </tr>
-            {% endif %}
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+    {% with table_label='データ選択', col_1='入力項目', col_2='設定項目', contents=input_table %}
+      {% include 'tables/display2columns.html' %}
+    {% endwith %}
     <hr>
   {% endif %}
 
@@ -37,29 +19,10 @@
     {#
     ##### 品詞 #####
     #}
-    <div class='form-group'>
-      <h5><div class='badge badge-danger'>必須</div> 可視化対象の品詞</h5>
-      <small>※（）内は含有数</small>
-      <div class='px-4'>
-        {% for key, value in hinshi_dict.items() %}
-          <div class='form-check'>
-            <input type='checkbox' name='hinshi' value={{key}} id={{key}}
-                class="form-check-input {{ 'is-invalid' if option and option.get('errors', {}).get('hinshi') else '' }}"
-                {% if option %}
-                  {{ 'checked' if value in option.get('hinshi', []) else '' }}
-                {% else %}
-                  {{ 'checked' if loop.index == 1 else '' }}
-                {% endif %}>
-            <label for={{key}} class='form-check-label'>{{key}}（{{value}}）</label>
-            {% if loop.index == hinshi_dict|length and option and option.get('errors', {}).get('hinshi') %}
-              <div class='invalid-feedback'>
-                {{ option.get('errors').get('hinshi') }}
-              </div>
-            {% endif %}
-          </div>
-        {% endfor %}
-      </div>
-    </div>
+    {% with option_type='必須', form_label='可視化対象の品詞', form_name='hinshi', form_remarks='※（）内は含有数',
+            form_hinshi=hinshi_dict, option=option if option else None %}
+      {% include 'forms/checkbox_form.html' %}
+    {% endwith %}
 
     {#
     ##### 内容確認ボタン #####
