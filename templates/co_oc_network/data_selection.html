@@ -35,9 +35,9 @@
               {#
               ##### 作品名（江戸川乱歩作品で分析） #####
               #}
-              <div class='form-group w-50'>
+              <div class='form-group'>
                 <label for='name' class='form-check-label'><div class='badge badge-danger'>必須</div> 作品名</label>
-                <div class='px-4'>
+                <div class='px-4 w-50'>
                   <select name='name' class='form-control' id='edogawa-works'>
                     {% for name, file in edogawa_data.get('name_file') %}
                       <option value={{name}}-{{file}} {{'selected' if input_data and input_data.get('name')==name else '' }}>
@@ -52,10 +52,12 @@
               #}
               <div class='form-group'>
                 <label for='mrph' class='form-check-label'><div class='badge badge-danger'>必須</div> 形態素解析器</label>
-                <small>※（）内は使用する辞書</small>
                 {# 形態素解析器の説明 #}
-                <div class='p-2'>
-                  <button class='btn btn-info dropdown-toggle' aria-controls='morphological_description' aria-expanded='false'
+                <div class='px-4'>
+                  <div class='small'>
+                    ※（）内は使用する辞書
+                  </div>
+                  <button class='btn btn-sm btn-outline-info dropdown-toggle' aria-controls='morphological_description' aria-expanded='false'
                       data-target='#morphological_description' data-toggle='collapse' type='button'>詳細説明</button>
                   <div id='morphological_description' class='collapse'>
                     <div class='bs-callout bs-callout-info mt-0 py-1'>
@@ -64,9 +66,7 @@
                       {% endfor %}
                     </div>
                   </div>
-                </div>
-                {# 入力欄 #}
-                <div class='px-2'>
+                  {# 入力欄 #}
                   <div class='form-check'>
                     <input type='radio' name='mrph_type' value='mecab' id='mecab' class='form-check-input'
                         {% if input_data %}
@@ -91,14 +91,14 @@
               #}
               <div class='form-group'>
                 <div class='badge badge-secondary'>任意</div>
-                <div class='form-check'>
-                  <input class='form-check-input' type='checkbox' name='is_used_category' id='categorization' value=1
-                      {{ 'checked' if input_data and input_data.get('is_used_category')==1 else '' }}>
-                  <label for='categorization' class='form-check-label'>章ごとのカテゴリ分割（3Dのみ）を行う</label>
-                </div>
                 {# 形態素解析器の説明 #}
-                <div class='p-2'>
-                  <button class='btn btn-info dropdown-toggle' aria-controls='categorization_description' aria-expanded='false'
+                <div class='px-4'>
+                  <div class='form-check'>
+                    <input class='form-check-input' type='checkbox' name='is_used_category' id='categorization' value=1
+                        {{ 'checked' if input_data and input_data.get('is_used_category')==1 else '' }}>
+                    <label for='categorization' class='form-check-label'>章ごとのカテゴリ分割（3Dのみ）を行う</label>
+                  </div>
+                  <button class='btn btn-sm btn-outline-info dropdown-toggle' aria-controls='categorization_description' aria-expanded='false'
                       data-target='#categorization_description' data-toggle='collapse' type='button'>詳細説明</button>
                   <div id='categorization_description' class='collapse'>
                     <div class='bs-callout bs-callout-info mt-0 py-1'>
@@ -129,7 +129,7 @@
                 {#
                 ##### ファイル形式 #####
                 #}
-                <button class='btn btn-info dropdown-toggle' aria-controls='csv-sample' aria-expanded='false'
+                <button class='btn btn-sm btn-outline-info dropdown-toggle' aria-controls='csv-sample' aria-expanded='false'
                     data-target='#csv-sample' data-toggle='collapse' type='button'>ファイル形式</button>
                 <div id='csv-sample' class='collapse'>
                   <div class='bs-callout bs-callout-info mt-0 py-1'>

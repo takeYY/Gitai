@@ -1,0 +1,53 @@
+{#
+  option_type: str
+    入力要件, value: ['必須', '任意']
+  form_label: str
+    ラベル名
+  form_help: str
+    説明文
+  form_name: str
+    name属性
+  option: dict
+    エラー時の入力項目やエラー文などを格納したデータ
+  form_size: int
+    xの長さ, value: [25, 50, 75, 100]
+  form_required: bool
+    required属性を設定するか否か
+  form_default: int
+    デフォルト値
+  form_step: float
+    step属性
+  form_min: int
+    min属性
+  form_max: int
+    max属性
+#}
+<div class='form-group'>
+  <h5><div class="badge badge-{{ 'danger' if option_type=='必須' else 'secondary' }}">{{ option_type }}</div> {{ form_label }}
+    {% if form_help %}
+      {# ヘルプアイコンを表示 #}
+      {% with help_text=form_help%}
+        {% include 'icons/help_icon.html' %}
+      {% endwith %}
+    {% endif %}
+  </h5>
+  <div class='px-4'>
+    {# 入力フォーム #}
+    <input type='number' name='{{ form_name }}' value="{{ option.get(form_name) if option else form_default }}"
+        class="form-control w-{{ form_size }}
+        {% if option %}
+          {{ 'is-invalid' if option.get('errors', {}).get(form_name) else '' }}
+        {% endif %}"
+        {{ 'required' if form_required else '' }}
+        placeholder={{ form_default if form_default else '' }}
+        step={{ form_step if form_step else '1' }}
+        min={{ form_min if form_min else '' }}
+        max={{ form_max if form_max else '' }}>
+    {# エラー時に表示される項目 #}
+    {% if option and option.get('errors', {}).get(form_name) %}
+      <div class='invalid-feedback'>
+        {{ option.get('errors').get(form_name) }}
+      </div>
+    {% endif %}
+  </div>
+</div>

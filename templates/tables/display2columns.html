@@ -1,0 +1,31 @@
+{#
+  table_label: str
+    表題
+  col_1: str
+    1番目の列名
+  col_2: str
+    2番目の列名
+  contents: dict
+    表示するデータの辞書
+#}
+<div class='my-2 table-responsive'>
+  <p>{{ table_label }}</p>
+  <table class='table table-hover table-striped table-sm'>
+    <thead class='thead-dark'>
+      <tr>
+        <th scope='col'>{{ col_1 }}</th>
+        <th>{{ col_2 }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for key, value in contents.items() %}
+        <tr class='small'>
+          {% if value %}
+            <th class='text-nowrap'>{{ key }}</th>
+            <th>{{ value }}</th>
+          {% endif %}
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

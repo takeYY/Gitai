@@ -1,0 +1,57 @@
+{#
+  option_type: str
+    入力要件, value: ['必須', '任意']
+  form_label: str
+    ラベル名
+  form_remarks: str
+    備考
+  description: str
+    詳細説明文
+  form_name: str
+    name属性
+  option: dict
+    エラー時の入力項目やエラー文などを格納したデータ
+  contents: dict
+    ラジオボタンで表示するデータの辞書
+#}
+<div class='form-group'>
+  <h5><div class="badge badge-{{ 'danger' if option_type=='必須' else 'secondary' }}">{{ option_type }}</div> {{ form_label }}</h5>
+  {% if form_remarks or description %}
+    <div class='px-4'>
+      {# 備考 #}
+      {% if form_remarks %}
+        <div class='small'>
+          {{ form_remarks }}
+        </div>
+      {% endif %}
+      {# 詳細説明 #}
+      {% if description %}
+        <button class='btn btn-sm btn-outline-info dropdown-toggle' aria-controls='{{form_name}}_description' aria-expanded='false'
+            data-target='#{{form_name}}_description' data-toggle='collapse' type='button'>詳細説明</button>
+        <div id='{{form_name}}_description' class='collapse'>
+          <div class='bs-callout bs-callout-info mt-0 py-1'>
+            {% for value in description.get(form_name).values() %}
+              {{ value|safe }}
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+  {# ラジオボタンの表示 #}
+  <div class='row'>
+    {% for key, value in contents.items() %}
+      <div class='col-md-4'>
+        <div class='form-check h-100'>
+          <input type='radio' name={{form_name}} value={{key}} id={{key}}
+              {% if option %}
+                {{ 'checked' if option.get(form_name)==key else '' }}
+              {% elif loop.index==1 %}
+                {{ 'checked' }}
+              {% endif %}>
+          <label class='form-check-label' for={{key}}>{{ value }}</label>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>

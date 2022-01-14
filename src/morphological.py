@@ -1,7 +1,8 @@
 import MeCab
 import timeout_decorator
 from pyknp import Juman
-from src.get_data import mecab_divide_dict, juman_divide_dict
+import pandas as pd
+from src.get_data import mecab_divide_dict
 
 
 def get_morphological_analysis_dict():
@@ -15,7 +16,7 @@ def get_mecab_mrph(text):
         '-d /usr/lib/x86_64-linux-gnu/mecab/dic/mecab-ipadic-neologd'
     )
     # MeCabの分類リスト取得
-    divide_keys = list(mecab_divide_dict().keys())
+    divide_values = list(mecab_divide_dict().values())
     # MeCabによる形態素解析
     mecab_parse = tagger.parse(text)
     mecab_line = [line for line in mecab_parse.split('\n')]
@@ -24,19 +25,18 @@ def get_mecab_mrph(text):
     for line in mecab_line:
         mecab_dict = {}
         line_split = line.split('\t')
-        if line_split[0] == 'EOS':
+        surface = line_split[0]
+        if surface == 'EOS':
             break
-
-        if line_split[0] == '\r':
+        if surface == '\r':
             continue
 
-        mecab_dict['surface'] = line_split[0]
+        mecab_dict['表層形'] = surface
         values = line_split[1].split(',')
         for idx, value in enumerate(values):
-            mecab_dict[divide_keys[idx+1]] = value
+            mecab_dict[divide_values[idx+1]] = value
         mrph_list.append(mecab_dict)
-
-    return mrph_list
+    return pd.DataFrame(mrph_list)
 
 
 @timeout_decorator.timeout(29, use_signals=False)
@@ -53,44 +53,55 @@ def get_juman_mrph(text):
             juman_dict = {}
             if mrph.midasi == '\r':
                 continue
-            juman_dict['midashi'] = mrph.midasi
-            juman_dict['yomi'] = mrph.yomi
-            juman_dict['genkei'] = mrph.genkei
-            juman_dict['hinshi'] = mrph.hinsi
-            juman_dict['bunrui'] = mrph.bunrui
-            juman_dict['katsuyou1'] = mrph.katuyou1
-            juman_dict['katsuyou2'] = mrph.katuyou2
-            juman_dict['imis'] = mrph.imis
-            juman_dict['repname'] = mrph.repname
+            juman_dict['見出し'] = mrph.midasi
+            juman_dict['読み'] = mrph.yomi
+            juman_dict['原形'] = mrph.genkei
+            juman_dict['品詞'] = mrph.hinsi
+            juman_dict['品詞細分類'] = mrph.bunrui
+            juman_dict['活用型'] = mrph.katuyou1
+            juman_dict['活用形'] = mrph.katuyou2
+            juman_dict['意味情報'] = mrph.imis
+            juman_dict['代表表記'] = mrph.repname
             result_list.append(juman_dict)
         mrph_list.extend(result_list)
 
-    return mrph_list
+    return pd.DataFrame(mrph_list)
 
 
-def mrph_analysis(mrph_type, text):
+def mrph_analysis(mrph_type, text) -> pd.DataFrame:
+    """
+    形態素解析の処理
+
+    Parameters
+    ----------
+    mrph_type: str
+        形態素解析器の種類, ['mecab', 'juman']
+    text: str
+        形態素解析対象のテキスト
+
+    Returns
+    -------
+    mrph_df: pd.DataFrame
+        形態素解析済みのDataFrame
+    """
     # MeCabによる解析
     if mrph_type == 'mecab':
         try:
             # MeCabによる形態素解析
-            mrph_result = get_mecab_mrph(text)
+            mrph_df = get_mecab_mrph(text)
         except:
             # 解析に29秒以上かかった場合
-            mrph_result = ''
-        # MeCabの分類辞書
-        divide_dict = mecab_divide_dict()
+            mrph_df = pd.DataFrame()
 
     # Jumanによる解析
     elif mrph_type == 'juman':
         try:
             # Jumanppによる形態素解析
-            mrph_result = get_juman_mrph(text)
+            mrph_df = get_juman_mrph(text)
         except:
             # 29秒以上かかった場合
-            mrph_result = ''
-        # Jumanppの分類辞書
-        divide_dict = juman_divide_dict()
+            mrph_df = pd.DataFrame()
     else:
-        mrph_result, divide_dict = '', ''
+        mrph_df = pd.DataFrame()
 
-    return mrph_result, divide_dict
+    return mrph_df

@@ -23,3 +23,17 @@ function countLength(field, text, max_length) {
   }
   target.innerHTML = `文字数：${Number(text_length).toLocaleString()}/${Number(max_length).toLocaleString()}`;
 }
+
+function checkAllContents(name) {
+  let contents = document.getElementsByName(name);
+  for (i = 0; i < contents.length; i++){
+    contents[i].checked = true;
+  }
+}
+
+function clearAllContents(name) {
+  let contents = document.getElementsByName(name);
+  for (i = 0; i < contents.length; i++){
+    contents[i].checked = false;
+  }
+}
