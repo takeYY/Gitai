@@ -6,54 +6,18 @@
   ##### 入力データの情報表示 #####
   #}
   {% if input_table %}
-    <div class='my-2'>
-      <p>データ選択</p>
-      <table class='table table-hover table-striped table-sm'>
-        <thead class='thead-dark'>
-          <tr>
-            <th scope='col'>入力項目</th>
-            <th scope='col'>設定項目</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for key, value in input_table.items() %}
-            {% if value %}
-              <tr>
-                <th>{{ key }}</th>
-                <th>{{ value }}</th>
-              </tr>
-            {% endif %}
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+    {% with table_label='データ選択', col_1='入力項目', col_2='設定項目', contents=input_table %}
+      {% include 'tables/display2columns.html' %}
+    {% endwith %}
   {% endif %}
 
   {#
   ##### 設定の情報表示 #####
   #}
   {% if option_table %}
-    <div class='my-2'>
-      <p>設定</p>
-      <table class='table table-hover table-striped table-sm'>
-        <thead class='thead-dark'>
-          <tr>
-            <th scope='col'>入力項目</th>
-            <th scope='col'>設定項目</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for key, value in option_table.items() %}
-            {% if value %}
-              <tr>
-                <th>{{ key }}</th>
-                <th>{{ value }}</th>
-              </tr>
-            {% endif %}
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+    {% with table_label='設定', col_1='入力項目', col_2='設定項目', contents=option_table %}
+      {% include 'tables/display2columns.html' %}
+    {% endwith %}
     <hr>
   {% endif %}
 
@@ -72,8 +36,8 @@
     {#
     ##### テーブル情報 #####
     #}
-    <button class='btn btn-primary' data-toggle='collapse' data-target='#agg-table'
-    aria-expand='false' aria-controls='agg-table'>テーブル表示</button>
+    <button class='btn btn-sm btn-outline-info' data-toggle='collapse' data-target='#agg-table'
+        aria-expand='false' aria-controls='agg-table'>テーブル表示</button>
     <div id='agg-table' class='collapse'>
       {#
       ##### csvダウンロードボタン #####
@@ -97,7 +61,7 @@
             </tr>
           </thead>
           {% for index, rows in result_data.get('df')[:50].iterrows() %}
-            <tr>
+            <tr class='small'>
               <td>{{ rows['ランキング'] }}</td>
               <td>{{ rows['単語'] }}</td>
               <td>{{ rows['品詞'] }}</td>

@@ -37,16 +37,19 @@ def get_csv_error_message(request):
     return ''
 
 
-# 選択された品詞である or 除去ワードリストにない単語であるか判定
-def can_add_genkei2words(sentence, target_hinshi, remove_words_list):
+# 選択された品詞である or ストップワード（強制除去語）リストにない単語であるか判定
+def can_add_genkei2words(sentence, target_hinshi, remove_words_list, target_words: list):
     midashi = sentence[0]
     genkei = sentence[1]
     hinshi = sentence[2]
 
+    # 強制抽出語であればどんな条件に関係なく追加
+    if target_words and midashi in target_words or genkei in target_words:
+        return True
     # 品詞が可視化対象の品詞に含まれていない場合
     if not hinshi in target_hinshi:
         return False
-    # 見出し や 原形が除去ワードリストに含まれている場合
+    # 見出し や 原形がストップワード（強制除去語）リストに含まれている場合
     if midashi in remove_words_list or genkei in remove_words_list:
         return False
 
@@ -113,7 +116,30 @@ def modify_df_with_synonym(df, synonym):
     return df
 
 
-def create_keywords(df, remove_words_list, target_hinshi):
+def create_keywords(df, remove_words_list, target_words, target_hinshi):
+    """
+    共起に使用する(単語, 品詞)を文ごとにリスト化する
+
+    Parameters
+    ----------
+    df: pd.DataFrame
+        共起ネットワークを構築する対象のデータ
+    remove_words_list: list of str
+        ストップワードのリスト
+    target_words: list of str
+        強制抽出語のリスト
+    target_hinshi: list of str
+        可視化対象の品詞のリスト
+
+    Returns
+    -------
+    keywords: list of tuple
+        ex) [
+                [('少年', '名詞'), ('探偵', '名詞')],
+                [('先生', '名詞'), ('明智', '名詞')],
+                [('受話器', '名詞'), ('小林', '名詞'), ('横', '名詞'), ('先生', '名詞'), ('明智', '名詞')]
+            ]
+    """
     # 形態素解析DFから各列の要素をリストで取得
     midashi = list(df['表層形'])
     genkei = list(df['原形'])
@@ -135,14 +161,47 @@ def create_keywords(df, remove_words_list, target_hinshi):
             words = set()
             continue
 
-        # 品詞がtarget_hinshiに含まれている and not (見出しが除去ワードリストに入っている or 原型が除去ワードリストに入っている)
+        # 見出しか原型が強制抽出語に含まれている or 品詞がtarget_hinshiに含まれている
+        # and not (見出しがストップワード（強制除去語）リストに入っている or 原型がストップワード（強制除去語）リストに入っている)
         # and not (除去対象の品詞組み合わせである)
-        if can_add_genkei2words(sentence, target_hinshi, remove_words_list):
+        if can_add_genkei2words(sentence, target_hinshi, remove_words_list, target_words):
             words.add((sentence[1], sentence[2]))
+
     return keywords
 
 
 def create_sentence_combinations(keywords, remove_combi):
+    """
+    単語の組み合わせを作成
+
+    Parameters
+    ----------
+    keywords: list of tuple
+        共起に使用する(単語, 品詞)を文ごとにリスト化したもの
+    remove_combi: dict
+        削除する品詞の組み合わせ辞書
+
+    Returns
+    -------
+    sentence_combinations: list of tuple
+        共起の組み合わせ
+        ex) [
+                [(('少年', '名詞'), ('探偵', '名詞'))],
+                [(('先生', '名詞'), ('明智', '名詞'))],
+                [
+                    (('横', '名詞'), ('先生', '名詞')),
+                    (('横', '名詞'), ('小林', '名詞')),
+                    (('受話器', '名詞'), ('よこ', '名詞')),
+                    (('横', '名詞'), ('明智', '名詞')),
+                    (('先生', '名詞'), ('小林', '名詞')),
+                    (('受話器', '名詞'), ('先生', '名詞')),
+                    (('先生', '名詞'), ('明智', '名詞')),
+                    (('受話器', '名詞'), ('小林', '名詞')),
+                    (('小林', '名詞'), ('明智', '名詞')),
+                    (('受話器', '名詞'), ('明智', '名詞'))
+                ]
+            ]
+    """
     # keywordsを基に単語ごとの組み合わせを計算
     sentence_combinations = [list(itertools.combinations(
         set(sentence), 2)) for sentence in keywords]
@@ -298,8 +357,8 @@ def kyoki_word_network(target_num=250, file_name='3742_9_3_11_02', target_coef='
     return got_net
 
 
-def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], target_num=250, remove_words='', remove_combi='',
-                   target_words='', data_type='edogawa', is_used_3d=False, used_category=0, synonym='', selected_category=[],
+def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], target_num=250, remove_words=[], remove_combi='',
+                   target_words=[], data_type='edogawa', is_used_3d=False, used_category=0, synonym='', selected_category=[],
                    target_coef='共起頻度', strength_max=10000, mrph_type='juman', co_oc_freq_min=2):
     """
     共起ネットワークの作成
@@ -312,12 +371,12 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
         共起に含めたい品詞
     target_num: int, default=250
         表示したい上位共起数
-    remove_words: str, default=''
-        共起に含めたくない除去ワード集
+    remove_words: list of str, default=[]
+        共起に含めたくないストップワード（強制除去語）のリスト
     remove_combi: dict, default=''
         除去対象の品詞組み合わせ
-    target_words: str, default=''
-        指定した単語の共起のみ表示する
+    target_words: list of str, default=[]
+        指定した単語の共起のみ表示するリスト
     data_type: str, default='edogawa'
         入力データの種類（江戸川乱歩作品: 'edoagwa', csv: 'csv'）
     is_used_3d: bool, default=False
@@ -371,8 +430,6 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
     df = df.rename(columns={'見出し': '表層形',
                             '原型': '原形',
                             '章ラベル': 'カテゴリー'})
-    # 除去ワードリスト
-    remove_words_list = remove_words.split('\r\n')
 
     # 同義語設定
     if synonym:
@@ -386,7 +443,8 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
     if used_category == 1 and is_used_3d:
         for cat in df['カテゴリー'].unique():
             keywords_dict[cat] = create_keywords(df.query(' カテゴリー==@cat '),
-                                                 remove_words_list,
+                                                 remove_words,
+                                                 target_words,
                                                  target_hinshi)
             sentence_combinations_dict[cat] = create_sentence_combinations(keywords_dict[cat],
                                                                            remove_combi)
@@ -399,7 +457,8 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
     else:
         key_name = 'all'
         keywords_dict[key_name] = create_keywords(df,
-                                                  remove_words_list,
+                                                  remove_words,
+                                                  target_words,
                                                   target_hinshi)
         sentence_combinations_dict[key_name] = create_sentence_combinations(keywords_dict[key_name],
                                                                             remove_combi)
@@ -420,10 +479,10 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
     # 共起頻度の最小値以上に制限
     co_oc_df = co_oc_df.query(
         ' @co_oc_freq_min <= 共起頻度 ').reset_index(drop=True)
-    # 指定ワードが含まれるレコードのみ抽出
+    # 強制抽出語が含まれるレコードのみ抽出
     if target_words:
         new_co_oc_df = pd.DataFrame()
-        for tw in target_words.split('\r\n'):
+        for tw in target_words:
             new_co_oc_df = pd.concat([new_co_oc_df,
                                       co_oc_df.query(' @tw in 単語a or @tw in 単語b ')])
         co_oc_df = new_co_oc_df.sort_values(
