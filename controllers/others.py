@@ -11,7 +11,14 @@ def download_csv(dl_type, target, new_name):
     csvデータのダウンロード
 
     """
-    dir_path = 'csv/khcoder' if dl_type == 'khcoder' else 'tmp'
+    if dl_type == 'khcoder':
+        dir_path = 'csv/khcoder'
+    elif dl_type == 'Jumanpp':
+        dir_path = 'csv/jumanpp'
+    elif dl_type == 'MeCab':
+        dir_path = 'csv/mecab_with_category'
+    else:
+        dir_path = 'tmp'
     return send_from_directory(
         dir_path,
         f'{target}.csv',

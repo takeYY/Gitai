@@ -18,4 +18,5 @@ def show():
 
     return render_template('information/index.html',
                            basic_data=basic_data,
-                           edogawa_merge_df=edogawa_merge_df)
+                           edogawa_merge_df=edogawa_merge_df,
+                           mrphs=['MeCab', 'Jumanpp'])
