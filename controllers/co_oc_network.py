@@ -8,7 +8,7 @@ from models.co_oc_network.option import OptionCoOcNetwork
 
 
 network_page = Blueprint(
-    'network', __name__, url_prefix='/rikkyo-edogawa/co-oc-network')
+    'network', __name__, url_prefix='/gitai/co-oc-network')
 
 
 def render_data_selection(basic_data: dict, edogawa_data: dict, description: dict, input_data: dict = None):

@@ -8,7 +8,7 @@ from models.aggregation.input import InputAggregation
 
 
 aggregation_page = Blueprint(
-    'aggregation', __name__, url_prefix='/rikkyo-edogawa/aggregation')
+    'aggregation', __name__, url_prefix='/gitai/aggregation')
 
 
 def render_data_selection(basic_data: dict, edogawa_data: dict, description: dict, input_data: dict = None):
