@@ -1,4 +1,3 @@
-from os import error
 from flask import Blueprint, render_template, request, session, flash, redirect, url_for
 from src.aggregation import create_aggregation, valid_agg_columns
 from src.description import csv_file_description, morphological_analysis_description

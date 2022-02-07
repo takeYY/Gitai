@@ -1,5 +1,4 @@
-from flask import Blueprint, request, render_template, send_from_directory, send_file, session
-from src.get_data import get_basic_data
+from flask import Blueprint, send_from_directory, send_file
 
 
 others_page = Blueprint('others', __name__)
