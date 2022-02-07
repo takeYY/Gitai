@@ -26,6 +26,14 @@
   #}
   {% if result_data and result_data.get('file_name') %}
     {#
+    ##### 全画面表示ボタン #####
+    #}
+    <div class='float-right'>
+      <form action={{ url_for( 'network.full_screen', target=result_data.get('html_file_name') ) }} method='post' target=_blank>
+        <button type='submit' class='btn btn-sm btn-outline-secondary'>全画面表示</button>
+      </form>
+    </div>
+    {#
     ##### 共起ネットワークのグラフ #####
     #}
     <div class='border embed-responsive embed-responsive-16by9'>

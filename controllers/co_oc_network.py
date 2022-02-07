@@ -196,3 +196,13 @@ def result():
                              input_data.get_table_dict(), option.get_table_dict())
     except:
         return redirect(url_for('network.data_selection'))
+
+
+@network_page.route('/full_screen/<target>', methods=['POST'])
+def full_screen(target):
+    # 基本情報
+    basic_data = get_basic_data(title='共起ネットワーク：結果全画面',
+                                active_url='co_oc_network')
+    return render_template('co_oc_network/full_screen.html',
+                           basic_data=basic_data,
+                           target=target)
