@@ -28,11 +28,26 @@
     {#
     ##### 全画面表示ボタン #####
     #}
-    <div class='float-right'>
+    <div class='float-left'>
       <form action={{ url_for( 'network.full_screen', target=result_data.get('html_file_name') ) }} method='post' target=_blank>
         <button type='submit' class='btn btn-sm btn-outline-secondary'>全画面表示</button>
       </form>
     </div>
+
+    {#
+    ##### 設定と結果のダウンロード #####
+    #}
+    <div class='float-right'>
+      <form action={{ url_for( 'others.download_zip',
+                               options_file=dl_data.get('options_filename'),
+                               result_html=result_data.get('html_file_name'),
+                               result_csv=dl_data.get('file_name'),
+                               new_name=dl_data.get('new_name') ) }}
+            method='post'>
+        <button type='submit' class='btn btn-sm btn-secondary'>設定と結果の一括ダウンロード</button>
+      </form>
+    </div>
+
     {#
     ##### 共起ネットワークのグラフ #####
     #}

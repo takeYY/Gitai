@@ -101,8 +101,9 @@ def get_plotly_text_positions():
     return ['top center', 'top right', 'middle right', 'bottom center', 'bottom right']
 
 
-def get_datetime_now():
-    return datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S%f')
+def get_datetime_now(hours: int = 9):
+    return datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=hours)))\
+                   .strftime('%Y_%m_%d_%H_%M_%S%f')
 
 
 def get_category_list(csv_filename):

@@ -1,10 +1,11 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
-from src.get_data import get_basic_data, get_co_oc_strength_dict, get_novels_tuple, get_hinshi_dict
+from src.get_data import get_basic_data, get_co_oc_strength_dict, get_novels_tuple, get_hinshi_dict, create_random_string
 from src.co_oc_network import create_network
 from src.co_oc_3d_network import create_3d_network
 from src.description import categorization_description, csv_file_description, morphological_analysis_description, co_oc_strength_description
 from models.co_oc_network.input import InputCoOcNetwork
 from models.co_oc_network.option import OptionCoOcNetwork
+import pandas as pd
 
 
 network_page = Blueprint(
@@ -182,10 +183,19 @@ def result():
                               'ファイル形式が正しくありません。（入力形式に沿ってください）')
         return render_data_selection(basic_data, edogawa_data, description,
                                      input_data=input_data.__dict__)
-    # csvダウンロード設定
+
+    # 設定項目の保存
+    options_filename = create_random_string(32)
+    options_dict = dict(**input_data.get_table_dict(),
+                        **option.get_table_dict())
+    pd.DataFrame(options_dict.items(),
+                 columns=['入力項目', '設定項目']).to_csv(f'tmp/{options_filename}.csv', index=False, encoding='utf_8_sig')
+
+    # データダウンロード設定
     dl_data = dict(file_name=csv_file_name,
                    dl_type='result',
-                   new_name=f'{input_data.name}_{"-".join(option.hinshi)}_{option.number}')
+                   new_name=f'{input_data.name}_{"-".join(option.hinshi)}_{option.number}',
+                   options_filename=options_filename)
     # 結果情報を格納
     result_data = dict(file_name=csv_file_name,
                        html_file_name=html_file_name,
