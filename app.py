@@ -1,6 +1,5 @@
 from flask import Blueprint, send_from_directory, send_file
-from src.get_data import get_datetime_now
-import zipfile
+from src.zip import create_zip
 from flask import redirect, url_for
 from flask_limiter.util import get_remote_address
 from flask_limiter import Limiter
@@ -37,14 +36,8 @@ others_page = Blueprint('others', __name__)
 @limiter.limit('1 per minute')
 def download_csv(dl_type, target, new_name):
     """csvデータのダウンロード"""
-    if dl_type == 'khcoder':
-        dir_path = 'csv/khcoder'
-    elif dl_type == 'Jumanpp':
-        dir_path = 'csv/jumanpp'
-    elif dl_type == 'MeCab':
-        dir_path = 'csv/mecab_with_category'
-    else:
-        dir_path = 'tmp'
+    dir_path = f'csv/{dl_type.lower()}' if dl_type in ['khcoder', 'Jumanpp', 'MeCab']\
+        else 'tmp'
     return send_from_directory(dir_path,
                                f'{target}.csv',
                                as_attachment=True,
@@ -55,23 +48,15 @@ def download_csv(dl_type, target, new_name):
 @limiter.limit('1 per minute')
 def download_zip(options_file, result_html, result_csv, new_name):
     """zipデータのダウンロード"""
-    time_now = ''.join(get_datetime_now().split('_'))
-    zip_name = f'{time_now}_{new_name}'
-    download_name = f'{time_now[:12]}_設定と結果_{new_name}'
+    csv_data = {options_file: '設定項目', result_csv: '共起関係'}
+    html_data = {result_html: '共起ネットワーク'}
     # zipの作成
-    with zipfile.ZipFile(f'tmp/{zip_name}.zip', 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=9) as zf:
-        zf.write(f'tmp/{options_file}.csv',
-                 arcname=f'設定項目_{time_now[:12]}.csv')
-        zf.write(f'tmp/{result_html}.html',
-                 arcname=f'共起ネットワーク_{time_now[:12]}.html')
-        zf.write(f'tmp/{result_csv}.csv',
-                 arcname=f'共起関係_{time_now[:12]}.csv')
-    return send_from_directory(
-        'tmp',
-        f'{zip_name}.zip',
-        as_attachment=True,
-        attachment_filename=f'{download_name}.zip',
-    )
+    zip_name, time_now = create_zip(new_name, csv_data, html_data)
+    download_name = f'{time_now[:12]}_設定と結果_{new_name}'
+    return send_from_directory('tmp',
+                               f'{zip_name}.zip',
+                               as_attachment=True,
+                               attachment_filename=f'{download_name}.zip',)
 
 
 @others_page.route('/gitai/co-occurrence_network/visualization/<file_name>')

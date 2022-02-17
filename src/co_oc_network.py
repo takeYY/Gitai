@@ -5,7 +5,7 @@ import numpy as np
 import itertools
 import collections
 from werkzeug.utils import secure_filename
-from src.get_data import get_jumanpp_df, get_mecab_with_category_df, get_datetime_now, get_hinshi_dict, create_random_string
+from src.get_data import get_jumanpp_df, get_mecab_df, get_datetime_now, get_hinshi_dict, create_random_string
 import os
 
 ALLOWED_EXTENSIONS = os.environ.get('ALLOWED_EXTENSIONS')
@@ -412,7 +412,7 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
                 df = get_jumanpp_df(file_name)
             else:
                 # MeCabにより形態素解析されたDF取得
-                df = get_mecab_with_category_df(file_name)
+                df = get_mecab_df(file_name)
         # カテゴリーごとの分析をする かつ 3D表示ならば
         else:
             if mrph_type == 'juman':
@@ -421,7 +421,7 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
                     columns={'章ラベル': 'カテゴリー'})
             else:
                 # MeCabにより形態素解析されたDF取得
-                df = get_mecab_with_category_df(file_name)
+                df = get_mecab_df(file_name)
             if selected_category:
                 df = df.query(' カテゴリー in @selected_category ')
     else:

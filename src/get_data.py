@@ -61,8 +61,8 @@ def get_jumanpp_df(file_name):
     return pd.read_csv(f'csv/jumanpp/{file_name}.csv')
 
 
-def get_mecab_with_category_df(file_name):
-    return pd.read_csv(f'csv/mecab_with_category/{file_name}.csv')
+def get_mecab_df(file_name):
+    return pd.read_csv(f'csv/mecab/{file_name}.csv')
 
 
 def get_basic_data(title='ホーム', active_url='home'):
@@ -107,7 +107,7 @@ def get_datetime_now(hours: int = 9):
 
 
 def get_category_list(csv_filename):
-    csv_path = 'csv/mecab_with_category'
+    csv_path = 'csv/mecab'
     return pd.read_csv(f'{csv_path}/{csv_filename}.csv')['カテゴリー'].unique().tolist()
 
 
