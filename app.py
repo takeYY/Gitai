@@ -32,7 +32,7 @@ def not_found(error):
 others_page = Blueprint('others', __name__)
 
 
-@others_page.route('/gitai/dl/csv/<dl_type>/<target>/<new_name>', methods=['POST'])
+@others_page.route('/rikkyo-edogawa/dl/csv/<dl_type>/<target>/<new_name>', methods=['POST'])
 @limiter.limit('1 per minute')
 def download_csv(dl_type, target, new_name):
     """csvデータのダウンロード"""
@@ -44,7 +44,7 @@ def download_csv(dl_type, target, new_name):
                                attachment_filename=f'{new_name}.csv',)
 
 
-@others_page.route('/gitai/dl/zip/<options_file>/<result_html>/<result_csv>/<new_name>', methods=['POST'])
+@others_page.route('/rikkyo-edogawa/dl/zip/<options_file>/<result_html>/<result_csv>/<new_name>', methods=['POST'])
 @limiter.limit('1 per minute')
 def download_zip(options_file, result_html, result_csv, new_name):
     """zipデータのダウンロード"""
@@ -59,7 +59,7 @@ def download_zip(options_file, result_html, result_csv, new_name):
                                attachment_filename=f'{download_name}.zip',)
 
 
-@others_page.route('/gitai/co-occurrence_network/visualization/<file_name>')
+@others_page.route('/rikkyo-edogawa/co-occurrence_network/visualization/<file_name>')
 def show_co_oc_network(file_name):
     """共起ネットワーク用htmlファイル"""
     return send_file(f'tmp/{file_name}.html')

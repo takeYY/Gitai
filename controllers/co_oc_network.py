@@ -9,7 +9,7 @@ import pandas as pd
 
 
 network_page = Blueprint(
-    'network', __name__, url_prefix='/gitai/co-oc-network')
+    'network', __name__, url_prefix='/rikkyo-edogawa/co-oc-network')
 
 
 def render_data_selection(basic_data: dict, edogawa_data: dict, description: dict, input_data: dict = None):

@@ -4,7 +4,7 @@ from src.get_data import get_basic_data
 from src.preprocessing import texts_preprocessing, get_other_option_dict
 
 preprocessing_page = Blueprint(
-    'text_preprocessing', __name__, url_prefix='/gitai/text-preprocessing')
+    'text_preprocessing', __name__, url_prefix='/rikkyo-edogawa/text-preprocessing')
 
 
 def render_index(basic_data: dict, other_option: dict, description: dict,
