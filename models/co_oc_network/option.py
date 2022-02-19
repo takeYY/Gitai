@@ -8,7 +8,7 @@ class OptionCoOcNetwork:
     Attributes
     ----------
     dimension: int
-        可視化する次元、[2, 3]
+        可視化する次元、[2, 3, 4]
     co_oc_strength: str
         共起強度、['frequency', 'jaccard', 'dice', 'simpson', 'pmi']
     strength_max: float

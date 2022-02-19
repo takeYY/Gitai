@@ -1,0 +1,9 @@
+{% extends "layout/layout_without_header.html" %}
+{% block content %}
+{#
+##### 共起ネットワークのグラフ #####
+#}
+<div class='border embed-responsive embed-responsive-16by9'>
+  <iframe src={{ url_for('others.show_co_oc_network', file_name=target) }}></iframe>
+</div>
+{% endblock %}

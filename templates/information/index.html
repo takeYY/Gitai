@@ -13,6 +13,7 @@
         <th>出版社</th>
         <th>初版発行日</th>
         <th></th>
+        <th>形態素解析済みデータ</th>
       </tr>
     </thead>
     {% for index, rows in edogawa_merge_df.iterrows() %}
@@ -26,13 +27,33 @@
           {% endif %}
           <a href="{{aozora_uri}}{{rows.reader_id}}.html" target="_blank">{{ rows['name'] }}</a>
         </td>
-        <td>{{ rows.first_appearance }}</td>
+        <td title={{rows.first_appearance}}>{{ rows.first_appearance | truncate(30) }}</td>
         <td>{{ rows.original_text }}</td>
         <td>{{ rows.publisher }}</td>
         <td>{{ rows.published_date }}</td>
         <td>
           <a class="btn btn-sm btn-info"
             href="https://www.satokazzz.com/airzoshi/reader.php?action=aozora&id={{rows.reader_id}}" target="_blank">読む</a>
+        </td>
+        <td style="text-align: center;">
+          <div class='dropdown'>
+            <button class='btn btn-sm btn-secondary dropdown-toggle' type='button' id='dropdownMenuButton'
+                data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+              DL
+            </button>
+            <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
+              {% for mrph in mrphs %}
+                <form class='dropdown-item'
+                    action={{ url_for('others.download_csv',
+                                    dl_type=mrph,
+                                    target=rows.file_name,
+                                    new_name=rows['name']+'_'+mrph) }}
+                    method='post'>
+                  <button type='submit' class='btn btn-link'>{{ mrph }}</button>
+                </form>
+              {% endfor %}
+            </div>
+          </div>
         </td>
       </tr>
     {% endfor %}

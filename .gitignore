@@ -131,3 +131,4 @@ dmypy.json
 # tmp
 tmp/*.html
 tmp/*.csv
+tmp/*.zip
