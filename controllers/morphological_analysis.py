@@ -4,7 +4,7 @@ from src.get_data import get_basic_data, save_df
 from src.morphological import mrph_analysis
 
 morph_analysis_page = Blueprint(
-    'morph_analysis', __name__, url_prefix='/rikkyo-edogawa/morphological-analysis')
+    'morph_analysis', __name__, url_prefix='/gitai/morphological-analysis')
 
 
 def render_index(basic_data: dict, description: dict,

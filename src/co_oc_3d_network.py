@@ -45,12 +45,12 @@ def append_edge_dictionary(dictionary, num, x, y, z, weight):
         # 0に追加
         dictionary['e0']['x'].append(x[idx])
         dictionary['e0']['y'].append(y[idx])
-        dictionary['e0']['z'].append(z[idx])
+        dictionary['e0']['z'].append(z[idx]) if z else None
         dictionary['e0']['weight'].append(weight)
         # numに追加
         dictionary[f'e{num}']['x'].append(x[idx])
         dictionary[f'e{num}']['y'].append(y[idx])
-        dictionary[f'e{num}']['z'].append(z[idx])
+        dictionary[f'e{num}']['z'].append(z[idx]) if z else None
         dictionary[f'e{num}']['weight'].append(weight)
 
     return dictionary

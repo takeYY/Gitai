@@ -1,11 +1,15 @@
 from flask import flash
 import math
+import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import itertools
 import collections
+import networkx as nx
+import plotly.graph_objects as go
 from werkzeug.utils import secure_filename
-from src.get_data import get_jumanpp_df, get_mecab_with_category_df, get_datetime_now, get_hinshi_dict, create_random_string
+from src.get_data import get_jumanpp_df, get_mecab_df, get_datetime_now, get_hinshi_dict, create_random_string
+from src.co_oc_3d_network import create_word_frequency, append_edge_dictionary, append_node_dictionary
 import os
 
 ALLOWED_EXTENSIONS = os.environ.get('ALLOWED_EXTENSIONS')
@@ -357,9 +361,196 @@ def kyoki_word_network(target_num=250, file_name='3742_9_3_11_02', target_coef='
     return got_net
 
 
+def create_2D_network_figure(df, target_num, fig, target_coef):
+    # 新規グラフを作成
+    G = nx.Graph()
+
+    # カラム名変更
+    df = df.rename(columns={target_coef: 'count'})
+
+    # タプル作成
+    kyouki_tuple = [(f'{first}__{first_type}', f'{second}__{second_type}', count)
+                    for first, second, count, first_type, second_type
+                    in zip(df['単語a'],
+                           df['単語b'],
+                           df['count'],
+                           df['単語aの品詞'],
+                           df['単語bの品詞'])]
+
+    # ノードとエッジを追加
+    list_edge = kyouki_tuple[:target_num]
+    G.add_weighted_edges_from(list_edge)
+
+    # nodeの連結nodeを取得
+    neighbors_list = ['<br>'.join(list(nx.all_neighbors(G, t)))
+                      for t in list(G.nodes())]
+
+    # 各単語の頻度を計算
+    word_frequency = create_word_frequency(df['単語a'].tolist(),
+                                           df['単語aの品詞'].tolist(),
+                                           df['単語aの出現頻度'].tolist())
+    word_frequency = create_word_frequency(df['単語b'].tolist(),
+                                           df['単語bの品詞'].tolist(),
+                                           df['単語bの出現頻度'].tolist(),
+                                           word_frequency=word_frequency)
+
+    # 各ノード情報を記載
+    for idx, text in enumerate(list(G.nodes())):
+        word, word_type = text.split('__')
+        G.nodes[text]['node_info'] = {
+            '単語ID': idx+1,
+            '単語': word,
+            '品詞': word_type,
+            '出現頻度': word_frequency[text],
+            '共起': f'<br>{neighbors_list[idx]}',
+        }
+
+    # 図のレイアウトを決める。kの値が小さい程図が密集
+    pos = nx.spring_layout(G, k=0.7, weight=None)
+
+    # ノードの位置を設定
+    for node in G.nodes():
+        G.nodes[node]["pos"] = pos[node]
+
+    # エッジの設定
+    if target_coef == '共起頻度':
+        edge_group = [10, 50, 100]
+    elif target_coef == '相互情報量':
+        edge_group = [5, 7.5, 10]
+    else:
+        edge_group = [0.1, 0.25, 0.5]
+    edges = dict(e0=dict(x=[], y=[], weight=[]),
+                 e1=dict(x=[], y=[], weight=[]),
+                 e2=dict(x=[], y=[], weight=[]),
+                 e3=dict(x=[], y=[], weight=[]),
+                 e4=dict(x=[], y=[], weight=[]),)
+    for e in G.edges():
+        x0, y0 = G.nodes[e[0]]['pos']
+        x1, y1 = G.nodes[e[1]]['pos']
+        weight = G.edges[e]['weight']
+        x_list = [x0, x1, None]
+        y_list = [y0, y1, None]
+        if weight < edge_group[0]:
+            edges = append_edge_dictionary(edges, 1,
+                                           x=x_list, y=y_list, z=None,
+                                           weight=weight)
+        elif edge_group[0] <= weight < edge_group[1]:
+            edges = append_edge_dictionary(edges, 2,
+                                           x=x_list, y=y_list, z=None,
+                                           weight=weight)
+        elif edge_group[1] <= weight < edge_group[2]:
+            edges = append_edge_dictionary(edges, 3,
+                                           x=x_list, y=y_list, z=None,
+                                           weight=weight)
+        else:
+            edges = append_edge_dictionary(edges, 4,
+                                           x=x_list, y=y_list, z=None,
+                                           weight=weight)
+
+    line_width = [1.0, 2.0, 3.0, 4.0]
+    for idx in range(len(line_width)):
+        if idx == 3:
+            name_text = f'{edge_group[2]} <='
+        else:
+            name_text = f'< {edge_group[idx]}'
+        fig.add_trace(go.Scatter(
+            name=name_text,
+            x=edges[f'e{idx+1}']['x'],
+            y=edges[f'e{idx+1}']['y'],
+            mode='lines',
+            opacity=0.5,
+            legendgroup='edges',
+            legendgrouptitle=dict(text='count'),
+            line=dict(width=line_width[idx]),
+            customdata=edges[f'e{idx+1}']['weight'],
+            hovertemplate="count: %{customdata}<extra></extra>"
+        ))
+
+    # ノードの設定
+    node_group = [50, 100, 200, 300]
+    nodes = dict(n0=dict(x=[], y=[], z=[], frequency=[], text=[], info=[]),
+                 n1=dict(x=[], y=[], z=[], frequency=[], text=[], info=[]),
+                 n2=dict(x=[], y=[], z=[], frequency=[], text=[], info=[]),
+                 n3=dict(x=[], y=[], z=[], frequency=[], text=[], info=[]),
+                 n4=dict(x=[], y=[], z=[], frequency=[], text=[], info=[]),)
+    for n in G.nodes():
+        x, y = G.nodes[n]['pos']
+        frequency = word_frequency.get(n)
+        text = n.split('__')[0]
+        info = '<br>'.join(
+            [f'{k}: {value}' for k, value in G.nodes[n]['node_info'].items()])
+        if frequency < node_group[0]:
+            nodes = append_node_dictionary(nodes, 1,
+                                           x, y, None,
+                                           frequency, text, info)
+        elif node_group[0] <= frequency < node_group[1]:
+            nodes = append_node_dictionary(nodes, 2,
+                                           x, y, None,
+                                           frequency, text, info)
+        elif node_group[1] <= frequency < node_group[2]:
+            nodes = append_node_dictionary(nodes, 3,
+                                           x, y, None,
+                                           frequency, text, info)
+        else:
+            nodes = append_node_dictionary(nodes, 4,
+                                           x, y, None,
+                                           frequency, text, info)
+
+    marker_size = [10, 20, 30, 40]
+    for idx in range(len(marker_size)):
+        if idx == 3:
+            name_text = f'{node_group[2]} <='
+        else:
+            name_text = f'< {node_group[idx]}'
+        fig.add_trace(go.Scatter(
+            name=name_text,
+            x=nodes[f'n{idx+1}']['x'],
+            y=nodes[f'n{idx+1}']['y'],
+            text=nodes[f'n{idx+1}']['text'],
+            customdata=nodes[f'n{idx+1}']['info'],
+            textposition='middle center',
+            mode='markers+text',
+            legendgroup='nodes',
+            legendgrouptitle=dict(text='frequency'),
+            marker=dict(size=marker_size[idx],
+                        line=dict(width=2),
+                        opacity=0.5,
+                        colorscale='jet'),
+            textfont=dict(size=10),
+            hovertemplate="%{customdata}<extra></extra>",
+        ))
+
+    return fig
+
+
+def create_2D_detail_network(df, target_num=50, target_coef='共起頻度', html_random_name=''):
+    fig = go.Figure()
+    fig = create_2D_network_figure(df, target_num, fig, target_coef)
+
+    layout = go.Layout(
+        showlegend=True,
+        legend=dict(
+            borderwidth=2,
+        ),
+        scene=dict(
+            xaxis=dict(backgroundcolor='rgb(150, 100, 100)'),
+            yaxis=dict(backgroundcolor='rgb(100, 150, 100)'),
+        ),
+        plot_bgcolor='rgba(0, 0, 0, 0)',
+        paper_bgcolor='rgba(0, 0, 0, 0)',
+        clickmode='select+event',
+    )
+
+    fig.update_layout(layout)
+
+    fig.write_html(f'tmp/{html_random_name}.html', auto_open=False)
+
+    return html_random_name
+
+
 def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], target_num=250, remove_words=[], remove_combi='',
                    target_words=[], data_type='edogawa', is_used_3d=False, used_category=0, synonym='', selected_category=[],
-                   target_coef='共起頻度', strength_max=10000, mrph_type='juman', co_oc_freq_min=2):
+                   target_coef='共起頻度', strength_max=10000, mrph_type='juman', co_oc_freq_min=2, dimension=2):
     """
     共起ネットワークの作成
 
@@ -395,6 +586,8 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
         入力データが江戸川乱歩作品の場合に使用する形態素解析器
     co_oc_freq_min: int, default=2
         共起頻度の最小値
+    dimension: int, default=2
+        表示形式
 
     Returns
     -------
@@ -412,7 +605,7 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
                 df = get_jumanpp_df(file_name)
             else:
                 # MeCabにより形態素解析されたDF取得
-                df = get_mecab_with_category_df(file_name)
+                df = get_mecab_df(file_name)
         # カテゴリーごとの分析をする かつ 3D表示ならば
         else:
             if mrph_type == 'juman':
@@ -421,7 +614,7 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
                     columns={'章ラベル': 'カテゴリー'})
             else:
                 # MeCabにより形態素解析されたDF取得
-                df = get_mecab_with_category_df(file_name)
+                df = get_mecab_df(file_name)
             if selected_category:
                 df = df.query(' カテゴリー in @selected_category ')
     else:
@@ -505,8 +698,12 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
     co_oc_df = co_oc_df.round(2)
 
     try:
-        # 2Dの共起ネットワークHTML作成
-        if not is_used_3d:
+        # 2D共起ネットワークHTML作成（詳細バージョン）
+        if dimension == 4:
+            create_2D_detail_network(
+                co_oc_df, target_num, target_coef, file_random_name)
+        # 2Dの共起ネットワークHTML作成（シンプルバージョン）
+        elif not is_used_3d:
             got_net = kyoki_word_network(target_num=target_num,
                                          file_name=file_random_name,
                                          target_coef=target_coef)

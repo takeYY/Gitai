@@ -35,12 +35,12 @@ def get_pmi_formula():
 
 def get_co_oc_formula_description():
     formula = r"""\begin{align}
-      A&：単語aの集合\\
-      B&：単語bの集合\\
-      |A\cup B|&：AとBの和集合の要素数\\
-      |A|&：Aの要素数\\
-      |B|&：Bの要素数\\
-      min(|A|,|B|)&：AとBの要素数の中から最小値\\
+      A&：単語aが含まれる文の集合\\
+      B&：単語bが含まれる文の集合\\
+      |A\cup B|&：単語aと単語bが同時に含まれる文の数\\
+      |A|&：集合Aの数\\
+      |B|&：集合Bの数\\
+      min(|A|,|B|)&：|A|と|B|の内の最小値\\
       N&：総語数
     \end{align}"""
 

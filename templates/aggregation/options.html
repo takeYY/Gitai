@@ -19,7 +19,7 @@
     {#
     ##### 品詞 #####
     #}
-    {% with option_type='必須', form_label='可視化対象の品詞', form_name='hinshi', form_remarks='※（）内は含有数',
+    {% with option_type='必須', form_label='可視化対象の品詞', form_name='hinshi', form_remarks='※（）内は品詞毎の総語数',
             form_hinshi=hinshi_dict, option=option if option else None %}
       {% include 'forms/checkbox_form.html' %}
     {% endwith %}

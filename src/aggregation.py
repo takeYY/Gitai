@@ -7,7 +7,7 @@ from src.get_data import create_random_string, get_plotly_symbols, get_plotly_te
 
 def get_df_from_csv_filename(mrph_type, csv_filename):
     if mrph_type == 'mecab':
-        return pd.read_csv(f'csv/mecab_with_category/{csv_filename}.csv')
+        return pd.read_csv(f'csv/mecab/{csv_filename}.csv')
     if mrph_type == 'juman':
         return pd.read_csv(f'csv/jumanpp/{csv_filename}.csv').rename(columns={'原型': '原形'})
 
