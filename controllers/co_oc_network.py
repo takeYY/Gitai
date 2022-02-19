@@ -168,7 +168,8 @@ def result():
                                                  selected_category=option.category,
                                                  target_coef=option.target_coef,
                                                  strength_max=option.strength_max, mrph_type=input_data.mrph_type,
-                                                 co_oc_freq_min=option.co_oc_freq_min)
+                                                 co_oc_freq_min=option.co_oc_freq_min,
+                                                 dimension=option.dimension)
         if option.is_3d:
             html_file_name = create_3d_network(co_oc_df, target_num=option.number,
                                                used_category=input_data.is_used_category, category_list=option.category,

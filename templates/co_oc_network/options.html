@@ -38,6 +38,7 @@
           <h5><div class='badge badge-danger'>必須</div> 表示形式</h5>
           <div class='form-check'>
             <div class='row'>
+              {# 2D（シンプル） #}
               <div class='col-md-3'>
                 <label class='form-check-label' for='2-dimension'>
                   <div class='card'>
@@ -48,12 +49,28 @@
                           {% else %}
                             {{ 'checked' }}
                           {% endif %}>
-                          2D
+                          2D（シンプル）
                     </div>
                     <img src='https://raw.githubusercontent.com/takeYY/Rampo_Edogawa_Visualization/main/static/images/network_2D.png' class='img-thumbnail'/>
                   </div>
                 </label>
               </div>
+              {# 2D（詳細） #}
+              <div class='col-md-3'>
+                <label class='form-check-label' for='2-dimension-detail'>
+                  <div class='card'>
+                    <div class='card-header px-4'>
+                      <input class='form-check-input' type='radio' name='dimension' value='4' id='2-dimension-detail'
+                          {% if option %}
+                            {{ 'checked' if option.get('dimension', 2) == 4 else '' }}
+                          {% endif %}>
+                          2D（詳細）
+                    </div>
+                    <img src='https://raw.githubusercontent.com/takeYY/Rampo_Edogawa_Visualization/main/static/images/network_2D.png' class='img-thumbnail'/>
+                  </div>
+                </label>
+              </div>
+              {# 3D #}
               <div class='col-md-3'>
                 <label class='form-check-label' for='3-dimension'>
                   <div class='card'>
