@@ -29,7 +29,7 @@ def show():
                    new_name=file_name)
     # 送信するデータの作成
     sent_data = dict(name=name, file_name=file_name,
-                     text_chapter=get_novels_tuple(novels=get_khcoder_df(file_name), col1='テキスト', col2='章'))
+                     df=get_khcoder_df(file_name))
 
     return render_template('khcoder/index.html',
                            basic_data=basic_data,
