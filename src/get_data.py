@@ -106,9 +106,35 @@ def get_datetime_now(hours: int = 9):
                    .strftime('%Y_%m_%d_%H_%M_%S%f')
 
 
+def create_category_df(df: pd.DataFrame):
+    try:
+        big_captions = [big if big == big else ''
+                        for big in df['大見出し'].tolist()]
+        middle_captions = [middle if middle == middle else ''
+                           for middle in df['中見出し'].tolist()]
+        small_captions = [small if small == small else ''
+                          for small in df['小見出し'].tolist()]
+        categories = []
+        for big, middle, small in zip(big_captions, middle_captions, small_captions):
+            category = ''
+            if big:
+                category += big
+            if middle:
+                category += f'_{middle}' if category else middle
+            if small:
+                category += f'_{small}' if category else small
+            categories.append(category)
+        df['カテゴリー'] = categories
+    except:
+        print('カテゴリーは作成できませんでした。')
+
+    return df
+
+
 def get_category_list(csv_filename):
     csv_path = 'csv/mecab'
-    return pd.read_csv(f'{csv_path}/{csv_filename}.csv')['カテゴリー'].unique().tolist()
+    df = create_category_df(pd.read_csv(f'{csv_path}/{csv_filename}.csv'))
+    return df['カテゴリー'].unique().tolist()
 
 
 def create_random_string(n):
