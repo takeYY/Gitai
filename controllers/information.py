@@ -2,7 +2,7 @@ from flask import Blueprint, render_template
 from src.get_data import get_basic_data, get_edogawa_merge_df
 
 information_page = Blueprint(
-    'information', __name__, url_prefix='/rikkyo-edogawa/information')
+    'information', __name__, url_prefix='/information')
 
 
 @information_page.route('')
