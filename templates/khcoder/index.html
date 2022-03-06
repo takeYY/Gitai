@@ -57,14 +57,22 @@
   <table class='table table-sm table-striped table-hover'>
     <thead class='thead-dark'>
       <tr>
+        <th>No.</th>
+        <th>大見出し</th>
+        <th>中見出し</th>
+        <th>小見出し</th>
         <th>テキスト</th>
-        <th>章</th>
       </tr>
     </thead>
-    {% for text, chapter in sent_data.get('text_chapter') %}
+    {% for rows in sent_data.get('df').itertuples() %}
     <tr>
-      <td title={{text}}>{{text | truncate(50)}}</td>
-      <td>{{chapter}}</td>
+      <td>{{ loop.index }}</td>
+      <td>{{ rows[1] if rows[1]==rows[1] else '' }}</td>
+      <td>{{ rows[2] if rows[2]==rows[2] else '' }}</td>
+      <td>{{ rows[3] if rows[3]==rows[3] else '' }}</td>
+      <td title={{ rows[4] if rows[4]==rows[4] else '' }}>
+        {{ rows[4]|truncate(45) if rows[4]==rows[4] else '' }}
+      </td>
     </tr>
     {% endfor %}
   </table>

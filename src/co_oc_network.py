@@ -8,7 +8,7 @@ import collections
 import networkx as nx
 import plotly.graph_objects as go
 from werkzeug.utils import secure_filename
-from src.get_data import get_jumanpp_df, get_mecab_df, get_datetime_now, get_hinshi_dict, create_random_string
+from src.get_data import get_jumanpp_df, get_mecab_df, get_datetime_now, get_hinshi_dict, create_random_string, create_category_df
 from src.co_oc_3d_network import create_word_frequency, append_edge_dictionary, append_node_dictionary
 import os
 
@@ -96,28 +96,46 @@ def get_csv_filename(request):
     return input_filename, csv_filename, dict()
 
 
-def modify_df_with_synonym(df, synonym):
+def modify_df_with_synonym(tmp_df: pd.DataFrame, synonym: str) -> pd.DataFrame:
     # key:置換対象の文字列, value:置換後の文字列
-    synonym_dict = {}
+    # ex) synonyms: [{'黄金': '黄金仮面', '仮面': '黄金仮面'}]
+    synonyms = []
     synonym_items = [s for s in synonym.split('・') if s != '']
     for item in synonym_items:
+        synonym_dict = {}
         item_split = [s for s in item.split('\r\n') if s != '']
         replace_word = item_split[0]
         target_word = item_split[1]
         for tw in target_word.split(','):
             synonym_dict[tw] = replace_word
+        synonyms.append(synonym_dict)
 
-    # 同義語設定
-    df_match = df.query(' 原形 in @synonym_dict.keys() ', engine='python')
-    df_unmatch = df.query(' 原形 not in @synonym_dict.keys() ', engine='python')
-    # 同義語に指定された単語を置き換え
-    df_match = df_match.replace({'原形': synonym_dict})
-    # 品詞を固有名詞に設定
-    df_match['品詞'] = '固有名詞'
-    # 結合
-    df = pd.concat([df_match, df_unmatch]).sort_index()
+    for syno_dict in synonyms:
+        df_match = tmp_df.query(' 原形 in @syno_dict.keys() or 表層形 in @syno_dict.keys() ',
+                                engine='python')
+        target = df_match.index.tolist()
+        target_tmp = target.copy()
+        i = 0
+        while True:
+            tgt = target_tmp[i]
+            for key in syno_dict.keys():
+                t_df = tmp_df[tgt-2:tgt+2].query(' 原形==@key or 表層形==@key ',
+                                                 engine='python')
+                if t_df.empty:
+                    try:
+                        target.remove(tgt)
+                    except:
+                        print('target:', target)
+                        print('tgt:', tgt)
+            i += 1
+            if i == len(target_tmp):
+                break
+        for tgt in target:
+            new_df = tmp_df[tgt-2:tgt+2].replace({'原形': syno_dict})
+            new_df.at[tgt, '品詞'] = '固有名詞'
+            tmp_df.iloc[tgt-2:tgt+2] = new_df
 
-    return df
+    return tmp_df
 
 
 def create_keywords(df, remove_words_list, target_words, target_hinshi):
@@ -616,13 +634,14 @@ def create_network(file_name='kaijin_nijumenso', target_hinshi=['名詞'], targe
                 # MeCabにより形態素解析されたDF取得
                 df = get_mecab_df(file_name)
             if selected_category:
-                df = df.query(' カテゴリー in @selected_category ')
+                # 見出しからカテゴリー作成後選択したカテゴリーに絞る
+                df = create_category_df(df).query(
+                    ' カテゴリー in @selected_category ')
     else:
         df = pd.read_csv(f'tmp/{file_name}.csv')
     # カラム名を統一
     df = df.rename(columns={'見出し': '表層形',
-                            '原型': '原形',
-                            '章ラベル': 'カテゴリー'})
+                            '原型': '原形'})
 
     # 同義語設定
     if synonym:
