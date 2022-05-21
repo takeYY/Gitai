@@ -21,7 +21,7 @@ app.config['RATELIMIT_HEADERS_ENABLED'] = True
 app.permanent_session_lifetime = timedelta(minutes=30)
 # アクセス制限
 limiter = Limiter(app, key_func=get_remote_address,
-                  default_limits=['10 per minute'])
+                  default_limits=['777 per minute'])
 
 
 @app.errorhandler(404)
@@ -33,7 +33,7 @@ others_page = Blueprint('others', __name__)
 
 
 @others_page.route('/dl/csv/<dl_type>/<target>/<new_name>', methods=['POST'])
-@limiter.limit('1 per minute')
+@limiter.limit('7 per minute')
 def download_csv(dl_type, target, new_name):
     """csvデータのダウンロード"""
     dir_path = f'csv/{dl_type.lower()}' if dl_type in ['khcoder', 'Jumanpp', 'MeCab']\
@@ -45,7 +45,7 @@ def download_csv(dl_type, target, new_name):
 
 
 @others_page.route('/dl/zip/<options_file>/<result_html>/<result_csv>/<new_name>', methods=['POST'])
-@limiter.limit('1 per minute')
+@limiter.limit('7 per minute')
 def download_zip(options_file, result_html, result_csv, new_name):
     """zipデータのダウンロード"""
     csv_data = {options_file: '設定項目', result_csv: '共起関係'}
