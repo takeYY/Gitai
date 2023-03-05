@@ -39,57 +39,58 @@ class OptionCoOcNetwork:
 
     def __init__(self, request):
         form = request.form
-        self.dimension: int = int(form.get('dimension'))
-        self.co_oc_strength: str = form.get('co_oc_strength')
-        self.strength_max: float = float(form.get('strength_max'))
-        self.number: int = int(form.get('number'))
-        self.co_oc_freq_min: int = int(form.get('co_oc_freq_min'))
-        self.hinshi: list = form.getlist('hinshi')
-        self.category: list = form.getlist('category')
-        self.remove_words: str = form.get('remove_words').split('\r\n')\
-            if form.get('remove_words')\
-            else []
+        self.dimension: int = int(form.get("dimension"))
+        self.co_oc_strength: str = form.get("co_oc_strength")
+        self.strength_max: float = float(form.get("strength_max"))
+        self.number: int = int(form.get("number"))
+        self.co_oc_freq_min: int = int(form.get("co_oc_freq_min"))
+        self.hinshi: list = form.getlist("hinshi")
+        self.category: list = form.getlist("category")
+        self.remove_words: str = form.get("remove_words").split("\r\n") if form.get("remove_words") else []
         self.set_remove_combi(form)
-        self.target_words: list = form.get('target_words').split('\r\n')\
-            if form.get('target_words')\
-            else []
-        self.synonym: str = form.get('synonym')
+        self.target_words: list = form.get("target_words").split("\r\n") if form.get("target_words") else []
+        self.synonym: str = form.get("synonym")
         self.set_target_coef()
         self.is_3d: bool = self.set_is_3d()
 
     def set_remove_combi(self, form):
-        remove_combi_meishi = form.getlist('remove-combi-meishi')
-        remove_combi_doushi = form.getlist('remove-combi-doushi')
-        remove_combi_keiyoushi = form.getlist('remove-combi-keiyoushi')
-        remove_combi_fukushi = form.getlist('remove-combi-fukushi')
-        self.remove_combi: dict = dict(meishi=remove_combi_meishi, doushi=remove_combi_doushi,
-                                       keiyoushi=remove_combi_keiyoushi, fukushi=remove_combi_fukushi)
+        remove_combi_meishi = form.getlist("remove-combi-meishi")
+        remove_combi_doushi = form.getlist("remove-combi-doushi")
+        remove_combi_keiyoushi = form.getlist("remove-combi-keiyoushi")
+        remove_combi_fukushi = form.getlist("remove-combi-fukushi")
+        self.remove_combi: dict = dict(
+            meishi=remove_combi_meishi,
+            doushi=remove_combi_doushi,
+            keiyoushi=remove_combi_keiyoushi,
+            fukushi=remove_combi_fukushi,
+        )
 
     def set_errors(self, key: str, value: str):
-        if not self.__dict__.get('errors'):
+        if not self.__dict__.get("errors"):
             self.errors = {}
 
         self.errors[key] = value
 
     def set_target_coef(self):
-        self.target_coef = get_co_oc_strength_dict().get(self.co_oc_strength, '共起頻度（0〜∞）')\
-                                                    .split('（')[0]
+        self.target_coef = get_co_oc_strength_dict().get(self.co_oc_strength, "共起頻度（0〜∞）").split("（")[0]
 
     def set_is_3d(self):
         return True if self.dimension == 3 else False
 
     def get_table_dict(self):
-        return {'表示形式': '2D' if self.dimension == 2 else '3D',
-                '共起関係上位': self.number,
-                '共起頻度の最小値': self.co_oc_freq_min,
-                '共起強度': self.target_coef,
-                '共起強度の最大値': self.strength_max,
-                '可視化対象の品詞': ', '.join(self.hinshi),
-                'カテゴリー選択（3Dのみ）': ', '.join(self.category) if self.category else '',
-                '強制抽出語': ', '.join(self.target_words),
-                '同義語指定': self.synonym,
-                'ストップワード（強制除去語）': ', '.join(self.remove_words),
-                '除去対象の品詞組み合わせ（名詞）': ', '.join(self.remove_combi.get('meishi')),
-                '除去対象の品詞組み合わせ（動詞）': ', '.join(self.remove_combi.get('doushi')),
-                '除去対象の品詞組み合わせ（形容詞）': ', '.join(self.remove_combi.get('keiyoushi')),
-                '除去対象の品詞組み合わせ（副詞）': ', '.join(self.remove_combi.get('fukushi'))}
+        return {
+            "表示形式": "2D" if self.dimension == 2 else "3D",
+            "共起関係上位": self.number,
+            "共起頻度の最小値": self.co_oc_freq_min,
+            "共起強度": self.target_coef,
+            "共起強度の最大値": self.strength_max,
+            "可視化対象の品詞": ", ".join(self.hinshi),
+            "カテゴリー選択（3Dのみ）": ", ".join(self.category) if self.category else "",
+            "強制抽出語": ", ".join(self.target_words),
+            "同義語指定": self.synonym,
+            "ストップワード（強制除去語）": ", ".join(self.remove_words),
+            "除去対象の品詞組み合わせ（名詞）": ", ".join(self.remove_combi.get("meishi")),
+            "除去対象の品詞組み合わせ（動詞）": ", ".join(self.remove_combi.get("doushi")),
+            "除去対象の品詞組み合わせ（形容詞）": ", ".join(self.remove_combi.get("keiyoushi")),
+            "除去対象の品詞組み合わせ（副詞）": ", ".join(self.remove_combi.get("fukushi")),
+        }

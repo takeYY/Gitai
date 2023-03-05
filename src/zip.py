@@ -2,7 +2,7 @@ import zipfile
 from src.get_data import get_datetime_now
 
 
-def create_zip(zip_name: str, csv_data: dict, html_data: dict) -> str:
+def create_zip(zip_name: str, csv_data: dict, html_data: dict):
     """
     zipファイルの作成
 
@@ -24,14 +24,13 @@ def create_zip(zip_name: str, csv_data: dict, html_data: dict) -> str:
     """
 
     # 作成時の日付を取得
-    time_now = ''.join(get_datetime_now().split('_'))
-    zip_name = f'{time_now}_{zip_name}'
+    time_now = "".join(get_datetime_now().split("_"))
+    zip_name = f"{time_now}_{zip_name}"
     # zipファイルの作成
-    with zipfile.ZipFile(f'tmp/{zip_name}.zip', 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=9) as zf:
+    with zipfile.ZipFile(f"tmp/{zip_name}.zip", "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as zf:
         for key, value in csv_data.items():
-            zf.write(f'tmp/{key}.csv',
-                     arcname=f'{value}_{time_now[:12]}.csv')
+            zf.write(f"tmp/{key}.csv", arcname=f"{value}_{time_now[:12]}.csv")
         for key, value in html_data.items():
-            zf.write(f'tmp/{key}.html',
-                     arcname=f'{value}_{time_now[:12]}.html')
+            zf.write(f"tmp/{key}.html", arcname=f"{value}_{time_now[:12]}.html")
+
     return zip_name, time_now
