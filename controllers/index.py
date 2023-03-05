@@ -1,16 +1,14 @@
 from flask import Blueprint, render_template
 from src.get_data import get_basic_data
 
-index_page = Blueprint('index', __name__, url_prefix='/home')
+index_page = Blueprint("index", __name__, url_prefix="/home")
 
 
-@index_page.route('')
+@index_page.route("")
 def show():
-    """
-    ホーム
+    """ホーム"""
 
-    """
     # 基本情報
     basic_data = get_basic_data()
 
-    return render_template('index.html', basic_data=basic_data)
+    return render_template("index.html", basic_data=basic_data)
